@@ -244,7 +244,12 @@ function InsightTile({ icon: Icon, title, body, tone }: { icon: ElementType; tit
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-sm font-black leading-5 text-slate-950">{title}</h3>
-          <ChevronRight className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true" />
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="rounded-full bg-amber-50 px-2 py-1 text-[0.62rem] font-black uppercase tracking-normal text-amber-700 ring-1 ring-amber-100">
+              AI demo
+            </span>
+            <ChevronRight className="size-4 text-slate-400" aria-hidden="true" />
+          </div>
         </div>
         <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">{body}</p>
       </div>
