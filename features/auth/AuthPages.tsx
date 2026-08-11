@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowRight, Mail, ShieldCheck } from "lucide-react";
 import { BrandMark } from "@/components/BrandMark";
 
@@ -56,10 +55,10 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
               <span>Password</span>
               <input type="password" placeholder="••••••••" />
             </label>
-            <Link href={isRegister ? "/onboarding" : "/"} className="primary-button">
+            <a href={isRegister ? "/onboarding" : "/"} className="primary-button">
               {isRegister ? "Criar conta" : "Entrar"}
               <ArrowRight size={18} aria-hidden="true" />
-            </Link>
+            </a>
           </form>
           <div className="mt-6 rounded-2xl bg-violet-50 p-4 text-sm leading-6 text-violet-900">
             <div className="flex items-center gap-2 font-black">
@@ -70,9 +69,9 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
           </div>
           <p className="mt-6 text-center text-sm text-slate-600">
             {isRegister ? "Ja tens conta?" : "Ainda nao tens conta?"}{" "}
-            <Link className="font-black text-violet-700" href={isRegister ? "/login" : "/register"}>
+            <a className="font-black text-violet-700" href={isRegister ? "/login" : "/register"}>
               {isRegister ? "Entrar" : "Criar conta"}
-            </Link>
+            </a>
           </p>
           <p className="mt-4 flex items-center justify-center gap-2 text-xs font-bold text-slate-400">
             <Mail size={14} aria-hidden="true" />

@@ -1,13 +1,12 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Bell, LogOut, Search, Send, Settings } from "lucide-react";
 import { BrandMark } from "@/components/BrandMark";
 import { desktopNav, mobileNav } from "@/lib/demo-data";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname() ?? "/";
+  const [pathname] = useState(() => (typeof window === "undefined" ? "/" : window.location.pathname));
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-ink)]">
@@ -18,29 +17,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             const Icon = item.icon;
             const active = pathname === item.href;
             return (
-              <Link key={item.href} href={item.href} className={`nav-link ${active ? "nav-link-active" : ""}`}>
+              <a key={item.href} href={item.href} className={`nav-link ${active ? "nav-link-active" : ""}`}>
                 <Icon size={20} aria-hidden="true" />
                 <span>{item.label}</span>
-              </Link>
+              </a>
             );
           })}
         </nav>
         <div className="mt-8 border-t border-slate-100 pt-5">
-          <Link href="/profile" className="nav-link">
+          <a href="/profile" className="nav-link">
             <Settings size={20} aria-hidden="true" />
             <span>Definicoes</span>
-          </Link>
-          <Link href="/login" className="nav-link">
+          </a>
+          <a href="/login" className="nav-link">
             <LogOut size={20} aria-hidden="true" />
             <span>Sair</span>
-          </Link>
+          </a>
         </div>
         <div className="absolute bottom-7 left-5 right-5 rounded-2xl bg-violet-50 p-4 ring-1 ring-violet-100">
           <p className="text-sm font-bold text-slate-950">Pergunta ao NorteAI</p>
           <p className="mt-1 text-xs leading-5 text-slate-600">Tens duvidas? O NorteAI esta aqui para ajudar.</p>
-          <Link href="/norteai" className="mt-4 inline-grid size-10 place-items-center rounded-full bg-violet-600 text-white shadow-soft" aria-label="Abrir NorteAI">
+          <a href="/norteai" className="mt-4 inline-grid size-10 place-items-center rounded-full bg-violet-600 text-white shadow-soft" aria-label="Abrir NorteAI">
             <Send size={17} aria-hidden="true" />
-          </Link>
+          </a>
         </div>
       </aside>
 
@@ -60,10 +59,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Bell size={19} aria-hidden="true" />
               <span className="absolute right-2 top-2 size-2 rounded-full bg-rose-500" />
             </button>
-            <Link href="/profile" className="flex items-center gap-3 rounded-full bg-white px-1.5 py-1.5 text-sm font-bold text-slate-900 ring-1 ring-slate-200">
+            <a href="/profile" className="flex items-center gap-3 rounded-full bg-white px-1.5 py-1.5 text-sm font-bold text-slate-900 ring-1 ring-slate-200">
               <span className="grid size-9 place-items-center rounded-full bg-violet-700 text-white">D</span>
               <span className="hidden sm:inline">Diogo</span>
-            </Link>
+            </a>
           </div>
         </div>
       </header>
@@ -78,10 +77,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             const Icon = item.icon;
             const active = pathname === item.href;
             return (
-              <Link key={item.href} href={item.href} className={`mobile-nav-link ${active ? "mobile-nav-active" : ""}`}>
+              <a key={item.href} href={item.href} className={`mobile-nav-link ${active ? "mobile-nav-active" : ""}`}>
                 <Icon size={20} aria-hidden="true" />
                 <span>{item.label}</span>
-              </Link>
+              </a>
             );
           })}
         </div>

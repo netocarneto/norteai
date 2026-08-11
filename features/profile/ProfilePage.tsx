@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { LogOut, Moon, ShieldCheck, UserRound } from "lucide-react";
 import type { ElementType } from "react";
 import { AppShell } from "@/components/AppShell";
@@ -51,10 +50,10 @@ export function ProfilePage() {
           <SettingsCard icon={ShieldCheck} title="Risk profile" text="Balanced growth com limites demo." />
           <SettingsCard icon={Moon} title="Theme" text="Light, dark e system preparados." />
         </section>
-        <Link href="/login" className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-700 shadow-sm">
+        <a href="/login" className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-700 shadow-sm">
           <LogOut size={18} aria-hidden="true" />
           Logout
-        </Link>
+        </a>
       </div>
     </AppShell>
   );

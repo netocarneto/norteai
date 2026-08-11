@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import { AIInput } from "@/components/AIInput";
 import { ChartCard } from "@/components/ChartCard";
@@ -18,9 +17,9 @@ export function DashboardPage() {
           <h1 className="page-title">Bom dia, Diogo 👋</h1>
           <p className="page-subtitle">O teu copiloto financeiro inteligente.</p>
         </div>
-        <Link href="/norteai" className="hidden rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white sm:inline-flex">
+        <a href="/norteai" className="hidden rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white sm:inline-flex">
           Abrir NorteAI
-        </Link>
+        </a>
       </section>
 
       <section className="grid gap-5 lg:grid-cols-[1fr_1.45fr] xl:grid-cols-[1fr_1.45fr_1fr]">
@@ -29,7 +28,7 @@ export function DashboardPage() {
         <aside className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100 lg:col-span-2 xl:col-span-1">
           <div className="flex items-center justify-between">
             <h2 className="section-title">O teu Norte hoje</h2>
-            <Link href="/norteai" className="text-sm font-bold text-violet-700">Ver todas</Link>
+            <a href="/norteai" className="text-sm font-bold text-violet-700">Ver todas</a>
           </div>
           <div className="mt-3">
             {insights.map((insight) => (
@@ -49,7 +48,7 @@ export function DashboardPage() {
         <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
           <div className="flex items-center justify-between">
             <h2 className="section-title">Atividade recente</h2>
-            <Link href="/money" className="text-sm font-bold text-violet-700">Ver todas</Link>
+            <a href="/money" className="text-sm font-bold text-violet-700">Ver todas</a>
           </div>
           <div className="mt-4 space-y-1">
             {transactions.map((transaction) => (

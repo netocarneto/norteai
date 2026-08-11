@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+/* eslint-disable @next/next/no-html-link-for-pages */
+
 import { ArrowRight, BadgeEuro, Goal, Shield, Sparkles, UserRound } from "lucide-react";
 import { BrandMark } from "@/components/BrandMark";
 
@@ -27,10 +28,10 @@ export function OnboardingPage() {
               <p className="mt-4 leading-7 text-slate-600">
                 Uma experiencia premium em cinco passos para preparar o dashboard com dados demo e escolhas realistas.
               </p>
-              <Link href="/" className="primary-button mt-8 w-fit">
+              <a href="/" className="primary-button mt-8 w-fit">
                 Finalizar demo
                 <ArrowRight size={18} aria-hidden="true" />
-              </Link>
+              </a>
             </div>
             <div className="grid gap-3">
               {steps.map((step, index) => {
