@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Moon, ShieldCheck, UserRound } from "lucide-react";
+import { ShieldCheck, UserRound } from "lucide-react";
 import type { ElementType } from "react";
 import { AppShell } from "@/components/AppShell";
 import { accountRows, user } from "@/lib/demo-data";
@@ -30,7 +30,7 @@ export function ProfilePage() {
             </div>
           </article>
           <article className="rounded-3xl bg-white p-6 shadow-soft ring-1 ring-slate-100">
-            <h2 className="section-title">Financial profile</h2>
+            <h2 className="section-title">Perfil financeiro</h2>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {accountRows.slice(0, 4).map((row) => {
                 const Icon = row.icon;
@@ -45,15 +45,10 @@ export function ProfilePage() {
             </div>
           </article>
         </section>
-        <section className="grid gap-4 md:grid-cols-3">
-          <SettingsCard icon={UserRound} title="Personal data" text="Nome, email, pais e moeda." />
-          <SettingsCard icon={ShieldCheck} title="Risk profile" text="Balanced growth com limites demo." />
-          <SettingsCard icon={Moon} title="Theme" text="Light, dark e system preparados." />
+        <section className="grid gap-4 md:grid-cols-2">
+          <InfoCard icon={UserRound} title="Dados pessoais" text="Nome, email, pais e moeda principal." />
+          <InfoCard icon={ShieldCheck} title="Perfil de risco" text="Crescimento equilibrado com limites demo." />
         </section>
-        <a href="/login" className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-700 shadow-sm">
-          <LogOut size={18} aria-hidden="true" />
-          Logout
-        </a>
       </div>
     </AppShell>
   );
@@ -68,7 +63,7 @@ function ProfileRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function SettingsCard({ icon: Icon, title, text }: { icon: ElementType; title: string; text: string }) {
+function InfoCard({ icon: Icon, title, text }: { icon: ElementType; title: string; text: string }) {
   return (
     <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
       <Icon size={22} className="text-violet-700" aria-hidden="true" />

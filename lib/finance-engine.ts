@@ -21,6 +21,46 @@ export const assetTypes: AssetType[] = ["investment", "real_estate", "vehicle", 
 export const liabilityTypes: LiabilityType[] = ["mortgage", "personal_loan", "credit_card", "other"];
 export const investmentTypes: InvestmentType[] = ["ETF", "Stock", "Crypto", "Fund", "Bond"];
 
+export const accountTypeLabels: Record<AccountType, string> = {
+  checking: "Conta corrente",
+  savings: "Poupanca",
+  cash: "Dinheiro",
+  broker: "Corretora",
+  crypto: "Cripto",
+  other: "Outro",
+};
+
+export const transactionTypeLabels: Record<TransactionType, string> = {
+  income: "Receita",
+  expense: "Despesa",
+  transfer: "Transferencia",
+  investment: "Investimento",
+};
+
+export const assetTypeLabels: Record<AssetType, string> = {
+  investment: "Investimento",
+  real_estate: "Imobiliario",
+  vehicle: "Veiculo",
+  business: "Negocio",
+  cash: "Dinheiro",
+  other: "Outro",
+};
+
+export const liabilityTypeLabels: Record<LiabilityType, string> = {
+  mortgage: "Credito habitacao",
+  personal_loan: "Credito pessoal",
+  credit_card: "Cartao de credito",
+  other: "Outro",
+};
+
+export const investmentTypeLabels: Record<InvestmentType, string> = {
+  ETF: "ETF",
+  Stock: "Acao",
+  Crypto: "Cripto",
+  Fund: "Fundo",
+  Bond: "Obrigacao",
+};
+
 export const initialFinanceState: FinanceState = {
   accounts: [
     { id: "acc-checking", name: "Conta corrente", institution: "Millennium", accountType: "checking", balance: 8420, currency: "EUR", color: "#2563eb", icon: "card" },
@@ -29,19 +69,19 @@ export const initialFinanceState: FinanceState = {
     { id: "acc-crypto", name: "Coinbase", institution: "Coinbase", accountType: "crypto", balance: 8500, currency: "EUR", color: "#f59e0b", icon: "crypto" },
   ],
   categories: [
-    { id: "cat-salary", name: "Salary", type: "income", icon: "briefcase", color: "#10b981" },
-    { id: "cat-business", name: "Business", type: "income", icon: "building", color: "#0f766e" },
-    { id: "cat-housing", name: "Housing", type: "expense", icon: "home", color: "#6366f1" },
-    { id: "cat-food", name: "Food", type: "expense", icon: "utensils", color: "#f59e0b" },
-    { id: "cat-transport", name: "Transport", type: "expense", icon: "car", color: "#2563eb" },
-    { id: "cat-restaurants", name: "Restaurants", type: "expense", icon: "receipt", color: "#fb7185" },
-    { id: "cat-shopping", name: "Shopping", type: "expense", icon: "bag", color: "#a855f7" },
-    { id: "cat-subscriptions", name: "Subscriptions", type: "expense", icon: "repeat", color: "#06b6d4" },
-    { id: "cat-insurance", name: "Insurance", type: "expense", icon: "shield", color: "#64748b" },
-    { id: "cat-health", name: "Health", type: "expense", icon: "heart", color: "#ef4444" },
-    { id: "cat-entertainment", name: "Entertainment", type: "expense", icon: "sparkles", color: "#8b5cf6" },
-    { id: "cat-investments", name: "Investments", type: "investment", icon: "trending-up", color: "#6d28d9" },
-    { id: "cat-other", name: "Other", type: "expense", icon: "tag", color: "#94a3b8" },
+    { id: "cat-salary", name: "Salario", type: "income", icon: "briefcase", color: "#10b981" },
+    { id: "cat-business", name: "Negocio", type: "income", icon: "building", color: "#0f766e" },
+    { id: "cat-housing", name: "Habitacao", type: "expense", icon: "home", color: "#6366f1" },
+    { id: "cat-food", name: "Alimentacao", type: "expense", icon: "utensils", color: "#f59e0b" },
+    { id: "cat-transport", name: "Transporte", type: "expense", icon: "car", color: "#2563eb" },
+    { id: "cat-restaurants", name: "Restaurantes", type: "expense", icon: "receipt", color: "#fb7185" },
+    { id: "cat-shopping", name: "Compras", type: "expense", icon: "bag", color: "#a855f7" },
+    { id: "cat-subscriptions", name: "Subscricoes", type: "expense", icon: "repeat", color: "#06b6d4" },
+    { id: "cat-insurance", name: "Seguros", type: "expense", icon: "shield", color: "#64748b" },
+    { id: "cat-health", name: "Saude", type: "expense", icon: "heart", color: "#ef4444" },
+    { id: "cat-entertainment", name: "Lazer", type: "expense", icon: "sparkles", color: "#8b5cf6" },
+    { id: "cat-investments", name: "Investimentos", type: "investment", icon: "trending-up", color: "#6d28d9" },
+    { id: "cat-other", name: "Outro", type: "expense", icon: "tag", color: "#94a3b8" },
   ],
   categoryRules: [
     { id: "rule-continente", merchantKeyword: "Continente", categoryId: "cat-food" },
@@ -76,6 +116,18 @@ export const initialFinanceState: FinanceState = {
   ],
 };
 
+const categoryNamePtById: Record<string, string> = Object.fromEntries(initialFinanceState.categories.map((category) => [category.id, category.name]));
+
+export function normalizeFinanceState(state: FinanceState): FinanceState {
+  return {
+    ...state,
+    categories: state.categories.map((category) => ({
+      ...category,
+      name: categoryNamePtById[category.id] ?? category.name,
+    })),
+  };
+}
+
 export function calculateSummary(state: FinanceState): FinancialSummary {
   const income = sum(state.transactions.filter((item) => item.type === "income").map((item) => item.amount));
   const expenses = Math.abs(sum(state.transactions.filter((item) => item.type === "expense").map((item) => item.amount)));
@@ -85,7 +137,7 @@ export function calculateSummary(state: FinanceState): FinancialSummary {
   const assets = cashPosition + sum(state.assets.map((item) => item.value));
   const liabilities = sum(state.liabilities.map((item) => item.amount));
   const investments = sum(state.investments.map((item) => item.currentValue));
-  const allocation = toPercentSlices(groupValues(state.investments, (item) => item.type, (item) => item.currentValue));
+  const allocation = toPercentSlices(groupValues(state.investments, (item) => investmentTypeLabels[item.type], (item) => item.currentValue));
   const spendingCategories = toAmountSlices(groupValues(state.transactions.filter((item) => item.type === "expense"), (item) => categoryName(state, item.categoryId), (item) => Math.abs(item.amount))).sort((a, b) => b.value - a.value);
 
   return {
@@ -129,7 +181,7 @@ export function inferCategoryId(state: FinanceState, merchant: string) {
 }
 
 export function categoryName(state: FinanceState, categoryId?: string) {
-  return state.categories.find((item) => item.id === categoryId)?.name ?? "Other";
+  return state.categories.find((item) => item.id === categoryId)?.name ?? "Outro";
 }
 
 export function accountName(state: FinanceState, accountId: string) {

@@ -5,7 +5,7 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { Edit3, Plus, Trash2, TrendingUp } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { AIInput } from "@/components/AIInput";
-import { euro, investmentTypes } from "@/lib/finance-engine";
+import { euro, investmentTypeLabels, investmentTypes } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { InvestmentRecord, InvestmentType } from "@/types/finance";
 
@@ -42,18 +42,18 @@ export function InvestmentsPage() {
       <div className="space-y-6">
         <section>
           <h1 className="page-title">Investimentos</h1>
-          <p className="page-subtitle">Tracking manual de posicoes, alocacao e contribuicoes.</p>
+          <p className="page-subtitle">Acompanhamento manual de posicoes, alocacao e contribuicoes.</p>
         </section>
 
         <section className="grid gap-5 lg:grid-cols-[1fr_1fr] xl:grid-cols-[1fr_1fr_0.9fr]">
           <article className="rounded-3xl bg-financial p-6 text-white shadow-purple">
-            <p className="text-sm font-medium text-violet-100">Portfolio total</p>
+            <p className="text-sm font-medium text-violet-100">Carteira total</p>
             <p className="mt-4 text-5xl font-black tracking-normal">{euro.format(summary.investments)}</p>
             <p className="mt-3 font-black text-emerald-200">Contribuicoes este mes: {euro.format(summary.investmentContributions)}</p>
           </article>
 
           <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
-            <h2 className="section-title">Allocation</h2>
+            <h2 className="section-title">Alocacao</h2>
             <div className="mt-4 grid items-center gap-4 sm:grid-cols-[170px_1fr]">
               <div className="h-44">
                 <ResponsiveContainer width="100%" height="100%">
@@ -84,7 +84,7 @@ export function InvestmentsPage() {
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <label className="form-field"><span>Ticker</span><input value={draft.ticker} onChange={(event) => setDraft({ ...draft, ticker: event.target.value.toUpperCase() })} placeholder="VWCE" /></label>
               <label className="form-field"><span>Nome</span><input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} placeholder="Vanguard FTSE All-World" /></label>
-              <label className="form-field"><span>Tipo</span><select value={draft.type} onChange={(event) => setDraft({ ...draft, type: event.target.value as InvestmentType })}>{investmentTypes.map((type) => <option key={type}>{type}</option>)}</select></label>
+              <label className="form-field"><span>Tipo</span><select value={draft.type} onChange={(event) => setDraft({ ...draft, type: event.target.value as InvestmentType })}>{investmentTypes.map((type) => <option key={type} value={type}>{investmentTypeLabels[type]}</option>)}</select></label>
               <label className="form-field"><span>Quantidade</span><input type="number" value={draft.quantity} onChange={(event) => setDraft({ ...draft, quantity: Number(event.target.value) })} /></label>
               <label className="form-field"><span>Preco medio</span><input type="number" value={draft.averagePrice} onChange={(event) => setDraft({ ...draft, averagePrice: Number(event.target.value) })} /></label>
               <label className="form-field"><span>Valor atual</span><input type="number" value={draft.currentValue} onChange={(event) => setDraft({ ...draft, currentValue: Number(event.target.value) })} /></label>
@@ -93,14 +93,14 @@ export function InvestmentsPage() {
           </article>
 
           <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
-            <h2 className="section-title">Positions</h2>
+            <h2 className="section-title">Posicoes</h2>
             <div className="mt-4 divide-y divide-slate-100">
               {state.investments.map((investment) => (
                 <div key={investment.id} className="flex items-center gap-3 py-4">
                   <div className="grid size-10 place-items-center rounded-xl bg-violet-50 text-violet-700"><TrendingUp size={18} /></div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-black text-slate-950">{investment.ticker} · {investment.name}</p>
-                    <p className="text-sm text-slate-500">{investment.type} · {investment.quantity} unidades · PM {investment.averagePrice}</p>
+                    <p className="text-sm text-slate-500">{investmentTypeLabels[investment.type]} · {investment.quantity} unidades · PM {investment.averagePrice}</p>
                   </div>
                   <p className="font-black text-slate-950">{euro.format(investment.currentValue)}</p>
                   <button className="icon-button" onClick={() => {

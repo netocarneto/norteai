@@ -128,7 +128,7 @@ export function DashboardPage() {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <TopStat icon={WalletCards} label="Cash" value={euro.format(summary.cashPosition)} detail="Contas correntes e poupanca" tone="blue" />
+        <TopStat icon={WalletCards} label="Liquidez" value={euro.format(summary.cashPosition)} detail="Contas correntes e poupanca" tone="blue" />
         <TopStat icon={Landmark} label="Investimentos" value={euro.format(summary.investments)} detail="Carteira atual" tone="violet" />
         <TopStat icon={CircleDollarSign} label="Poupanca mensal" value={euro.format(summary.savings)} detail={`${summary.savingsRate}% das receitas`} tone="teal" />
         <TopStat icon={TrendingUp} label="Ativos" value={euro.format(summary.assets)} detail="Antes de passivos" tone="slate" />

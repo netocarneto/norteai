@@ -22,7 +22,7 @@ export function AppShell({ children, activePath = "/" }: { children: React.React
           })}
         </nav>
         <div className="mt-8 border-t border-slate-100 pt-5">
-          <a href="/profile" className="nav-link">
+          <a href="/definicoes" className={`nav-link ${activePath === "/definicoes" ? "nav-link-active" : ""}`}>
             <Settings size={20} aria-hidden="true" />
             <span>Definicoes</span>
           </a>

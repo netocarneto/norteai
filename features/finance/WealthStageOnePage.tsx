@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Edit3, Landmark, Plus, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { assetTypes, euro, liabilityTypes } from "@/lib/finance-engine";
+import { assetTypeLabels, assetTypes, euro, liabilityTypeLabels, liabilityTypes } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { AssetRecord, AssetType, LiabilityRecord, LiabilityType } from "@/types/finance";
 
@@ -47,14 +47,14 @@ export function WealthStageOnePage() {
 
         <section className="grid gap-4 md:grid-cols-3">
           <SummaryCard label="Ativos" value={euro.format(summary.assets)} />
-          <SummaryCard label="Total debt" value={euro.format(summary.liabilities)} />
-          <SummaryCard label="Monthly payments" value={euro.format(state.liabilities.reduce((total, item) => total + item.monthlyPayment, 0))} />
+          <SummaryCard label="Divida total" value={euro.format(summary.liabilities)} />
+          <SummaryCard label="Pagamentos mensais" value={euro.format(state.liabilities.reduce((total, item) => total + item.monthlyPayment, 0))} />
         </section>
 
         <section className="grid gap-5 xl:grid-cols-[1fr_1fr]">
           <CrudPanel title={editingAsset ? "Editar ativo" : "Criar ativo"}>
             <label className="form-field"><span>Nome</span><input value={assetDraft.name} onChange={(event) => setAssetDraft({ ...assetDraft, name: event.target.value })} placeholder="Casa" /></label>
-            <label className="form-field"><span>Tipo</span><select value={assetDraft.type} onChange={(event) => setAssetDraft({ ...assetDraft, type: event.target.value as AssetType })}>{assetTypes.map((type) => <option key={type}>{type}</option>)}</select></label>
+            <label className="form-field"><span>Tipo</span><select value={assetDraft.type} onChange={(event) => setAssetDraft({ ...assetDraft, type: event.target.value as AssetType })}>{assetTypes.map((type) => <option key={type} value={type}>{assetTypeLabels[type]}</option>)}</select></label>
             <label className="form-field"><span>Valor</span><input type="number" value={assetDraft.value} onChange={(event) => setAssetDraft({ ...assetDraft, value: Number(event.target.value) })} /></label>
             <label className="form-field"><span>Descricao</span><input value={assetDraft.description ?? ""} onChange={(event) => setAssetDraft({ ...assetDraft, description: event.target.value })} /></label>
             <button className="primary-button md:col-span-2" onClick={saveAsset}>{editingAsset ? "Guardar ativo" : "Criar ativo"}</button>
@@ -62,7 +62,7 @@ export function WealthStageOnePage() {
 
           <CrudPanel title={editingLiability ? "Editar divida" : "Criar divida"}>
             <label className="form-field"><span>Nome</span><input value={liabilityDraft.name} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, name: event.target.value })} placeholder="Credito habitacao" /></label>
-            <label className="form-field"><span>Tipo</span><select value={liabilityDraft.type} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, type: event.target.value as LiabilityType })}>{liabilityTypes.map((type) => <option key={type}>{type}</option>)}</select></label>
+            <label className="form-field"><span>Tipo</span><select value={liabilityDraft.type} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, type: event.target.value as LiabilityType })}>{liabilityTypes.map((type) => <option key={type} value={type}>{liabilityTypeLabels[type]}</option>)}</select></label>
             <label className="form-field"><span>Montante</span><input type="number" value={liabilityDraft.amount} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, amount: Number(event.target.value) })} /></label>
             <label className="form-field"><span>Pagamento mensal</span><input type="number" value={liabilityDraft.monthlyPayment} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, monthlyPayment: Number(event.target.value) })} /></label>
             <label className="form-field"><span>Juro %</span><input type="number" value={liabilityDraft.interestRate} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, interestRate: Number(event.target.value) })} /></label>
@@ -73,7 +73,7 @@ export function WealthStageOnePage() {
         <section className="grid gap-5 xl:grid-cols-[1fr_1fr]">
           <ListPanel title="Ativos">
             {state.assets.map((asset) => (
-              <Row key={asset.id} title={asset.name} subtitle={asset.type} value={euro.format(asset.value)} onEdit={() => {
+              <Row key={asset.id} title={asset.name} subtitle={assetTypeLabels[asset.type]} value={euro.format(asset.value)} onEdit={() => {
                 const { id, ...rest } = asset;
                 setAssetDraft(rest);
                 setEditingAsset(id);
@@ -82,7 +82,7 @@ export function WealthStageOnePage() {
           </ListPanel>
           <ListPanel title="Passivos">
             {state.liabilities.map((liability) => (
-              <Row key={liability.id} title={liability.name} subtitle={`${liability.type} · ${liability.interestRate}%`} value={euro.format(liability.amount)} onEdit={() => {
+              <Row key={liability.id} title={liability.name} subtitle={`${liabilityTypeLabels[liability.type]} · ${liability.interestRate}%`} value={euro.format(liability.amount)} onEdit={() => {
                 const { id, ...rest } = liability;
                 setLiabilityDraft(rest);
                 setEditingLiability(id);

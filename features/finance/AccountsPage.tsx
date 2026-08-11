@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Edit3, Plus, Trash2, WalletCards } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { accountTypes, euro } from "@/lib/finance-engine";
+import { accountTypeLabels, accountTypes, euro } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { AccountType, FinancialAccountRecord } from "@/types/finance";
 
@@ -46,10 +46,10 @@ export function AccountsPage() {
         <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="page-title">Dinheiro</h1>
-            <p className="page-subtitle">Gere contas financeiras reais: bancos, poupanca, cash, broker e cripto.</p>
+            <p className="page-subtitle">Gere contas financeiras reais: bancos, poupanca, dinheiro, corretoras e cripto.</p>
           </div>
           <div className="rounded-2xl bg-white px-5 py-3 shadow-soft ring-1 ring-slate-100">
-            <p className="text-xs font-bold text-slate-500">Cash position</p>
+            <p className="text-xs font-bold text-slate-500">Posicao de liquidez</p>
             <p className="text-2xl font-black text-slate-950">{euro.format(summary.cashPosition)}</p>
           </div>
         </section>
@@ -71,7 +71,7 @@ export function AccountsPage() {
                 </div>
               </div>
               <p className="mt-4 text-lg font-black text-slate-950">{account.name}</p>
-              <p className="text-sm font-bold text-slate-500">{account.institution} · {account.accountType}</p>
+              <p className="text-sm font-bold text-slate-500">{account.institution} · {accountTypeLabels[account.accountType]}</p>
               <p className="mt-4 text-3xl font-black text-slate-950">{euro.format(account.balance)}</p>
             </article>
           ))}
@@ -94,7 +94,7 @@ export function AccountsPage() {
             <label className="form-field">
               <span>Tipo</span>
               <select value={draft.accountType} onChange={(event) => setDraft({ ...draft, accountType: event.target.value as AccountType })}>
-                {accountTypes.map((type) => <option key={type}>{type}</option>)}
+                {accountTypes.map((type) => <option key={type} value={type}>{accountTypeLabels[type]}</option>)}
               </select>
             </label>
             <label className="form-field">

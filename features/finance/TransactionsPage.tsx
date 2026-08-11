@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Check, Edit3, Filter, Plus, Search, Trash2, Upload } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { accountName, categoryName, categoryTypes, euroCents, inferCategoryId, parseCsv, transactionTypes } from "@/lib/finance-engine";
+import { accountName, categoryName, categoryTypes, euroCents, inferCategoryId, parseCsv, transactionTypeLabels, transactionTypes } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { CategoryType, TransactionRecord, TransactionType } from "@/types/finance";
 
@@ -109,7 +109,7 @@ export function TransactionsPage() {
                 <input value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} placeholder="Continente" />
               </label>
               <label className="form-field">
-                <span>Merchant</span>
+                <span>Comerciante</span>
                 <input value={draft.merchant} onChange={(event) => setDraft({ ...draft, merchant: event.target.value })} placeholder="Continente" />
               </label>
               <label className="form-field">
@@ -119,7 +119,7 @@ export function TransactionsPage() {
               <label className="form-field">
                 <span>Tipo</span>
                 <select value={draft.type} onChange={(event) => setDraft({ ...draft, type: event.target.value as TransactionType })}>
-                  {transactionTypes.map((type) => <option key={type}>{type}</option>)}
+                  {transactionTypes.map((type) => <option key={type} value={type}>{transactionTypeLabels[type]}</option>)}
                 </select>
               </label>
               <label className="form-field sm:col-span-2">
@@ -143,7 +143,7 @@ export function TransactionsPage() {
                 <span className="sr-only">Tipo</span>
                 <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as "all" | TransactionType)}>
                   <option value="all">Todos</option>
-                  {transactionTypes.map((type) => <option key={type}>{type}</option>)}
+                  {transactionTypes.map((type) => <option key={type} value={type}>{transactionTypeLabels[type]}</option>)}
                 </select>
               </label>
               <label className="form-field">
@@ -173,16 +173,16 @@ export function TransactionsPage() {
         <section className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
           <div className="flex items-center gap-2">
             <Upload size={20} className="text-violet-700" aria-hidden="true" />
-            <h2 className="section-title">CSV import foundation</h2>
+            <h2 className="section-title">Base de importacao CSV</h2>
           </div>
           <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_1fr]">
             <textarea className="min-h-36 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none focus:border-violet-500" value={csvText} onChange={(event) => setCsvText(event.target.value)} />
             <div>
               <div className="flex gap-3">
-                <button className="primary-button" onClick={buildPreview}>Preview</button>
+                <button className="primary-button" onClick={buildPreview}>Pre-visualizar</button>
                 <button className="primary-button bg-slate-950" onClick={confirmImport} disabled={!preview.length}>
                   <Check size={17} aria-hidden="true" />
-                  Confirm import
+                  Confirmar importacao
                 </button>
               </div>
               <div className="mt-4 space-y-2">
@@ -212,8 +212,8 @@ export function TransactionsPage() {
               </button>
             </div>
             <div className="mt-5 grid gap-3 md:grid-cols-4">
-              <label className="form-field md:col-span-2"><span>Nome</span><input value={categoryDraft.name} onChange={(event) => setCategoryDraft({ ...categoryDraft, name: event.target.value })} placeholder="Restaurants" /></label>
-              <label className="form-field"><span>Tipo</span><select value={categoryDraft.type} onChange={(event) => setCategoryDraft({ ...categoryDraft, type: event.target.value as CategoryType })}>{categoryTypes.map((type) => <option key={type}>{type}</option>)}</select></label>
+              <label className="form-field md:col-span-2"><span>Nome</span><input value={categoryDraft.name} onChange={(event) => setCategoryDraft({ ...categoryDraft, name: event.target.value })} placeholder="Restaurantes" /></label>
+              <label className="form-field"><span>Tipo</span><select value={categoryDraft.type} onChange={(event) => setCategoryDraft({ ...categoryDraft, type: event.target.value as CategoryType })}>{categoryTypes.map((type) => <option key={type} value={type}>{transactionTypeLabels[type]}</option>)}</select></label>
               <label className="form-field"><span>Cor</span><input value={categoryDraft.color} onChange={(event) => setCategoryDraft({ ...categoryDraft, color: event.target.value })} /></label>
             </div>
             <div className="mt-5 flex flex-wrap gap-2">
@@ -242,7 +242,7 @@ export function TransactionsPage() {
               </button>
             </div>
             <div className="mt-5 grid gap-3 md:grid-cols-2">
-              <label className="form-field"><span>Merchant keyword</span><input value={ruleDraft.merchantKeyword} onChange={(event) => setRuleDraft({ ...ruleDraft, merchantKeyword: event.target.value })} placeholder="Continente" /></label>
+              <label className="form-field"><span>Palavra-chave do comerciante</span><input value={ruleDraft.merchantKeyword} onChange={(event) => setRuleDraft({ ...ruleDraft, merchantKeyword: event.target.value })} placeholder="Continente" /></label>
               <label className="form-field"><span>Categoria</span><select value={ruleDraft.categoryId} onChange={(event) => setRuleDraft({ ...ruleDraft, categoryId: event.target.value })}>{state.categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
             </div>
             <div className="mt-5 space-y-2">

@@ -31,7 +31,7 @@ export const user = {
   netWorth: 245230,
   investments: 96350,
   cash: 18420,
-  riskProfile: "Balanced growth",
+  riskProfile: "Crescimento equilibrado",
 };
 
 export const desktopNav: NavItem[] = [
@@ -105,9 +105,9 @@ export const transactions: Transaction[] = [
 
 export const allocation = [
   { name: "ETFs", value: 62, color: "#6d28d9" },
-  { name: "Stocks", value: 18, color: "#0f766e" },
-  { name: "Crypto", value: 12, color: "#f59e0b" },
-  { name: "Cash", value: 8, color: "#2563eb" },
+  { name: "Acoes", value: 18, color: "#0f766e" },
+  { name: "Cripto", value: 12, color: "#f59e0b" },
+  { name: "Liquidez", value: 8, color: "#2563eb" },
 ];
 
 export const positions: Position[] = [
