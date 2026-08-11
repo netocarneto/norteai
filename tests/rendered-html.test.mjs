@@ -32,7 +32,7 @@ test("server-renders NorteAI dashboard shell", async () => {
   assert.match(html, /NorteAI Pessoal|NorteAI/);
   assert.match(html, /O teu copiloto financeiro inteligente/);
   assert.match(html, /Patrimonio liquido|Património líquido/);
-  assert.match(html, /Dados reais de Stage 1|Norte Score v1/);
+  assert.match(html, /Stage 1 financeiro|Norte Score/);
   assert.match(html, /Dinheiro/);
   assert.match(html, /Movimentos/);
   assert.doesNotMatch(html, /Your site is taking shape|codex-preview|react-loading-skeleton/);

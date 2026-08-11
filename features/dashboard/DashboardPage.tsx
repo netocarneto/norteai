@@ -1,99 +1,194 @@
 "use client";
 
+import type { ElementType } from "react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { ArrowUpRight, Landmark, PiggyBank, WalletCards } from "lucide-react";
+import {
+  ArrowUpRight,
+  ChevronRight,
+  CircleDollarSign,
+  Grid2X2,
+  Landmark,
+  Lightbulb,
+  Navigation,
+  PieChart as PieChartIcon,
+  Target,
+  TrendingUp,
+  WalletCards,
+} from "lucide-react";
 import { AIInput } from "@/components/AIInput";
 import { accountName, categoryName, euro, euroCents } from "@/lib/finance-engine";
+import { desktopNav } from "@/lib/demo-data";
 import { useFinanceState } from "@/hooks/use-finance-state";
 
 const wealthCurve = [
-  { month: "Mar", value: 214000 },
-  { month: "Abr", value: 219800 },
-  { month: "Mai", value: 225200 },
-  { month: "Jun", value: 230100 },
-  { month: "Jul", value: 236800 },
-  { month: "Ago", value: 0 },
+  { month: "Jan", value: 112000 },
+  { month: "Fev", value: 148500 },
+  { month: "Mar", value: 165000 },
+  { month: "Abr", value: 201500 },
+  { month: "Mai", value: 224000 },
+  { month: "Jun", value: 0 },
 ];
 
 export function DashboardPage() {
   const { state, summary, score } = useFinanceState();
-  const chartCurve = wealthCurve.map((item) => (item.month === "Ago" ? { ...item, value: summary.netWorth } : item));
+  const chartCurve = wealthCurve.map((item) => (item.month === "Jun" ? { ...item, value: summary.netWorth } : item));
   const recent = [...state.transactions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+  const spendingCategories = summary.spendingCategories.length
+    ? summary.spendingCategories
+    : [{ name: "Sem dados", value: 1, color: "#e2e8f0" }];
   const incomeExpense = [
-    { name: "Income", value: summary.income },
-    { name: "Expenses", value: summary.expenses },
-    { name: "Savings", value: Math.max(summary.savings, 0) },
+    { name: "Receitas", value: summary.income },
+    { name: "Despesas", value: summary.expenses },
+    { name: "Poupanca", value: Math.max(summary.savings, 0) },
   ];
+  const scoreSparkline = [
+    { label: "Poupanca", value: score.savingsRatePoints },
+    { label: "Emergencia", value: score.emergencyFundPoints },
+    { label: "Divida", value: score.debtRatioPoints },
+    { label: "Diversificacao", value: score.diversificationPoints },
+    { label: "Consistencia", value: score.consistencyPoints },
+  ];
+  const firstValue = chartCurve[0]?.value || summary.netWorth;
+  const netWorthDelta = firstValue ? ((summary.netWorth - firstValue) / firstValue) * 100 : 0;
 
   return (
-    <div className="space-y-6">
-      <section className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="page-title">Bom dia, Diogo 👋</h1>
-          <p className="page-subtitle">Dados reais de Stage 1 calculados pelo motor financeiro.</p>
+    <div className="space-y-6 xl:space-y-8">
+      <section className="grid min-h-[calc(100vh-5rem)] gap-6 xl:grid-cols-[0.78fr_1.25fr] xl:items-center">
+        <div className="relative isolate overflow-hidden rounded-[2rem] bg-white px-6 py-8 shadow-soft ring-1 ring-slate-100 sm:px-8 xl:min-h-[38rem] xl:rounded-[2.2rem] xl:px-10 xl:py-12">
+          <div className="absolute inset-x-0 bottom-0 h-48 overflow-hidden bg-gradient-to-t from-violet-50 via-transparent to-transparent" aria-hidden="true">
+            <div className="absolute -bottom-14 left-[-12%] h-36 w-[68%] skew-y-[-8deg] rounded-[45%] bg-slate-200/70" />
+            <div className="absolute -bottom-16 left-[20%] h-44 w-[76%] skew-y-[-10deg] rounded-[45%] bg-slate-300/55" />
+            <div className="absolute -bottom-20 right-[-18%] h-48 w-[84%] skew-y-[-17deg] rounded-[45%] bg-gradient-to-br from-violet-700 to-violet-500" />
+          </div>
+
+          <div className="relative z-10">
+            <CompassLogo />
+            <div className="mt-8">
+              <h1 className="max-w-[34rem] text-[4rem] font-black leading-none tracking-normal text-[#071733] sm:text-[5.4rem] xl:text-[6.7rem]">
+                Norte<span className="text-violet-600">AI</span>
+              </h1>
+              <p className="mt-1 text-[2.3rem] font-medium leading-none tracking-normal text-[#071733] sm:text-[3.25rem]">
+                Pessoal
+              </p>
+            </div>
+            <div className="mt-7 h-1 w-24 rounded-full bg-violet-600" />
+            <p className="mt-6 max-w-[33rem] text-3xl font-black leading-tight tracking-normal text-[#071733] sm:text-4xl">
+              O teu copiloto financeiro inteligente.
+            </p>
+            <div className="mt-8 h-1 w-36 rotate-[-6deg] rounded-full bg-teal-400" />
+          </div>
         </div>
-        <a href="/movimentos" className="hidden rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white sm:inline-flex">
-          Adicionar movimento
-        </a>
-      </section>
 
-      <section className="grid gap-5 lg:grid-cols-[0.9fr_1.5fr] xl:grid-cols-[0.9fr_1.5fr_1fr]">
-        <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100 sm:p-6">
-          <p className="text-sm font-bold text-slate-500">Norte Score v1</p>
-          <p className="mt-4 text-5xl font-black text-slate-950">{score.score}<span className="text-lg text-slate-500">/100</span></p>
-          <p className="mt-2 font-black text-emerald-600">{score.classification}</p>
-          <div className="mt-5 space-y-2 text-xs font-bold text-slate-500">
-            <ScoreLine label="Poupanca" value={score.savingsRatePoints} max={30} />
-            <ScoreLine label="Emergencia" value={score.emergencyFundPoints} max={20} />
-            <ScoreLine label="Divida" value={score.debtRatioPoints} max={20} />
-            <ScoreLine label="Diversificacao" value={score.diversificationPoints} max={20} />
-          </div>
-        </article>
+        <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_26px_80px_rgba(15,23,42,0.13)] xl:rounded-[2.4rem]">
+          <div className="grid md:grid-cols-[5rem_1fr]">
+            <OverviewRail />
+            <div className="bg-[#fbfcff] p-4 sm:p-5 xl:p-6">
+              <header className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-black text-slate-500">Bom dia, Diogo</p>
+                  <p className="mt-1 text-xs font-bold text-slate-400">Stage 1 financeiro</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <a href="/movimentos" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white">
+                    Adicionar movimento
+                  </a>
+                  <a href="/profile" className="grid size-10 place-items-center rounded-full bg-violet-700 text-sm font-black text-white" aria-label="Abrir perfil">
+                    D
+                  </a>
+                </div>
+              </header>
 
-        <article className="overflow-hidden rounded-3xl bg-financial p-5 text-white shadow-purple sm:p-6">
-          <p className="text-sm font-medium text-violet-100">Patrimonio liquido</p>
-          <p className="mt-4 text-4xl font-black tracking-normal sm:text-5xl">{euro.format(summary.netWorth)}</p>
-          <p className="mt-2 text-sm font-bold text-emerald-200">Ativos - passivos, atualizado pelos teus registos</p>
-          <div className="mt-4 h-44">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartCurve}>
-                <CartesianGrid stroke="rgba(255,255,255,0.16)" vertical={false} />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "rgba(255,255,255,0.72)", fontSize: 12 }} />
-                <YAxis hide />
-                <Tooltip formatter={(value) => euro.format(Number(value))} />
-                <Area dataKey="value" type="monotone" stroke="#ffffff" strokeWidth={2.5} fill="#ffffff" fillOpacity={0.18} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </article>
+              <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
+                <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h2 className="text-sm font-black text-slate-950">Norte Score</h2>
+                      <div className="mt-4 flex items-center gap-4">
+                        <ScoreDial score={score.score} />
+                        <div>
+                          <p className="text-sm font-black text-emerald-600">{score.classification}</p>
+                          <p className="mt-1 max-w-36 text-xs font-bold leading-5 text-slate-500">
+                            Saude financeira calculada pelos teus registos.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="hidden h-24 min-w-36 flex-1 sm:block">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={scoreSparkline}>
+                          <Area dataKey="value" type="monotone" stroke="#6d28d9" strokeWidth={2.5} fill="#6d28d9" fillOpacity={0.08} />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                  <SignalBars value={score.score} />
+                </article>
 
-        <aside className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100 lg:col-span-2 xl:col-span-1">
-          <h2 className="section-title">Resumo Agosto 2026</h2>
-          <div className="mt-5 space-y-3">
-            <MetricRow icon={WalletCards} label="Cash" value={euro.format(summary.cashPosition)} />
-            <MetricRow icon={Landmark} label="Investimentos" value={euro.format(summary.investments)} />
-            <MetricRow icon={PiggyBank} label="Poupanca mensal" value={`${euro.format(summary.savings)} · ${summary.savingsRate}%`} />
+                <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h2 className="text-sm font-black text-slate-950">Patrimonio liquido</h2>
+                      <p className="mt-5 text-4xl font-black leading-none tracking-normal text-[#071733] sm:text-5xl">
+                        {euro.format(summary.netWorth)}
+                      </p>
+                      <p className="mt-4 text-sm font-black text-teal-600">
+                        {netWorthDelta >= 0 ? "+" : ""}
+                        {netWorthDelta.toFixed(1)}% nos ultimos 6 meses
+                      </p>
+                    </div>
+                    <div className="grid size-16 place-items-center rounded-full bg-teal-50 text-teal-600">
+                      <TrendingUp size={30} strokeWidth={2.6} aria-hidden="true" />
+                    </div>
+                  </div>
+                </article>
+              </div>
+
+              <article className="mt-4 rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-sm font-black text-slate-950">Evolucao patrimonial</h2>
+                  <button className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-600" type="button">
+                    6M
+                  </button>
+                </div>
+                <div className="mt-4 h-56 sm:h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartCurve} margin={{ left: 6, right: 10, top: 8, bottom: 0 }}>
+                      <CartesianGrid stroke="#edf1f7" vertical={false} />
+                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#7b8494", fontSize: 12, fontWeight: 700 }} />
+                      <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: "#7b8494", fontSize: 12, fontWeight: 700 }}
+                        tickFormatter={(value) => `${Math.round(Number(value) / 1000)}K €`}
+                        width={56}
+                      />
+                      <Tooltip formatter={(value) => euro.format(Number(value))} />
+                      <Area dataKey="value" type="monotone" stroke="#6d28d9" strokeWidth={3} fill="#6d28d9" fillOpacity={0.12} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </article>
+
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
+                <InsightTile icon={Target} title="Estas no bom caminho." body={`A tua taxa de poupanca esta em ${summary.savingsRate}%.`} tone="violet" />
+                <InsightTile icon={PieChartIcon} title="Diversificacao equilibrada." body="O teu portfolio esta bem distribuido." tone="teal" />
+                <InsightTile icon={Lightbulb} title="Oportunidade detectada." body="Podes otimizar a tua alocacao de ativos." tone="violet" />
+              </div>
+            </div>
           </div>
-        </aside>
+        </div>
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {[
-          ["Receitas", summary.income, "text-emerald-600"],
-          ["Despesas", summary.expenses, "text-rose-600"],
-          ["Ativos", summary.assets, "text-violet-700"],
-          ["Dividas", summary.liabilities, "text-slate-950"],
-        ].map(([label, value, color]) => (
-          <article key={label} className="metric-card">
-            <p className="text-sm font-bold text-slate-500">{label}</p>
-            <p className={`mt-4 text-3xl font-black ${color}`}>{euro.format(Number(value))}</p>
-          </article>
-        ))}
+        <TopStat icon={WalletCards} label="Cash" value={euro.format(summary.cashPosition)} detail="Contas correntes e poupanca" tone="blue" />
+        <TopStat icon={Landmark} label="Investimentos" value={euro.format(summary.investments)} detail="Carteira atual" tone="violet" />
+        <TopStat icon={CircleDollarSign} label="Poupanca mensal" value={euro.format(summary.savings)} detail={`${summary.savingsRate}% das receitas`} tone="teal" />
+        <TopStat icon={TrendingUp} label="Ativos" value={euro.format(summary.assets)} detail="Antes de passivos" tone="slate" />
       </section>
 
-      <section className="grid gap-5 xl:grid-cols-[1fr_1fr_0.9fr]">
+      <section className="grid gap-5 xl:grid-cols-[1fr_1fr_0.95fr]">
         <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
-          <h2 className="section-title">Income vs expenses</h2>
+          <h2 className="section-title">Receitas vs despesas</h2>
           <div className="mt-5 h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={incomeExpense}>
@@ -115,14 +210,14 @@ export function DashboardPage() {
             <div className="h-40">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={summary.spendingCategories} dataKey="value" innerRadius={48} outerRadius={70}>
-                    {summary.spendingCategories.map((item) => <Cell key={item.name} fill={item.color} />)}
+                  <Pie data={spendingCategories} dataKey="value" innerRadius={48} outerRadius={70}>
+                    {spendingCategories.map((item) => <Cell key={item.name} fill={item.color} />)}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
             </div>
             <div className="space-y-2">
-              {summary.spendingCategories.slice(0, 4).map((item) => (
+              {spendingCategories.slice(0, 4).map((item) => (
                 <div key={item.name} className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-sm">
                   <span className="font-bold text-slate-600">{item.name}</span>
                   <span className="font-black text-slate-950">{euroCents.format(item.value)}</span>
@@ -158,30 +253,112 @@ export function DashboardPage() {
   );
 }
 
-function ScoreLine({ label, value, max }: { label: string; value: number; max: number }) {
+function CompassLogo() {
   return (
-    <div>
-      <div className="flex justify-between">
-        <span>{label}</span>
-        <span>{value}/{max}</span>
+    <div className="relative grid size-28 place-items-center rounded-full border-[5px] border-[#071733] text-[#071733] sm:size-36" aria-hidden="true">
+      <span className="absolute -top-9 text-4xl font-black tracking-normal">N</span>
+      <span className="absolute left-3 h-0.5 w-4 bg-[#071733]" />
+      <span className="absolute right-3 h-0.5 w-4 bg-[#071733]" />
+      <Navigation className="size-16 rotate-[-22deg] fill-violet-600 text-[#071733] sm:size-20" strokeWidth={1.8} />
+    </div>
+  );
+}
+
+function OverviewRail() {
+  return (
+    <aside className="hidden bg-[#061936] px-3 py-5 text-white md:flex md:flex-col md:items-center">
+      <div className="grid size-12 place-items-center rounded-full border border-white/35">
+        <Navigation className="size-7 rotate-[-20deg] fill-violet-500 text-white" strokeWidth={1.8} aria-hidden="true" />
       </div>
-      <div className="mt-1 h-2 rounded-full bg-slate-100">
-        <div className="h-2 rounded-full bg-violet-600" style={{ width: `${(value / max) * 100}%` }} />
+      <nav className="mt-7 flex flex-1 flex-col items-center gap-3" aria-label="Principal compacto">
+        {desktopNav.slice(0, 6).map((item) => {
+          const Icon = item.href === "/" ? Grid2X2 : item.icon;
+          const active = item.href === "/";
+          return (
+            <a
+              key={item.href}
+              href={item.href}
+              className={`grid size-11 place-items-center rounded-2xl transition ${active ? "bg-violet-600 text-white shadow-purple" : "text-white/62 hover:bg-white/10 hover:text-white"}`}
+              aria-label={item.label}
+              title={item.label}
+            >
+              <Icon size={20} aria-hidden="true" />
+            </a>
+          );
+        })}
+      </nav>
+      <div className="h-px w-9 bg-white/18" />
+    </aside>
+  );
+}
+
+function ScoreDial({ score }: { score: number }) {
+  const clamped = Math.max(0, Math.min(score, 100));
+  const degrees = `${clamped * 3.6}deg`;
+
+  return (
+    <div
+      className="grid size-24 shrink-0 place-items-center rounded-full"
+      style={{ background: `conic-gradient(from -42deg, #6d28d9 0deg, #14b8a6 ${degrees}, #e7ebf1 ${degrees}, #e7ebf1 360deg)` }}
+      aria-label={`Norte Score ${score} em 100`}
+    >
+      <div className="grid size-[4.7rem] place-items-center rounded-full bg-white">
+        <span className="text-4xl font-black tracking-normal text-[#071733]">{score}</span>
       </div>
     </div>
   );
 }
 
-function MetricRow({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
+function SignalBars({ value }: { value: number }) {
+  const activeBars = Math.round((Math.max(0, Math.min(value, 100)) / 100) * 18);
+
   return (
-    <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3">
-      <div className="grid size-10 place-items-center rounded-xl bg-violet-50 text-violet-700">
-        <Icon size={19} aria-hidden="true" />
-      </div>
-      <div>
-        <p className="text-sm font-bold text-slate-500">{label}</p>
-        <p className="font-black text-slate-950">{value}</p>
-      </div>
+    <div className="mt-4 flex items-end gap-1.5" aria-hidden="true">
+      {Array.from({ length: 18 }, (_, index) => (
+        <span
+          key={index}
+          className={`h-4 w-1.5 rounded-full ${index < activeBars ? "bg-gradient-to-t from-violet-600 to-teal-400" : "bg-slate-100"}`}
+        />
+      ))}
     </div>
+  );
+}
+
+function InsightTile({ icon: Icon, title, body, tone }: { icon: ElementType; title: string; body: string; tone: "violet" | "teal" }) {
+  const toneClass = tone === "teal" ? "bg-teal-50 text-teal-600" : "bg-violet-50 text-violet-600";
+
+  return (
+    <article className="flex min-h-28 items-center gap-4 rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100">
+      <div className={`grid size-14 shrink-0 place-items-center rounded-full ${toneClass}`}>
+        <Icon size={28} strokeWidth={2.4} aria-hidden="true" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-sm font-black leading-5 text-slate-950">{title}</h3>
+          <ChevronRight className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true" />
+        </div>
+        <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">{body}</p>
+      </div>
+    </article>
+  );
+}
+
+function TopStat({ icon: Icon, label, value, detail, tone }: { icon: ElementType; label: string; value: string; detail: string; tone: "blue" | "violet" | "teal" | "slate" }) {
+  const tones = {
+    blue: "bg-blue-50 text-blue-600",
+    violet: "bg-violet-50 text-violet-600",
+    teal: "bg-teal-50 text-teal-600",
+    slate: "bg-slate-100 text-slate-700",
+  };
+
+  return (
+    <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+      <div className={`grid size-12 place-items-center rounded-2xl ${tones[tone]}`}>
+        <Icon size={22} aria-hidden="true" />
+      </div>
+      <p className="mt-5 text-sm font-bold text-slate-500">{label}</p>
+      <p className="mt-2 text-3xl font-black leading-none tracking-normal text-slate-950">{value}</p>
+      <p className="mt-3 text-xs font-bold text-slate-400">{detail}</p>
+    </article>
   );
 }
