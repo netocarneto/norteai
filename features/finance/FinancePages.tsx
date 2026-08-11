@@ -9,7 +9,7 @@ import { accountRows, metrics, transactions } from "@/lib/demo-data";
 
 export function MoneyPage() {
   return (
-    <AppShell>
+    <AppShell activePath="/dinheiro">
       <div className="space-y-6">
         <section>
           <h1 className="page-title">Dinheiro</h1>
@@ -51,7 +51,7 @@ export function MoneyPage() {
 
 export function WealthPage() {
   return (
-    <AppShell>
+    <AppShell activePath="/patrimonio">
       <div className="space-y-6">
         <section>
           <h1 className="page-title">Patrimonio</h1>
@@ -78,7 +78,7 @@ export function WealthPage() {
 
 export function NorteAIPage() {
   return (
-    <AppShell>
+    <AppShell activePath="/norteai">
       <div className="space-y-6">
         <section>
           <h1 className="page-title">NorteAI</h1>

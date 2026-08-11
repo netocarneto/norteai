@@ -33,7 +33,7 @@ export function GoalsPage() {
   }
 
   return (
-    <AppShell>
+    <AppShell activePath="/goals">
       <div className="space-y-6">
         <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>

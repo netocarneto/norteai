@@ -41,7 +41,7 @@ export function AccountsPage() {
   }
 
   return (
-    <AppShell>
+    <AppShell activePath="/dinheiro">
       <div className="space-y-6">
         <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>

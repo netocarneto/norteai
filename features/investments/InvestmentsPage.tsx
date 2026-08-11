@@ -38,7 +38,7 @@ export function InvestmentsPage() {
   }
 
   return (
-    <AppShell>
+    <AppShell activePath="/investimentos">
       <div className="space-y-6">
         <section>
           <h1 className="page-title">Investimentos</h1>

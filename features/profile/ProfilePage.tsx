@@ -7,7 +7,7 @@ import { accountRows, user } from "@/lib/demo-data";
 
 export function ProfilePage() {
   return (
-    <AppShell>
+    <AppShell activePath="/profile">
       <div className="space-y-6">
         <section>
           <h1 className="page-title">Perfil</h1>

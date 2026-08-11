@@ -73,7 +73,7 @@ export function TransactionsPage() {
   }
 
   return (
-    <AppShell>
+    <AppShell activePath="/movimentos">
       <div className="space-y-6">
         <section className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>

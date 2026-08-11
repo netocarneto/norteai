@@ -38,7 +38,7 @@ export function WealthStageOnePage() {
   }
 
   return (
-    <AppShell>
+    <AppShell activePath="/patrimonio">
       <div className="space-y-6">
         <section>
           <h1 className="page-title">Patrimonio</h1>

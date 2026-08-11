@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { Bell, LogOut, Search, Send, Settings } from "lucide-react";
 import { BrandMark } from "@/components/BrandMark";
 import { desktopNav, mobileNav } from "@/lib/demo-data";
 
-export function AppShell({ children }: { children: React.ReactNode }) {
-  const [pathname] = useState(() => (typeof window === "undefined" ? "/" : window.location.pathname));
-  const isOverview = pathname === "/";
+export function AppShell({ children, overview = false, activePath = "/" }: { children: React.ReactNode; overview?: boolean; activePath?: string }) {
+  const isOverview = overview;
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-ink)]">
@@ -17,7 +15,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <nav className="mt-9 space-y-1.5" aria-label="Principal">
             {desktopNav.map((item) => {
               const Icon = item.icon;
-              const active = pathname === item.href;
+              const active = activePath === item.href;
               return (
                 <a key={item.href} href={item.href} className={`nav-link ${active ? "nav-link-active" : ""}`}>
                   <Icon size={20} aria-hidden="true" />
@@ -80,7 +78,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
           {mobileNav.map((item) => {
             const Icon = item.icon;
-            const active = pathname === item.href;
+            const active = activePath === item.href;
             return (
               <a key={item.href} href={item.href} className={`mobile-nav-link ${active ? "mobile-nav-active" : ""}`}>
                 <Icon size={20} aria-hidden="true" />
