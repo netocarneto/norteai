@@ -54,7 +54,12 @@ export function DashboardPage() {
         <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100 xl:p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="text-sm font-black text-slate-950">Norte Score</h2>
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-sm font-black text-slate-950">Norte Score</h2>
+                <span className="rounded-full bg-amber-50 px-2 py-1 text-[0.62rem] font-black uppercase tracking-normal text-amber-700 ring-1 ring-amber-100">
+                  AI demo
+                </span>
+              </div>
               <div className="mt-4 flex items-center gap-4">
                 <ScoreDial score={score.score} />
                 <div>
