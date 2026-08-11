@@ -2,22 +2,9 @@
 
 import type { ElementType } from "react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import {
-  ArrowUpRight,
-  ChevronRight,
-  CircleDollarSign,
-  Grid2X2,
-  Landmark,
-  Lightbulb,
-  Navigation,
-  PieChart as PieChartIcon,
-  Target,
-  TrendingUp,
-  WalletCards,
-} from "lucide-react";
+import { ArrowUpRight, ChevronRight, CircleDollarSign, Landmark, Lightbulb, PieChart as PieChartIcon, Target, TrendingUp, WalletCards } from "lucide-react";
 import { AIInput } from "@/components/AIInput";
 import { accountName, categoryName, euro, euroCents } from "@/lib/finance-engine";
-import { desktopNav } from "@/lib/demo-data";
 import { useFinanceState } from "@/hooks/use-finance-state";
 
 const wealthCurve = [
@@ -52,106 +39,92 @@ export function DashboardPage() {
   const netWorthDelta = firstValue ? ((summary.netWorth - firstValue) / firstValue) * 100 : 0;
 
   return (
-    <div className="space-y-6 xl:space-y-8">
-      <section className="flex min-h-[calc(100vh-5rem)] items-center justify-center">
-        <div className="w-full max-w-[1220px] overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.18)] xl:rounded-[2.4rem]">
-          <div className="grid md:grid-cols-[5.25rem_1fr]">
-            <OverviewRail />
-            <div className="bg-[#fbfcff] p-4 sm:p-6 xl:p-8">
-              <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div className="space-y-6">
+      <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="page-title">Visao Geral</h1>
+          <p className="page-subtitle">Bom dia, Diogo. A tua fotografia financeira de Stage 1.</p>
+        </div>
+        <a href="/movimentos" className="hidden rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white sm:inline-flex">
+          Adicionar movimento
+        </a>
+      </section>
+
+      <section className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
+        <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100 xl:p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-sm font-black text-slate-950">Norte Score</h2>
+              <div className="mt-4 flex items-center gap-4">
+                <ScoreDial score={score.score} />
                 <div>
-                  <p className="text-sm font-black text-slate-500">Bom dia, Diogo</p>
-                  <p className="mt-1 text-xs font-bold text-slate-400">Stage 1 financeiro</p>
+                  <p className="text-sm font-black text-emerald-600">{score.classification}</p>
+                  <p className="mt-1 max-w-44 text-xs font-bold leading-5 text-slate-500">
+                    Saude financeira calculada pelos teus registos.
+                  </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <a href="/movimentos" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white">
-                    Adicionar movimento
-                  </a>
-                  <a href="/profile" className="grid size-10 place-items-center rounded-full bg-violet-700 text-sm font-black text-white" aria-label="Abrir perfil">
-                    D
-                  </a>
-                </div>
-              </header>
-
-              <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
-                <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100 xl:p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h2 className="text-sm font-black text-slate-950">Norte Score</h2>
-                      <div className="mt-4 flex items-center gap-4">
-                        <ScoreDial score={score.score} />
-                        <div>
-                          <p className="text-sm font-black text-emerald-600">{score.classification}</p>
-                          <p className="mt-1 max-w-36 text-xs font-bold leading-5 text-slate-500">
-                            Saude financeira calculada pelos teus registos.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="hidden h-24 min-w-36 flex-1 sm:block">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={scoreSparkline}>
-                          <Area dataKey="value" type="monotone" stroke="#6d28d9" strokeWidth={2.5} fill="#6d28d9" fillOpacity={0.08} />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-                  <SignalBars value={score.score} />
-                </article>
-
-                <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100 xl:p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h2 className="text-sm font-black text-slate-950">Patrimonio liquido</h2>
-                      <p className="mt-5 text-4xl font-black leading-none tracking-normal text-[#071733] sm:text-5xl">
-                        {euro.format(summary.netWorth)}
-                      </p>
-                      <p className="mt-4 text-sm font-black text-teal-600">
-                        {netWorthDelta >= 0 ? "+" : ""}
-                        {netWorthDelta.toFixed(1)}% nos ultimos 6 meses
-                      </p>
-                    </div>
-                    <div className="grid size-16 place-items-center rounded-full bg-teal-50 text-teal-600">
-                      <TrendingUp size={30} strokeWidth={2.6} aria-hidden="true" />
-                    </div>
-                  </div>
-                </article>
-              </div>
-
-              <article className="mt-5 rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5 xl:p-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-black text-slate-950">Evolucao patrimonial</h2>
-                  <button className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-600" type="button">
-                    6M
-                  </button>
-                </div>
-                <div className="mt-4 h-64 sm:h-72 xl:h-[22rem]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={chartCurve} margin={{ left: 6, right: 10, top: 8, bottom: 0 }}>
-                      <CartesianGrid stroke="#edf1f7" vertical={false} />
-                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#7b8494", fontSize: 12, fontWeight: 700 }} />
-                      <YAxis
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fill: "#7b8494", fontSize: 12, fontWeight: 700 }}
-                        tickFormatter={(value) => `${Math.round(Number(value) / 1000)}K €`}
-                        width={56}
-                      />
-                      <Tooltip formatter={(value) => euro.format(Number(value))} />
-                      <Area dataKey="value" type="monotone" stroke="#6d28d9" strokeWidth={3} fill="#6d28d9" fillOpacity={0.12} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </article>
-
-              <div className="mt-5 grid gap-4 md:grid-cols-3">
-                <InsightTile icon={Target} title="Estas no bom caminho." body={`A tua taxa de poupanca esta em ${summary.savingsRate}%.`} tone="violet" />
-                <InsightTile icon={PieChartIcon} title="Diversificacao equilibrada." body="O teu portfolio esta bem distribuido." tone="teal" />
-                <InsightTile icon={Lightbulb} title="Oportunidade detectada." body="Podes otimizar a tua alocacao de ativos." tone="violet" />
               </div>
             </div>
+            <div className="hidden h-24 min-w-40 flex-1 sm:block">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={scoreSparkline}>
+                  <Area dataKey="value" type="monotone" stroke="#6d28d9" strokeWidth={2.5} fill="#6d28d9" fillOpacity={0.08} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
+          <SignalBars value={score.score} />
+        </article>
+
+        <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100 xl:p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-sm font-black text-slate-950">Patrimonio liquido</h2>
+              <p className="mt-5 text-4xl font-black leading-none tracking-normal text-[#071733] sm:text-5xl">
+                {euro.format(summary.netWorth)}
+              </p>
+              <p className="mt-4 text-sm font-black text-teal-600">
+                {netWorthDelta >= 0 ? "+" : ""}
+                {netWorthDelta.toFixed(1)}% nos ultimos 6 meses
+              </p>
+            </div>
+            <div className="grid size-16 place-items-center rounded-full bg-teal-50 text-teal-600">
+              <TrendingUp size={30} strokeWidth={2.6} aria-hidden="true" />
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <article className="rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5 xl:p-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-black text-slate-950">Evolucao patrimonial</h2>
+          <button className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-600" type="button">
+            6M
+          </button>
         </div>
+        <div className="mt-4 h-64 sm:h-72 xl:h-[22rem]">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartCurve} margin={{ left: 6, right: 10, top: 8, bottom: 0 }}>
+              <CartesianGrid stroke="#edf1f7" vertical={false} />
+              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#7b8494", fontSize: 12, fontWeight: 700 }} />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#7b8494", fontSize: 12, fontWeight: 700 }}
+                tickFormatter={(value) => `${Math.round(Number(value) / 1000)}K €`}
+                width={56}
+              />
+              <Tooltip formatter={(value) => euro.format(Number(value))} />
+              <Area dataKey="value" type="monotone" stroke="#6d28d9" strokeWidth={3} fill="#6d28d9" fillOpacity={0.12} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </article>
+
+      <section className="grid gap-4 md:grid-cols-3">
+        <InsightTile icon={Target} title="Estas no bom caminho." body={`A tua taxa de poupanca esta em ${summary.savingsRate}%.`} tone="violet" />
+        <InsightTile icon={PieChartIcon} title="Diversificacao equilibrada." body="O teu portfolio esta bem distribuido." tone="teal" />
+        <InsightTile icon={Lightbulb} title="Oportunidade detectada." body="Podes otimizar a tua alocacao de ativos." tone="violet" />
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -225,34 +198,6 @@ export function DashboardPage() {
         </div>
       </section>
     </div>
-  );
-}
-
-function OverviewRail() {
-  return (
-    <aside className="hidden bg-[#061936] px-3 py-5 text-white md:flex md:flex-col md:items-center">
-      <div className="grid size-12 place-items-center rounded-full border border-white/35">
-        <Navigation className="size-7 rotate-[-20deg] fill-violet-500 text-white" strokeWidth={1.8} aria-hidden="true" />
-      </div>
-      <nav className="mt-7 flex flex-1 flex-col items-center gap-3" aria-label="Principal compacto">
-        {desktopNav.slice(0, 6).map((item) => {
-          const Icon = item.href === "/" ? Grid2X2 : item.icon;
-          const active = item.href === "/";
-          return (
-            <a
-              key={item.href}
-              href={item.href}
-              className={`grid size-11 place-items-center rounded-2xl transition ${active ? "bg-violet-600 text-white shadow-purple" : "text-white/62 hover:bg-white/10 hover:text-white"}`}
-              aria-label={item.label}
-              title={item.label}
-            >
-              <Icon size={20} aria-hidden="true" />
-            </a>
-          );
-        })}
-      </nav>
-      <div className="h-px w-9 bg-white/18" />
-    </aside>
   );
 }
 

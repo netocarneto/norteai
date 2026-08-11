@@ -3,7 +3,7 @@ import { DashboardPage } from "@/features/dashboard/DashboardPage";
 
 export default function Home() {
   return (
-    <AppShell overview activePath="/">
+    <AppShell activePath="/">
       <DashboardPage />
     </AppShell>
   );
