@@ -32,7 +32,12 @@ export function AppShell({ children, activePath = "/" }: { children: React.React
           </a>
         </div>
         <div className="absolute bottom-7 left-5 right-5 rounded-2xl bg-violet-50 p-4 ring-1 ring-violet-100">
-          <p className="text-sm font-bold text-slate-950">Pergunta ao NorteAI</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm font-bold text-slate-950">Pergunta ao NorteAI</p>
+            <span className="rounded-full bg-amber-50 px-2 py-1 text-[0.62rem] font-black uppercase tracking-normal text-amber-700 ring-1 ring-amber-100">
+              AI demo
+            </span>
+          </div>
           <p className="mt-1 text-xs leading-5 text-slate-600">Tens duvidas? O NorteAI esta aqui para ajudar.</p>
           <a href="/norteai" className="mt-4 inline-grid size-10 place-items-center rounded-full bg-violet-600 text-white shadow-soft" aria-label="Abrir NorteAI">
             <Send size={17} aria-hidden="true" />

@@ -9,6 +9,9 @@ export function AIInput({ compact = false }: { compact?: boolean }) {
       <div className="flex items-center gap-2 text-sm font-black text-violet-700">
         <Sparkles size={18} aria-hidden="true" />
         <span>NorteAI diz</span>
+        <span className="rounded-full bg-amber-50 px-2 py-1 text-[0.65rem] font-black uppercase tracking-normal text-amber-700 ring-1 ring-amber-100">
+          AI demo
+        </span>
       </div>
       <p className="mt-5 text-sm leading-6 text-slate-700">
         A tua exposicao ao mercado dos EUA esta acima do recomendado para o teu perfil.

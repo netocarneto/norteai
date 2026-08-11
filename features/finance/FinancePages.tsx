@@ -81,13 +81,23 @@ export function NorteAIPage() {
     <AppShell activePath="/norteai">
       <div className="space-y-6">
         <section>
-          <h1 className="page-title">NorteAI</h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="page-title">NorteAI</h1>
+            <span className="rounded-full bg-amber-50 px-3 py-1.5 text-xs font-black uppercase tracking-normal text-amber-700 ring-1 ring-amber-100">
+              AI demo
+            </span>
+          </div>
           <p className="page-subtitle">Interface do assistente AI, sem ligacao real nesta fase.</p>
         </section>
         <section className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
           <AIInput />
           <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
-            <h2 className="section-title">Analise completa</h2>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="section-title">Analise completa</h2>
+              <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-normal text-amber-700 ring-1 ring-amber-100">
+                AI demo
+              </span>
+            </div>
             <div className="mt-5 space-y-4">
               {[
                 "A reserva de emergencia esta acima do objetivo definido.",
