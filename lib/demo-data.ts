@@ -6,6 +6,7 @@ import {
   ChartNoAxesCombined,
   CircleDollarSign,
   CreditCard,
+  ListTree,
   Goal as GoalIcon,
   Home,
   Landmark,
@@ -35,9 +36,10 @@ export const user = {
 
 export const desktopNav: NavItem[] = [
   { label: "Visao Geral", href: "/", icon: Home },
-  { label: "Dinheiro", href: "/money", icon: WalletCards },
-  { label: "Investimentos", href: "/investments", icon: ChartNoAxesCombined },
-  { label: "Patrimonio", href: "/wealth", icon: Landmark },
+  { label: "Dinheiro", href: "/dinheiro", icon: WalletCards },
+  { label: "Movimentos", href: "/movimentos", icon: ListTree },
+  { label: "Investimentos", href: "/investimentos", icon: ChartNoAxesCombined },
+  { label: "Patrimonio", href: "/patrimonio", icon: Landmark },
   { label: "Objetivos", href: "/goals", icon: GoalIcon },
   { label: "NorteAI", href: "/norteai", icon: Sparkles },
   { label: "Perfil", href: "/profile", icon: CircleDollarSign },
@@ -45,10 +47,10 @@ export const desktopNav: NavItem[] = [
 
 export const mobileNav: NavItem[] = [
   { label: "Inicio", href: "/", icon: Home },
-  { label: "Dinheiro", href: "/money", icon: CreditCard },
-  { label: "Investir", href: "/investments", icon: ChartNoAxesCombined },
+  { label: "Dinheiro", href: "/dinheiro", icon: CreditCard },
+  { label: "Movimentos", href: "/movimentos", icon: ListTree },
+  { label: "Investir", href: "/investimentos", icon: ChartNoAxesCombined },
   { label: "NorteAI", href: "/norteai", icon: Sparkles },
-  { label: "Perfil", href: "/profile", icon: CircleDollarSign },
 ];
 
 export const wealthCurve = [
