@@ -53,37 +53,12 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6 xl:space-y-8">
-      <section className="grid min-h-[calc(100vh-5rem)] gap-6 xl:grid-cols-[0.78fr_1.25fr] xl:items-center">
-        <div className="relative isolate overflow-hidden rounded-[2rem] bg-white px-6 py-8 shadow-soft ring-1 ring-slate-100 sm:px-8 xl:min-h-[38rem] xl:rounded-[2.2rem] xl:px-10 xl:py-12">
-          <div className="absolute inset-x-0 bottom-0 h-48 overflow-hidden bg-gradient-to-t from-violet-50 via-transparent to-transparent" aria-hidden="true">
-            <div className="absolute -bottom-14 left-[-12%] h-36 w-[68%] skew-y-[-8deg] rounded-[45%] bg-slate-200/70" />
-            <div className="absolute -bottom-16 left-[20%] h-44 w-[76%] skew-y-[-10deg] rounded-[45%] bg-slate-300/55" />
-            <div className="absolute -bottom-20 right-[-18%] h-48 w-[84%] skew-y-[-17deg] rounded-[45%] bg-gradient-to-br from-violet-700 to-violet-500" />
-          </div>
-
-          <div className="relative z-10">
-            <CompassLogo />
-            <div className="mt-8">
-              <h1 className="max-w-[34rem] text-[4rem] font-black leading-none tracking-normal text-[#071733] sm:text-[5.4rem] xl:text-[6.7rem]">
-                Norte<span className="text-violet-600">AI</span>
-              </h1>
-              <p className="mt-1 text-[2.3rem] font-medium leading-none tracking-normal text-[#071733] sm:text-[3.25rem]">
-                Pessoal
-              </p>
-            </div>
-            <div className="mt-7 h-1 w-24 rounded-full bg-violet-600" />
-            <p className="mt-6 max-w-[33rem] text-3xl font-black leading-tight tracking-normal text-[#071733] sm:text-4xl">
-              O teu copiloto financeiro inteligente.
-            </p>
-            <div className="mt-8 h-1 w-36 rotate-[-6deg] rounded-full bg-teal-400" />
-          </div>
-        </div>
-
-        <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_26px_80px_rgba(15,23,42,0.13)] xl:rounded-[2.4rem]">
-          <div className="grid md:grid-cols-[5rem_1fr]">
+      <section className="flex min-h-[calc(100vh-5rem)] items-center justify-center">
+        <div className="w-full max-w-[1220px] overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.18)] xl:rounded-[2.4rem]">
+          <div className="grid md:grid-cols-[5.25rem_1fr]">
             <OverviewRail />
-            <div className="bg-[#fbfcff] p-4 sm:p-5 xl:p-6">
-              <header className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div className="bg-[#fbfcff] p-4 sm:p-6 xl:p-8">
+              <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-sm font-black text-slate-500">Bom dia, Diogo</p>
                   <p className="mt-1 text-xs font-bold text-slate-400">Stage 1 financeiro</p>
@@ -98,8 +73,8 @@ export function DashboardPage() {
                 </div>
               </header>
 
-              <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
-                <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+              <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
+                <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100 xl:p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h2 className="text-sm font-black text-slate-950">Norte Score</h2>
@@ -124,7 +99,7 @@ export function DashboardPage() {
                   <SignalBars value={score.score} />
                 </article>
 
-                <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+                <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100 xl:p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h2 className="text-sm font-black text-slate-950">Patrimonio liquido</h2>
@@ -143,14 +118,14 @@ export function DashboardPage() {
                 </article>
               </div>
 
-              <article className="mt-4 rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5">
+              <article className="mt-5 rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5 xl:p-6">
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-black text-slate-950">Evolucao patrimonial</h2>
                   <button className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-600" type="button">
                     6M
                   </button>
                 </div>
-                <div className="mt-4 h-56 sm:h-64">
+                <div className="mt-4 h-64 sm:h-72 xl:h-[22rem]">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartCurve} margin={{ left: 6, right: 10, top: 8, bottom: 0 }}>
                       <CartesianGrid stroke="#edf1f7" vertical={false} />
@@ -169,7 +144,7 @@ export function DashboardPage() {
                 </div>
               </article>
 
-              <div className="mt-4 grid gap-3 md:grid-cols-3">
+              <div className="mt-5 grid gap-4 md:grid-cols-3">
                 <InsightTile icon={Target} title="Estas no bom caminho." body={`A tua taxa de poupanca esta em ${summary.savingsRate}%.`} tone="violet" />
                 <InsightTile icon={PieChartIcon} title="Diversificacao equilibrada." body="O teu portfolio esta bem distribuido." tone="teal" />
                 <InsightTile icon={Lightbulb} title="Oportunidade detectada." body="Podes otimizar a tua alocacao de ativos." tone="violet" />
@@ -249,17 +224,6 @@ export function DashboardPage() {
           <AIInput compact />
         </div>
       </section>
-    </div>
-  );
-}
-
-function CompassLogo() {
-  return (
-    <div className="relative grid size-28 place-items-center rounded-full border-[5px] border-[#071733] text-[#071733] sm:size-36" aria-hidden="true">
-      <span className="absolute -top-9 text-4xl font-black tracking-normal">N</span>
-      <span className="absolute left-3 h-0.5 w-4 bg-[#071733]" />
-      <span className="absolute right-3 h-0.5 w-4 bg-[#071733]" />
-      <Navigation className="size-16 rotate-[-22deg] fill-violet-600 text-[#071733] sm:size-20" strokeWidth={1.8} />
     </div>
   );
 }
