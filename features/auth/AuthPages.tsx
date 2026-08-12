@@ -32,7 +32,7 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
             {isRegister ? "Criar conta" : "Entrar"}
           </h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            {isRegister ? "Comeca com dados demo e termina no onboarding." : "Acede ao prototipo com a conta demo de Diogo."}
+            {isRegister ? "Comeca por criar a tua visao financeira pessoal." : "Acede ao teu espaco financeiro pessoal."}
           </p>
           <form className="mt-7 space-y-4">
             {isRegister && (
@@ -63,9 +63,9 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
           <div className="mt-6 rounded-2xl bg-violet-50 p-4 text-sm leading-6 text-violet-900">
             <div className="flex items-center gap-2 font-black">
               <ShieldCheck size={17} aria-hidden="true" />
-              <span>Autenticacao Stage 0</span>
+              <span>Autenticacao preparada</span>
             </div>
-            <p className="mt-1">JWT/session segura preparada na arquitetura; sem dados reais nesta fase.</p>
+            <p className="mt-1">A arquitetura esta preparada para sessoes seguras e isolamento por workspace.</p>
           </div>
           <p className="mt-6 text-center text-sm text-slate-600">
             {isRegister ? "Ja tens conta?" : "Ainda nao tens conta?"}{" "}
@@ -75,7 +75,7 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
           </p>
           <p className="mt-4 flex items-center justify-center gap-2 text-xs font-bold text-slate-400">
             <Mail size={14} aria-hidden="true" />
-            Demo only
+            NorteAI Pessoal
           </p>
         </section>
       </div>

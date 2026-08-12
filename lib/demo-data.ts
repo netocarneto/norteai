@@ -12,6 +12,7 @@ import {
   Landmark,
   PiggyBank,
   ReceiptText,
+  Settings,
   ShieldCheck,
   Sparkles,
   Utensils,
@@ -50,7 +51,7 @@ export const mobileNav: NavItem[] = [
   { label: "Dinheiro", href: "/dinheiro", icon: CreditCard },
   { label: "Movimentos", href: "/movimentos", icon: ListTree },
   { label: "Investir", href: "/investimentos", icon: ChartNoAxesCombined },
-  { label: "NorteAI", href: "/norteai", icon: Sparkles },
+  { label: "Definicoes", href: "/definicoes", icon: Settings },
 ];
 
 export const wealthCurve = [

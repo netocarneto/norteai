@@ -1,8 +1,6 @@
-# vinext-starter
+# NorteAI Pessoal
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+NorteAI Pessoal is a fintech personal finance dashboard prototype prepared for a production foundation.
 
 ## Prerequisites
 
@@ -16,14 +14,27 @@ npm run dev
 npm run build
 ```
 
-This starter does not use `wrangler.jsonc`.
+## Production Foundation
+
+The frontend is currently deployable as a private Sites app.
+
+The Supabase production foundation lives in `supabase/migrations` and includes:
+
+- Supabase Auth profile mirror
+- User -> Workspace -> Financial Data
+- automatic PERSONAL workspace onboarding
+- independent data sources per workspace
+- Row Level Security policies for workspace isolation
+
+Before using real financial data, apply the Supabase migration to a real project and validate RLS with at least two users.
 
 ## Included Shape
 
 - edit site code under `app/`
 - `.openai/hosting.json` declares optional Sites D1 and R2 bindings
 - `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
+- `db/schema.ts` contains the local prototype schema
+- `supabase/migrations` contains the production PostgreSQL/RLS foundation
 - `examples/d1/` contains an optional D1 example surface
 - `drizzle.config.ts` supports local migration generation when needed
 

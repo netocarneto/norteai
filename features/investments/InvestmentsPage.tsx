@@ -4,34 +4,49 @@ import { useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { Edit3, Plus, Trash2, TrendingUp } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { AIInput } from "@/components/AIInput";
 import { euro, investmentTypeLabels, investmentTypes } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { InvestmentRecord, InvestmentType } from "@/types/finance";
 
 const emptyInvestment = {
+  accountId: "",
   assetId: "asset-investments",
   ticker: "",
   name: "",
   type: "ETF" as InvestmentType,
   quantity: 0,
   averagePrice: 0,
+  currentPrice: 0,
   currentValue: 0,
+  costBasis: 0,
+  source: "manual" as const,
+  updatedAt: "2026-08-11T09:00:00.000Z",
+  institution: "",
   currency: "EUR",
 };
 
 export function InvestmentsPage() {
-  const { state, setState, summary } = useFinanceState();
-  const [draft, setDraft] = useState<Omit<InvestmentRecord, "id">>(emptyInvestment);
+  const { state, setState, summary, activeWorkspace } = useFinanceState();
+  const [draft, setDraft] = useState<Omit<InvestmentRecord, "id" | "workspaceId">>(emptyInvestment);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const portfolioCost = state.investments.reduce((total, investment) => total + investment.costBasis, 0);
+  const portfolioValue = state.investments.reduce((total, investment) => total + investment.currentValue, 0);
+  const portfolioGain = portfolioValue - portfolioCost;
+  const portfolioGainRate = portfolioCost ? (portfolioGain / portfolioCost) * 100 : null;
+  const latestUpdate = state.investments
+    .map((investment) => investment.updatedAt)
+    .filter(Boolean)
+    .sort((a, b) => b.localeCompare(a))[0];
 
   function saveInvestment() {
-    if (!draft.ticker || !draft.name) return;
+    if (!draft.ticker || !draft.name || !activeWorkspace) return;
+    const costBasis = draft.costBasis || draft.quantity * draft.averagePrice;
+    const investment = { ...draft, costBasis, institution: draft.institution || "Manual", workspaceId: activeWorkspace.id, updatedAt: new Date().toISOString() };
     setState((current) => ({
       ...current,
       investments: editingId
-        ? current.investments.map((item) => (item.id === editingId ? { ...draft, id: editingId } : item))
-        : [...current.investments, { ...draft, id: `inv-${Date.now()}` }],
+        ? current.investments.map((item) => (item.id === editingId ? { ...investment, id: editingId } : item))
+        : [...current.investments, { ...investment, id: `inv-${Date.now()}` }],
     }));
     setDraft(emptyInvestment);
     setEditingId(null);
@@ -75,7 +90,27 @@ export function InvestmentsPage() {
               </div>
             </div>
           </article>
-          <AIInput compact />
+          <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="section-title">Resumo da carteira</h2>
+                <p className="mt-1 text-sm font-semibold text-slate-500">Valores calculados pelas posicoes registadas.</p>
+              </div>
+              <div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-teal-50 text-teal-700">
+                <TrendingUp size={20} aria-hidden="true" />
+              </div>
+            </div>
+            <div className="mt-5 grid gap-3">
+              <SummaryRow label="Valor investido" value={euro.format(portfolioCost)} />
+              <SummaryRow label="Valor atual" value={euro.format(portfolioValue)} />
+              <SummaryRow
+                label="Diferenca estimada"
+                value={`${portfolioGain >= 0 ? "+" : ""}${euro.format(portfolioGain)}${portfolioGainRate === null ? "" : ` · ${portfolioGainRate.toFixed(1)}%`}`}
+                tone={portfolioGain >= 0 ? "positive" : "negative"}
+              />
+              <SummaryRow label="Ultima atualizacao" value={latestUpdate ? formatDate(latestUpdate) : "Sem registo"} />
+            </div>
+          </article>
         </section>
 
         <section className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
@@ -85,9 +120,12 @@ export function InvestmentsPage() {
               <label className="form-field"><span>Ticker</span><input value={draft.ticker} onChange={(event) => setDraft({ ...draft, ticker: event.target.value.toUpperCase() })} placeholder="VWCE" /></label>
               <label className="form-field"><span>Nome</span><input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} placeholder="Vanguard FTSE All-World" /></label>
               <label className="form-field"><span>Tipo</span><select value={draft.type} onChange={(event) => setDraft({ ...draft, type: event.target.value as InvestmentType })}>{investmentTypes.map((type) => <option key={type} value={type}>{investmentTypeLabels[type]}</option>)}</select></label>
+              <label className="form-field"><span>Instituicao</span><input value={draft.institution} onChange={(event) => setDraft({ ...draft, institution: event.target.value })} placeholder="Trade Republic" /></label>
               <label className="form-field"><span>Quantidade</span><input type="number" value={draft.quantity} onChange={(event) => setDraft({ ...draft, quantity: Number(event.target.value) })} /></label>
               <label className="form-field"><span>Preco medio</span><input type="number" value={draft.averagePrice} onChange={(event) => setDraft({ ...draft, averagePrice: Number(event.target.value) })} /></label>
+              <label className="form-field"><span>Preco atual</span><input type="number" value={draft.currentPrice ?? 0} onChange={(event) => setDraft({ ...draft, currentPrice: Number(event.target.value) })} /></label>
               <label className="form-field"><span>Valor atual</span><input type="number" value={draft.currentValue} onChange={(event) => setDraft({ ...draft, currentValue: Number(event.target.value) })} /></label>
+              <label className="form-field"><span>Custo total</span><input type="number" value={draft.costBasis} onChange={(event) => setDraft({ ...draft, costBasis: Number(event.target.value) })} /></label>
               <button className="primary-button sm:col-span-2" onClick={saveInvestment}>{editingId ? "Guardar posicao" : "Criar posicao"}</button>
             </div>
           </article>
@@ -104,9 +142,22 @@ export function InvestmentsPage() {
                   </div>
                   <p className="font-black text-slate-950">{euro.format(investment.currentValue)}</p>
                   <button className="icon-button" onClick={() => {
-                    const { id, ...rest } = investment;
-                    setDraft(rest);
-                    setEditingId(id);
+                    setDraft({
+                      assetId: investment.assetId,
+                      ticker: investment.ticker,
+                      name: investment.name,
+                      type: investment.type,
+                      quantity: investment.quantity,
+                      averagePrice: investment.averagePrice,
+                      currentPrice: investment.currentPrice,
+                      currentValue: investment.currentValue,
+                      costBasis: investment.costBasis,
+                      source: investment.source,
+                      updatedAt: investment.updatedAt,
+                      institution: investment.institution,
+                      currency: investment.currency,
+                    });
+                    setEditingId(investment.id);
                   }} aria-label="Editar"><Edit3 size={15} /></button>
                   <button className="icon-button" onClick={() => setState((current) => ({ ...current, investments: current.investments.filter((item) => item.id !== investment.id) }))} aria-label="Eliminar"><Trash2 size={15} /></button>
                 </div>
@@ -117,4 +168,19 @@ export function InvestmentsPage() {
       </div>
     </AppShell>
   );
+}
+
+function SummaryRow({ label, value, tone = "neutral" }: { label: string; value: string; tone?: "positive" | "negative" | "neutral" }) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-3">
+      <span className="text-sm font-bold text-slate-500">{label}</span>
+      <span className={`text-sm font-black ${tone === "positive" ? "text-teal-700" : tone === "negative" ? "text-rose-600" : "text-slate-950"}`}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(value));
 }

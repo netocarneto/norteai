@@ -7,31 +7,33 @@ import { assetTypeLabels, assetTypes, euro, liabilityTypeLabels, liabilityTypes 
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { AssetRecord, AssetType, LiabilityRecord, LiabilityType } from "@/types/finance";
 
-const emptyAsset = { name: "", type: "investment" as AssetType, value: 0, currency: "EUR", description: "" };
-const emptyLiability = { name: "", type: "mortgage" as LiabilityType, amount: 0, monthlyPayment: 0, interestRate: 0 };
+const emptyAsset = { name: "", type: "real_estate" as AssetType, value: 0, currency: "EUR", ownershipType: "personal" as const, ownershipPercentage: 100, valuationDate: "2026-08-11", description: "", notes: "" };
+const emptyLiability = { name: "", type: "mortgage" as LiabilityType, balance: 0, monthlyPayment: 0, interestRate: 0, currency: "EUR", maturityDate: "" };
 
 export function WealthStageOnePage() {
-  const { state, setState, summary } = useFinanceState();
-  const [assetDraft, setAssetDraft] = useState<Omit<AssetRecord, "id">>(emptyAsset);
-  const [liabilityDraft, setLiabilityDraft] = useState<Omit<LiabilityRecord, "id">>(emptyLiability);
+  const { state, setState, summary, activeWorkspace } = useFinanceState();
+  const [assetDraft, setAssetDraft] = useState<Omit<AssetRecord, "id" | "workspaceId">>(emptyAsset);
+  const [liabilityDraft, setLiabilityDraft] = useState<Omit<LiabilityRecord, "id" | "workspaceId">>(emptyLiability);
   const [editingAsset, setEditingAsset] = useState<string | null>(null);
   const [editingLiability, setEditingLiability] = useState<string | null>(null);
 
   function saveAsset() {
-    if (!assetDraft.name) return;
+    if (!assetDraft.name || !activeWorkspace) return;
+    const asset = { ...assetDraft, workspaceId: activeWorkspace.id };
     setState((current) => ({
       ...current,
-      assets: editingAsset ? current.assets.map((item) => (item.id === editingAsset ? { ...assetDraft, id: editingAsset } : item)) : [...current.assets, { ...assetDraft, id: `asset-${Date.now()}` }],
+      assets: editingAsset ? current.assets.map((item) => (item.id === editingAsset ? { ...asset, id: editingAsset } : item)) : [...current.assets, { ...asset, id: `asset-${Date.now()}` }],
     }));
     setAssetDraft(emptyAsset);
     setEditingAsset(null);
   }
 
   function saveLiability() {
-    if (!liabilityDraft.name) return;
+    if (!liabilityDraft.name || !activeWorkspace) return;
+    const liability = { ...liabilityDraft, workspaceId: activeWorkspace.id };
     setState((current) => ({
       ...current,
-      liabilities: editingLiability ? current.liabilities.map((item) => (item.id === editingLiability ? { ...liabilityDraft, id: editingLiability } : item)) : [...current.liabilities, { ...liabilityDraft, id: `lia-${Date.now()}` }],
+      liabilities: editingLiability ? current.liabilities.map((item) => (item.id === editingLiability ? { ...liability, id: editingLiability } : item)) : [...current.liabilities, { ...liability, id: `lia-${Date.now()}` }],
     }));
     setLiabilityDraft(emptyLiability);
     setEditingLiability(null);
@@ -63,7 +65,7 @@ export function WealthStageOnePage() {
           <CrudPanel title={editingLiability ? "Editar divida" : "Criar divida"}>
             <label className="form-field"><span>Nome</span><input value={liabilityDraft.name} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, name: event.target.value })} placeholder="Credito habitacao" /></label>
             <label className="form-field"><span>Tipo</span><select value={liabilityDraft.type} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, type: event.target.value as LiabilityType })}>{liabilityTypes.map((type) => <option key={type} value={type}>{liabilityTypeLabels[type]}</option>)}</select></label>
-            <label className="form-field"><span>Montante</span><input type="number" value={liabilityDraft.amount} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, amount: Number(event.target.value) })} /></label>
+            <label className="form-field"><span>Saldo em divida</span><input type="number" value={liabilityDraft.balance} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, balance: Number(event.target.value) })} /></label>
             <label className="form-field"><span>Pagamento mensal</span><input type="number" value={liabilityDraft.monthlyPayment} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, monthlyPayment: Number(event.target.value) })} /></label>
             <label className="form-field"><span>Juro %</span><input type="number" value={liabilityDraft.interestRate} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, interestRate: Number(event.target.value) })} /></label>
             <button className="primary-button" onClick={saveLiability}>{editingLiability ? "Guardar divida" : "Criar divida"}</button>
@@ -74,18 +76,16 @@ export function WealthStageOnePage() {
           <ListPanel title="Ativos">
             {state.assets.map((asset) => (
               <Row key={asset.id} title={asset.name} subtitle={assetTypeLabels[asset.type]} value={euro.format(asset.value)} onEdit={() => {
-                const { id, ...rest } = asset;
-                setAssetDraft(rest);
-                setEditingAsset(id);
+                setAssetDraft({ name: asset.name, type: asset.type, value: asset.value, currency: asset.currency, ownershipType: asset.ownershipType, ownershipPercentage: asset.ownershipPercentage, valuationDate: asset.valuationDate, description: asset.description ?? "", notes: asset.notes ?? "" });
+                setEditingAsset(asset.id);
               }} onDelete={() => setState((current) => ({ ...current, assets: current.assets.filter((item) => item.id !== asset.id) }))} />
             ))}
           </ListPanel>
           <ListPanel title="Passivos">
             {state.liabilities.map((liability) => (
-              <Row key={liability.id} title={liability.name} subtitle={`${liabilityTypeLabels[liability.type]} · ${liability.interestRate}%`} value={euro.format(liability.amount)} onEdit={() => {
-                const { id, ...rest } = liability;
-                setLiabilityDraft(rest);
-                setEditingLiability(id);
+              <Row key={liability.id} title={liability.name} subtitle={`${liabilityTypeLabels[liability.type]} · ${liability.interestRate}%`} value={euro.format(liability.balance)} onEdit={() => {
+                setLiabilityDraft({ name: liability.name, type: liability.type, balance: liability.balance, monthlyPayment: liability.monthlyPayment, interestRate: liability.interestRate, currency: liability.currency, maturityDate: liability.maturityDate ?? "" });
+                setEditingLiability(liability.id);
               }} onDelete={() => setState((current) => ({ ...current, liabilities: current.liabilities.filter((item) => item.id !== liability.id) }))} />
             ))}
           </ListPanel>

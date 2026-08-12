@@ -10,7 +10,7 @@ const steps = [
   { title: "Informacao pessoal", copy: "Pais, moeda e preferencias para personalizar a experiencia.", icon: UserRound },
   { title: "Perfil financeiro", copy: "Rendimento, poupanca e experiencia financeira.", icon: BadgeEuro },
   { title: "Objetivos", copy: "Casa, emergencia, reforma ou investimentos.", icon: Goal },
-  { title: "Perfil de risco", copy: "Conservador, balanced, growth ou aggressive.", icon: Shield },
+  { title: "Perfil de risco", copy: "Conservador, equilibrado, crescimento ou agressivo.", icon: Shield },
 ];
 
 export function OnboardingPage() {
@@ -26,10 +26,10 @@ export function OnboardingPage() {
                 Estamos prontos para criar o teu Norte financeiro.
               </h1>
               <p className="mt-4 leading-7 text-slate-600">
-                Uma experiencia premium em cinco passos para preparar o dashboard com dados demo e escolhas realistas.
+                Uma experiencia premium em cinco passos para preparar o dashboard com dados financeiros iniciais e escolhas realistas.
               </p>
               <a href="/" className="primary-button mt-8 w-fit">
-                Finalizar demo
+                Finalizar configuracao
                 <ArrowRight size={18} aria-hidden="true" />
               </a>
             </div>
@@ -42,7 +42,7 @@ export function OnboardingPage() {
                       <Icon size={21} aria-hidden="true" />
                     </div>
                     <div>
-                      <p className="text-xs font-black text-slate-400">Step {index + 1}</p>
+                      <p className="text-xs font-black text-slate-400">Passo {index + 1}</p>
                       <h2 className="mt-1 font-black text-slate-950">{step.title}</h2>
                       <p className="mt-1 text-sm leading-6 text-slate-600">{step.copy}</p>
                     </div>

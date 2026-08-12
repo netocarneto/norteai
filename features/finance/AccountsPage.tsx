@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Edit3, Plus, Trash2, WalletCards } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { accountTypeLabels, accountTypes, euro } from "@/lib/finance-engine";
+import { accountTypeLabels, accountTypes, euro, ownershipTypeLabels } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
-import type { AccountType, FinancialAccountRecord } from "@/types/finance";
+import type { AccountType, FinancialAccountRecord, OwnershipType } from "@/types/finance";
 
 const emptyAccount = {
   name: "",
@@ -13,31 +13,66 @@ const emptyAccount = {
   accountType: "checking" as AccountType,
   balance: 0,
   currency: "EUR",
+  ownershipType: "personal" as OwnershipType,
+  ownershipPercentage: 100,
+  source: "manual" as const,
   color: "#6d28d9",
   icon: "wallet",
+  createdAt: "2026-08-11T09:00:00.000Z",
+  updatedAt: "2026-08-11T09:00:00.000Z",
 };
 
 export function AccountsPage() {
-  const { state, setState, summary } = useFinanceState();
-  const [draft, setDraft] = useState<Omit<FinancialAccountRecord, "id">>(emptyAccount);
+  const { state, setState, summary, activeWorkspace } = useFinanceState();
+  const [draft, setDraft] = useState<Omit<FinancialAccountRecord, "id" | "workspaceId"> & { ownershipPercentage: number }>(emptyAccount);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   function saveAccount() {
-    if (!draft.name || !draft.institution) return;
+    if (!draft.name || !draft.institution || !activeWorkspace) return;
+    if (draft.balance < 0 || draft.ownershipPercentage < 0 || draft.ownershipPercentage > 100) return;
+    const { ownershipPercentage, ...accountDraft } = draft;
+    const now = new Date().toISOString();
+    const account = { ...accountDraft, ownershipPercentage, workspaceId: activeWorkspace.id, updatedAt: now, createdAt: editingId ? accountDraft.createdAt : now };
+    const accountId = editingId ?? `acc-${Date.now()}`;
     setState((current) => ({
       ...current,
       accounts: editingId
-        ? current.accounts.map((item) => (item.id === editingId ? { ...draft, id: editingId } : item))
-        : [...current.accounts, { ...draft, id: `acc-${Date.now()}` }],
+        ? current.accounts.map((item) => (item.id === editingId ? { ...account, id: accountId } : item))
+        : [...current.accounts, { ...account, id: accountId }],
+      accountOwnerships: editingId
+        ? current.accountOwnerships.map((item) => (item.accountId === editingId ? { ...item, ownershipPercentage } : item))
+        : [
+            ...current.accountOwnerships,
+            {
+              id: `own-${Date.now()}`,
+              workspaceId: activeWorkspace.id,
+              accountId,
+              memberId: current.workspaceMembers.find((member) => member.workspaceId === activeWorkspace.id)?.id ?? "member-diogo-personal",
+              ownershipPercentage,
+            },
+          ],
     }));
     setDraft(emptyAccount);
     setEditingId(null);
   }
 
   function editAccount(account: FinancialAccountRecord) {
-    const { id, ...rest } = account;
-    setDraft(rest);
-    setEditingId(id);
+    const ownership = state.accountOwnerships.find((item) => item.accountId === account.id);
+    setDraft({
+      name: account.name,
+      institution: account.institution,
+      accountType: account.accountType,
+      balance: account.balance,
+      currency: account.currency,
+      ownershipType: account.ownershipType,
+      ownershipPercentage: ownership?.ownershipPercentage ?? 100,
+      source: account.source,
+      color: account.color,
+      icon: account.icon,
+      createdAt: account.createdAt,
+      updatedAt: account.updatedAt,
+    });
+    setEditingId(account.id);
   }
 
   return (
@@ -46,7 +81,7 @@ export function AccountsPage() {
         <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="page-title">Dinheiro</h1>
-            <p className="page-subtitle">Gere contas financeiras reais: bancos, poupanca, dinheiro, corretoras e cripto.</p>
+            <p className="page-subtitle">Gere contas correntes, poupanca, dinheiro, corretoras, cripto e outras contas pessoais.</p>
           </div>
           <div className="rounded-2xl bg-white px-5 py-3 shadow-soft ring-1 ring-slate-100">
             <p className="text-xs font-bold text-slate-500">Posicao de liquidez</p>
@@ -71,8 +106,13 @@ export function AccountsPage() {
                 </div>
               </div>
               <p className="mt-4 text-lg font-black text-slate-950">{account.name}</p>
-              <p className="text-sm font-bold text-slate-500">{account.institution} · {accountTypeLabels[account.accountType]}</p>
+              <p className="text-sm font-bold text-slate-500">{account.institution} · {accountTypeLabels[account.accountType]} · {ownershipTypeLabels[account.ownershipType]}</p>
               <p className="mt-4 text-3xl font-black text-slate-950">{euro.format(account.balance)}</p>
+              {account.ownershipType === "shared" ? (
+                <p className="mt-2 text-xs font-black text-violet-700">
+                  Valor atribuivel: {euro.format(account.balance * (account.ownershipPercentage / 100))}
+                </p>
+              ) : null}
             </article>
           ))}
         </section>
@@ -100,6 +140,17 @@ export function AccountsPage() {
             <label className="form-field">
               <span>Saldo</span>
               <input type="number" value={draft.balance} onChange={(event) => setDraft({ ...draft, balance: Number(event.target.value) })} />
+            </label>
+            <label className="form-field">
+              <span>Propriedade</span>
+              <select value={draft.ownershipType} onChange={(event) => setDraft({ ...draft, ownershipType: event.target.value as OwnershipType, ownershipPercentage: event.target.value === "personal" ? 100 : draft.ownershipPercentage })}>
+                <option value="personal">Pessoal</option>
+                <option value="shared">Partilhada</option>
+              </select>
+            </label>
+            <label className="form-field">
+              <span>Percentagem</span>
+              <input type="number" min={0} max={100} value={draft.ownershipPercentage} onChange={(event) => setDraft({ ...draft, ownershipPercentage: Number(event.target.value) })} />
             </label>
             <label className="form-field">
               <span>Cor</span>

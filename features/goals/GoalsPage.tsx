@@ -1,35 +1,40 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { useMemo } from "react";
+import { Plus } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { GoalCard } from "@/components/GoalCard";
-import { initialGoals } from "@/lib/demo-data";
-import type { Goal } from "@/types/finance";
+import { useFinanceState } from "@/hooks/use-finance-state";
 
 export function GoalsPage() {
-  const [goals, setGoals] = useState<Goal[]>(initialGoals);
+  const { state, setState, activeWorkspace } = useFinanceState();
+  const goals = state.financialGoals;
   const totalProgress = useMemo(() => {
-    const current = goals.reduce((sum, goal) => sum + goal.currentAmount, 0);
-    const target = goals.reduce((sum, goal) => sum + goal.targetAmount, 0);
+    const current = goals.reduce((sum, goal) => sum + goal.currentValue, 0);
+    const target = goals.reduce((sum, goal) => sum + goal.targetValue, 0);
     return target ? Math.round((current / target) * 100) : 0;
   }, [goals]);
 
   function addGoal() {
-    setGoals((current) => [
+    if (!activeWorkspace) return;
+    setState((current) => ({
       ...current,
-      {
-        id: crypto.randomUUID(),
-        name: "Novo objetivo",
-        type: "other",
-        targetAmount: 15000,
-        currentAmount: 2500,
-        targetDate: "2027-12-31",
-        priority: "Media",
-        status: "Ativo",
-      },
-    ]);
+      financialGoals: [
+        ...current.financialGoals,
+        {
+          id: crypto.randomUUID(),
+          workspaceId: activeWorkspace.id,
+          name: "Novo objetivo",
+          type: "outros",
+          targetValue: 15000,
+          currentValue: 2500,
+          deadline: "2027-12-31",
+          priority: "Media",
+          status: "Ativo",
+        },
+      ],
+    }));
   }
 
   return (
@@ -57,16 +62,11 @@ export function GoalsPage() {
         ) : (
           <section className="grid gap-4 lg:grid-cols-2">
             {goals.map((goal) => (
-              <div key={goal.id} className="relative">
-                <GoalCard goal={goal} />
-                <button
-                  onClick={() => setGoals((current) => current.filter((item) => item.id !== goal.id))}
-                  className="absolute right-4 top-4 grid size-9 place-items-center rounded-full bg-white text-slate-400 shadow-sm ring-1 ring-slate-200 hover:text-rose-600"
-                  aria-label={`Eliminar ${goal.name}`}
-                >
-                  <Trash2 size={16} aria-hidden="true" />
-                </button>
-              </div>
+              <GoalCard
+                key={goal.id}
+                goal={goal}
+                onDelete={() => setState((current) => ({ ...current, financialGoals: current.financialGoals.filter((item) => item.id !== goal.id) }))}
+              />
             ))}
           </section>
         )}

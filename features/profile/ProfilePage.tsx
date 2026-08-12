@@ -47,7 +47,7 @@ export function ProfilePage() {
         </section>
         <section className="grid gap-4 md:grid-cols-2">
           <InfoCard icon={UserRound} title="Dados pessoais" text="Nome, email, pais e moeda principal." />
-          <InfoCard icon={ShieldCheck} title="Perfil de risco" text="Crescimento equilibrado com limites demo." />
+          <InfoCard icon={ShieldCheck} title="Perfil de risco" text="Crescimento equilibrado com limites definidos no perfil." />
         </section>
       </div>
     </AppShell>
