@@ -1,8 +1,57 @@
+"use client";
+
+import { useState } from "react";
 import { ArrowRight, Mail, ShieldCheck } from "lucide-react";
 import { BrandMark } from "@/components/BrandMark";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase-client";
 
 export function AuthPage({ mode }: { mode: "login" | "register" }) {
   const isRegister = mode === "register";
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [status, setStatus] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function submitAuth(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setStatus(null);
+
+    if (!supabase) {
+      setStatus("Supabase ainda nao esta configurado neste ambiente.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const redirectTo = `${window.location.origin}/`;
+    const fullName = `${firstName} ${lastName}`.trim();
+
+    const result = isRegister
+      ? await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: redirectTo,
+            data: { name: fullName || email.split("@")[0] },
+          },
+        })
+      : await supabase.auth.signInWithPassword({ email, password });
+
+    setIsSubmitting(false);
+
+    if (result.error) {
+      setStatus(result.error.message);
+      return;
+    }
+
+    if (isRegister && !result.data.session) {
+      setStatus("Conta criada. Confirma o email para entrar.");
+      return;
+    }
+
+    window.location.href = "/";
+  }
 
   return (
     <main className="min-h-screen bg-[var(--color-bg)] px-4 py-8">
@@ -34,38 +83,39 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
           <p className="mt-2 text-sm leading-6 text-slate-600">
             {isRegister ? "Comeca por criar a tua visao financeira pessoal." : "Acede ao teu espaco financeiro pessoal."}
           </p>
-          <form className="mt-7 space-y-4">
+          <form className="mt-7 space-y-4" onSubmit={submitAuth}>
             {isRegister && (
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="form-field">
                   <span>Nome</span>
-                  <input placeholder="Diogo" />
+                  <input value={firstName} onChange={(event) => setFirstName(event.target.value)} placeholder="Diogo" />
                 </label>
                 <label className="form-field">
                   <span>Apelido</span>
-                  <input placeholder="Silva" />
+                  <input value={lastName} onChange={(event) => setLastName(event.target.value)} placeholder="Silva" />
                 </label>
               </div>
             )}
             <label className="form-field">
               <span>Email</span>
-              <input type="email" placeholder="diogo@norteai.pt" />
+              <input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="diogo@norteai.pt" />
             </label>
             <label className="form-field">
               <span>Password</span>
-              <input type="password" placeholder="••••••••" />
+              <input required minLength={8} type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="••••••••" />
             </label>
-            <a href={isRegister ? "/onboarding" : "/"} className="primary-button">
-              {isRegister ? "Criar conta" : "Entrar"}
+            <button className="primary-button w-full" type="submit" disabled={isSubmitting || !isSupabaseConfigured}>
+              {isSubmitting ? "A processar..." : isRegister ? "Criar conta" : "Entrar"}
               <ArrowRight size={18} aria-hidden="true" />
-            </a>
+            </button>
           </form>
+          {status ? <p className="mt-4 rounded-2xl bg-slate-50 p-3 text-sm font-bold text-slate-600">{status}</p> : null}
           <div className="mt-6 rounded-2xl bg-violet-50 p-4 text-sm leading-6 text-violet-900">
             <div className="flex items-center gap-2 font-black">
               <ShieldCheck size={17} aria-hidden="true" />
-              <span>Autenticacao preparada</span>
+              <span>{isSupabaseConfigured ? "Autenticacao Supabase ativa" : "Autenticacao por configurar"}</span>
             </div>
-            <p className="mt-1">A arquitetura esta preparada para sessoes seguras e isolamento por workspace.</p>
+            <p className="mt-1">Sessoes seguras com onboarding automatico de workspace pessoal.</p>
           </div>
           <p className="mt-6 text-center text-sm text-slate-600">
             {isRegister ? "Ja tens conta?" : "Ainda nao tens conta?"}{" "}
