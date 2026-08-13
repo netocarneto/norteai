@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, LogOut, Search } from "lucide-react";
 import { BrandMark } from "@/components/BrandMark";
-import { desktopNav, mobileNav } from "@/lib/demo-data";
+import { desktopNav, mobileNav } from "@/lib/navigation";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import { accountName, categoryName, euro, euroCents, workspaceTypeLabels } from "@/lib/finance-engine";
 import type { FinanceState } from "@/types/finance";
