@@ -24,7 +24,7 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
     }
 
     setIsSubmitting(true);
-    const redirectTo = `${window.location.origin}/`;
+    const redirectTo = getAuthRedirectUrl();
     const fullName = `${firstName} ${lastName}`.trim();
 
     const result = isRegister
@@ -131,4 +131,14 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
       </div>
     </main>
   );
+}
+
+function getAuthRedirectUrl() {
+  const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+  if (configuredUrl) return `${configuredUrl}/`;
+
+  const isLocalhost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+  if (isLocalhost) return "https://norteai.carlosanetopt.workers.dev/";
+
+  return `${window.location.origin}/`;
 }
