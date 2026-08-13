@@ -10,7 +10,7 @@ import type { FinanceState, FinancialSummary, NorteScore } from "@/types/finance
 
 export function DashboardPage() {
   const { state, summary, score, activeWorkspace, setActiveWorkspace } = useFinanceState();
-  if (activeWorkspace?.type === "FAMILY") return <FutureWorkspaceDashboard icon={UsersRound} title="NorteAI Família" text="Esta área está preparada para uma fase futura. Nesta fase estamos a finalizar o NorteAI Pessoal." onReturnToPersonal={() => setActiveWorkspace(defaultWorkspaceId)} />;
+  if (activeWorkspace?.type === "FAMILY") return <FamilyDashboard state={state} summary={summary} score={score} onReturnToPersonal={() => setActiveWorkspace(defaultWorkspaceId)} />;
   if (activeWorkspace?.type === "FREELANCER") return <FutureWorkspaceDashboard icon={BriefcaseBusiness} title="NorteAI Freelancer" text="Esta área está preparada para atividade independente numa fase futura. Agora o foco é completar o NorteAI Pessoal." onReturnToPersonal={() => setActiveWorkspace(defaultWorkspaceId)} />;
 
   return <PersonalDashboard state={state} summary={summary} score={score} />;
@@ -131,6 +131,102 @@ function PersonalDashboard({ state, summary, score }: { state: FinanceState; sum
         <div className="grid gap-5">
           <DataFreshnessCard state={state} />
           <AnalysisCard summary={summary} />
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function FamilyDashboard({ state, summary, score, onReturnToPersonal }: { state: FinanceState; summary: FinancialSummary; score: NorteScore; onReturnToPersonal: () => void }) {
+  const hasData = hasWorkspaceData(state);
+  if (!hasData) {
+    return <WorkspaceEmptyState title="NorteAI Família" subtitle="Workspace familiar ativo." text="Adiciona uma conta partilhada para começar a visão familiar." action="Adicionar conta" href="/dinheiro" />;
+  }
+
+  const recent = [...state.transactions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+
+  return (
+    <div className="space-y-6">
+      <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="page-title">NorteAI Família</h1>
+          <p className="page-subtitle">Visão partilhada do agregado, isolada do workspace Pessoal.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <span className="rounded-full bg-violet-50 px-4 py-2 text-xs font-black uppercase tracking-normal text-violet-700 ring-1 ring-violet-100">
+            MVP Família
+          </span>
+          <Link href="/" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white" onClick={onReturnToPersonal}>
+            Voltar ao Pessoal
+          </Link>
+        </div>
+      </section>
+
+      <section className="grid gap-3 min-[390px]:grid-cols-2 lg:gap-5 xl:grid-cols-4">
+        <TopStat icon={UsersRound} label="Património familiar" value={euro.format(summary.netWorth)} detail="Ativos menos passivos" tone="violet" />
+        <TopStat icon={WalletCards} label="Liquidez partilhada" value={euro.format(summary.cashPosition)} detail="Contas familiares" tone="blue" />
+        <TopStat icon={ReceiptText} label="Despesas do mês" value={euro.format(summary.expenses)} detail="Movimentos familiares" tone="slate" />
+        <TopStat icon={CircleDollarSign} label="Poupança familiar" value={euro.format(summary.savings)} detail={summary.savingsRate === null ? "Sem receitas suficientes" : `${summary.savingsRate}% das receitas`} tone="teal" />
+      </section>
+
+      <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+          <div className="flex items-center gap-2">
+            <UsersRound size={20} className="text-violet-700" aria-hidden="true" />
+            <h2 className="section-title">Membros e propriedade</h2>
+          </div>
+          <div className="mt-4 space-y-2">
+            {state.workspaceMembers.map((member) => (
+              <div key={member.id} className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-3 py-3">
+                <div className="min-w-0">
+                  <p className="truncate font-black text-slate-950">{member.name}</p>
+                  <p className="text-xs font-bold text-slate-500">{member.role === "owner" ? "Responsável" : "Membro"}</p>
+                </div>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-700 ring-1 ring-slate-200">
+                  {member.ownershipPercentage ?? 0}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+          <div className="flex items-center gap-2">
+            <WalletCards size={20} className="text-violet-700" aria-hidden="true" />
+            <h2 className="section-title">Contas partilhadas</h2>
+          </div>
+          <div className="mt-4 space-y-2">
+            {state.accounts.map((account) => (
+              <div key={account.id} className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-3 py-3">
+                <div className="min-w-0">
+                  <p className="truncate font-black text-slate-950">{account.name}</p>
+                  <p className="truncate text-xs font-bold text-slate-500">{account.institution} · {account.ownershipType === "shared" ? "Partilhada" : "Pessoal"}</p>
+                </div>
+                <p className="shrink-0 font-black text-slate-950">{euro.format(account.balance)}</p>
+              </div>
+            ))}
+          </div>
+        </article>
+      </section>
+
+      <section className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.95fr)]">
+        <MonthlyReportCard state={state} summary={summary} />
+        <RecentTransactionsCard state={state} recent={recent} />
+        <div className="grid gap-5">
+          <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+            <h2 className="section-title">Norte Score familiar</h2>
+            <div className="mt-4 flex items-center gap-4">
+              <ScoreDial score={score.score} muted={!score.isDataSufficient} />
+              <div>
+                <p className="font-black text-emerald-600">{score.classification}</p>
+                <p className="mt-1 text-sm font-semibold leading-6 text-slate-500">
+                  Calculado por regras a partir dos dados familiares registados.
+                </p>
+              </div>
+            </div>
+            <SignalBars value={score.score} muted={!score.isDataSufficient} />
+          </article>
+          <DataFreshnessCard state={state} />
         </div>
       </section>
     </div>

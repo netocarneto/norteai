@@ -3,11 +3,13 @@ import test from "node:test";
 import {
   calculateNorteScore,
   calculateSummary,
+  familyWorkspaceId,
   initialFinanceState,
   isDuplicateTransaction,
   markDataSourceUpdated,
   normalizeFinanceState,
   parseCsv,
+  scopeFinanceState,
 } from "../lib/finance-engine.ts";
 
 test("calculates the initial personal financial summary from registered data", () => {
@@ -37,6 +39,23 @@ test("calculates Norte Score from financial factors, not hardcoded UI values", (
   assert.equal(score.diversificationPoints, 15);
   assert.equal(score.consistencyPoints, 10);
   assert.equal(score.isDataSufficient, true);
+});
+
+test("calculates family workspace summary independently from personal data", () => {
+  const familyState = { ...initialFinanceState, activeWorkspaceId: familyWorkspaceId };
+  const summary = calculateSummary(familyState);
+  const score = calculateNorteScore(summary);
+
+  assert.equal(summary.cashPosition, 23240);
+  assert.equal(summary.assets, 308240);
+  assert.equal(summary.liabilities, 148000);
+  assert.equal(summary.netWorth, 160240);
+  assert.equal(summary.income, 4000);
+  assert.equal(Number(summary.expenses.toFixed(2)), 985.6);
+  assert.equal(Number(summary.savings.toFixed(2)), 3014.4);
+  assert.equal(summary.savingsRate, 75.4);
+  assert.equal(score.score, 61);
+  assert.equal(score.classification, "Precisa de atenção");
 });
 
 test("parses CSV imports with inferred categories and duplicate detection", () => {
@@ -79,4 +98,23 @@ test("migrates legacy unused CSV source from pending to optional", () => {
 
   assert.equal(csv?.status, "disconnected");
   assert.equal(csv?.dataUntil, undefined);
+});
+
+test("adds family seed records to legacy personal-only local states", () => {
+  const legacy = structuredClone(initialFinanceState);
+  legacy.accounts = legacy.accounts.filter((record) => record.workspaceId !== familyWorkspaceId);
+  legacy.accountOwnerships = legacy.accountOwnerships.filter((record) => record.workspaceId !== familyWorkspaceId);
+  legacy.transactions = legacy.transactions.filter((record) => record.workspaceId !== familyWorkspaceId);
+  legacy.assets = legacy.assets.filter((record) => record.workspaceId !== familyWorkspaceId);
+  legacy.liabilities = legacy.liabilities.filter((record) => record.workspaceId !== familyWorkspaceId);
+  legacy.dataSources = legacy.dataSources.filter((record) => record.workspaceId !== familyWorkspaceId);
+
+  const normalized = normalizeFinanceState(legacy);
+  const family = scopeFinanceState({ ...normalized, activeWorkspaceId: familyWorkspaceId });
+
+  assert.equal(family.accounts.length, 2);
+  assert.equal(family.transactions.length, 6);
+  assert.equal(family.assets.length, 1);
+  assert.equal(family.liabilities.length, 1);
+  assert.equal(family.dataSources.some((source) => source.type === "manual" && source.status === "updated"), true);
 });

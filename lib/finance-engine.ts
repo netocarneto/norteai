@@ -133,12 +133,18 @@ export const initialFinanceState: FinanceState = {
     { id: "own-savings-diogo", workspaceId: defaultWorkspaceId, accountId: "acc-savings", memberId: "member-diogo-personal", ownershipPercentage: 100 },
     { id: "own-broker-diogo", workspaceId: defaultWorkspaceId, accountId: "acc-broker", memberId: "member-diogo-personal", ownershipPercentage: 100 },
     { id: "own-cash-diogo", workspaceId: defaultWorkspaceId, accountId: "acc-cash", memberId: "member-diogo-personal", ownershipPercentage: 100 },
+    { id: "own-family-joint-diogo", workspaceId: familyWorkspaceId, accountId: "acc-family-joint", memberId: "member-diogo-family", ownershipPercentage: 50 },
+    { id: "own-family-joint-partner", workspaceId: familyWorkspaceId, accountId: "acc-family-joint", memberId: "member-family-partner", ownershipPercentage: 50 },
+    { id: "own-family-savings-diogo", workspaceId: familyWorkspaceId, accountId: "acc-family-savings", memberId: "member-diogo-family", ownershipPercentage: 50 },
+    { id: "own-family-savings-partner", workspaceId: familyWorkspaceId, accountId: "acc-family-savings", memberId: "member-family-partner", ownershipPercentage: 50 },
   ],
   accounts: [
     { id: "acc-checking", workspaceId: defaultWorkspaceId, name: "Conta corrente", institution: "Millennium", accountType: "checking", balance: 8420, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, source: "manual", color: "#2563eb", icon: "card", createdAt, updatedAt: createdAt },
     { id: "acc-savings", workspaceId: defaultWorkspaceId, name: "Poupança", institution: "Caixa Geral de Depósitos", accountType: "savings", balance: 12000, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, source: "manual", color: "#10b981", icon: "piggy", createdAt, updatedAt: createdAt },
     { id: "acc-broker", workspaceId: defaultWorkspaceId, name: "Trade Republic", institution: "Trade Republic", accountType: "broker", balance: 96350, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, source: "manual", color: "#6d28d9", icon: "chart", createdAt, updatedAt: createdAt },
     { id: "acc-cash", workspaceId: defaultWorkspaceId, name: "Carteira", institution: "Manual", accountType: "cash", balance: 0, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, source: "manual", color: "#f59e0b", icon: "cash", createdAt, updatedAt: createdAt },
+    { id: "acc-family-joint", workspaceId: familyWorkspaceId, name: "Conta conjunta", institution: "Banco familiar", accountType: "checking", balance: 5240, currency: "EUR", ownershipType: "shared", ownershipPercentage: 100, source: "manual", color: "#0f766e", icon: "card", createdAt, updatedAt: createdAt },
+    { id: "acc-family-savings", workspaceId: familyWorkspaceId, name: "Poupança família", institution: "Banco familiar", accountType: "savings", balance: 18000, currency: "EUR", ownershipType: "shared", ownershipPercentage: 100, source: "manual", color: "#6d28d9", icon: "piggy", createdAt, updatedAt: createdAt },
   ],
   categories: [defaultWorkspaceId, familyWorkspaceId, freelancerWorkspaceId].flatMap((workspaceId) => baseCategories.map((category) => ({ ...category, id: `${category.id}-${workspaceId}`, workspaceId }))),
   categoryRules: [
@@ -148,6 +154,9 @@ export const initialFinanceState: FinanceState = {
     { id: "rule-netflix", workspaceId: defaultWorkspaceId, merchantKeyword: "Netflix", categoryId: `cat-subscriptions-${defaultWorkspaceId}` },
     { id: "rule-uber", workspaceId: defaultWorkspaceId, merchantKeyword: "Uber", categoryId: `cat-transport-${defaultWorkspaceId}` },
     { id: "rule-amazon", workspaceId: defaultWorkspaceId, merchantKeyword: "Amazon", categoryId: `cat-shopping-${defaultWorkspaceId}` },
+    { id: "rule-family-continente", workspaceId: familyWorkspaceId, merchantKeyword: "Continente", categoryId: `cat-supermarket-${familyWorkspaceId}` },
+    { id: "rule-family-edp", workspaceId: familyWorkspaceId, merchantKeyword: "EDP", categoryId: `cat-housing-${familyWorkspaceId}` },
+    { id: "rule-family-school", workspaceId: familyWorkspaceId, merchantKeyword: "Escola", categoryId: `cat-education-${familyWorkspaceId}` },
   ],
   transactions: [
     { id: "trx-salary", workspaceId: defaultWorkspaceId, accountId: "acc-checking", date: "2026-08-02", description: "Salário Agosto", merchant: "Salário", amount: 4200, currency: "EUR", type: "income", category: "Salário", source: "manual", categoryId: `cat-salary-${defaultWorkspaceId}`, createdAt, updatedAt: createdAt },
@@ -157,14 +166,22 @@ export const initialFinanceState: FinanceState = {
     { id: "trx-netflix", workspaceId: defaultWorkspaceId, accountId: "acc-checking", date: "2026-08-06", description: "Streaming", merchant: "Netflix", amount: -15.99, currency: "EUR", type: "expense", category: "Subscrições", source: "manual", categoryId: `cat-subscriptions-${defaultWorkspaceId}`, createdAt, updatedAt: createdAt },
     { id: "trx-amazon", workspaceId: defaultWorkspaceId, accountId: "acc-checking", date: "2026-08-07", description: "Compras online", merchant: "Amazon", amount: -128.5, currency: "EUR", type: "expense", category: "Compras", source: "manual", categoryId: `cat-shopping-${defaultWorkspaceId}`, createdAt, updatedAt: createdAt },
     { id: "trx-vwce", workspaceId: defaultWorkspaceId, accountId: "acc-broker", date: "2026-08-08", description: "Compra VWCE", merchant: "VWCE", amount: -500, currency: "EUR", type: "investment", category: "ETF", source: "manual", categoryId: `cat-etf-${defaultWorkspaceId}`, createdAt, updatedAt: createdAt },
+    { id: "trx-family-income-diogo", workspaceId: familyWorkspaceId, accountId: "acc-family-joint", date: "2026-08-02", description: "Contributo mensal Diogo", merchant: "Diogo", amount: 2200, currency: "EUR", type: "income", category: "Salário", source: "manual", categoryId: `cat-salary-${familyWorkspaceId}`, createdAt, updatedAt: createdAt },
+    { id: "trx-family-income-partner", workspaceId: familyWorkspaceId, accountId: "acc-family-joint", date: "2026-08-02", description: "Contributo mensal familiar", merchant: "Membro familiar", amount: 1800, currency: "EUR", type: "income", category: "Salário", source: "manual", categoryId: `cat-salary-${familyWorkspaceId}`, createdAt, updatedAt: createdAt },
+    { id: "trx-family-mortgage", workspaceId: familyWorkspaceId, accountId: "acc-family-joint", date: "2026-08-03", description: "Prestação casa", merchant: "Banco familiar", amount: -650, currency: "EUR", type: "expense", category: "Habitação", source: "manual", categoryId: `cat-housing-${familyWorkspaceId}`, createdAt, updatedAt: createdAt },
+    { id: "trx-family-continente", workspaceId: familyWorkspaceId, accountId: "acc-family-joint", date: "2026-08-05", description: "Supermercado semanal", merchant: "Continente", amount: -168.4, currency: "EUR", type: "expense", category: "Supermercado", source: "manual", categoryId: `cat-supermarket-${familyWorkspaceId}`, createdAt, updatedAt: createdAt },
+    { id: "trx-family-edp", workspaceId: familyWorkspaceId, accountId: "acc-family-joint", date: "2026-08-07", description: "Energia", merchant: "EDP", amount: -92.3, currency: "EUR", type: "expense", category: "Habitação", source: "manual", categoryId: `cat-housing-${familyWorkspaceId}`, createdAt, updatedAt: createdAt },
+    { id: "trx-family-school", workspaceId: familyWorkspaceId, accountId: "acc-family-joint", date: "2026-08-09", description: "Material escolar", merchant: "Escola", amount: -74.9, currency: "EUR", type: "expense", category: "Educação", source: "manual", categoryId: `cat-education-${familyWorkspaceId}`, createdAt, updatedAt: createdAt },
   ],
   assets: [
     { id: "asset-home", workspaceId: defaultWorkspaceId, name: "Casa", type: "real_estate", value: 250000, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, valuationDate: "2026-08-01", description: "Habitação própria" },
     { id: "asset-tesla", workspaceId: defaultWorkspaceId, name: "Tesla Model 3", type: "vehicle", value: 35000, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, valuationDate: "2026-08-01", description: "Valor estimado de mercado" },
+    { id: "asset-family-home", workspaceId: familyWorkspaceId, name: "Casa da família", type: "real_estate", value: 285000, currency: "EUR", ownershipType: "shared", ownershipPercentage: 100, valuationDate: "2026-08-01", description: "Ativo partilhado do agregado" },
   ],
   liabilities: [
     { id: "lia-mortgage", workspaceId: defaultWorkspaceId, name: "Crédito habitação", type: "mortgage", balance: 126000, monthlyPayment: 620, interestRate: 3.15, maturityDate: "2052-12-31", currency: "EUR" },
     { id: "lia-card", workspaceId: defaultWorkspaceId, name: "Cartão crédito", type: "credit_card", balance: 850, monthlyPayment: 120, interestRate: 12.9, currency: "EUR" },
+    { id: "lia-family-mortgage", workspaceId: familyWorkspaceId, name: "Crédito habitação família", type: "mortgage", balance: 148000, monthlyPayment: 650, interestRate: 3.1, maturityDate: "2051-12-31", currency: "EUR" },
   ],
   investments: [
     { id: "inv-vwce", workspaceId: defaultWorkspaceId, accountId: "acc-broker", assetId: "asset-investments", ticker: "VWCE", name: "Vanguard FTSE All-World", type: "ETF", quantity: 405, averagePrice: 95.2, currentPrice: 105.8, currentValue: 42850, costBasis: 38556, source: "manual", updatedAt: createdAt, institution: "Trade Republic", currency: "EUR" },
@@ -177,18 +194,29 @@ export const initialFinanceState: FinanceState = {
     { id: "goal-emergency", workspaceId: defaultWorkspaceId, name: "Fundo de emergência", type: "safety", targetValue: 18000, currentValue: 12000, deadline: "2026-12-31", priority: "Alta", status: "Ativo" },
     { id: "goal-home", workspaceId: defaultWorkspaceId, name: "Amortizar crédito", type: "debt", targetValue: 25000, currentValue: 8400, deadline: "2028-06-30", priority: "Média", status: "Ativo" },
   ],
-  financialScores: [{ id: "score-initial", workspaceId: defaultWorkspaceId, score: 82, createdAt }],
+  financialScores: [
+    { id: "score-initial", workspaceId: defaultWorkspaceId, score: 82, createdAt },
+    { id: "score-family-initial", workspaceId: familyWorkspaceId, score: 78, createdAt },
+  ],
   financialSnapshots: [
     { id: "snap-jan", workspaceId: defaultWorkspaceId, snapshotDate: "2026-01-31", snapshotType: "INITIAL", month: "Jan", netWorth: 112000, liquidAssets: 15000, income: 4000, expenses: 2600, savingsRate: 35, assets: 220000, liabilities: 108000, investmentValue: 72000, createdAt },
     { id: "snap-fev", workspaceId: defaultWorkspaceId, snapshotDate: "2026-02-28", snapshotType: "MONTHLY", month: "Fev", netWorth: 148500, liquidAssets: 17200, income: 4100, expenses: 2480, savingsRate: 39.5, assets: 254000, liabilities: 105500, investmentValue: 76000, createdAt },
     { id: "snap-mar", workspaceId: defaultWorkspaceId, snapshotDate: "2026-03-31", snapshotType: "MONTHLY", month: "Mar", netWorth: 165000, liquidAssets: 18600, income: 4200, expenses: 2550, savingsRate: 39.3, assets: 269000, liabilities: 104000, investmentValue: 81000, createdAt },
     { id: "snap-abr", workspaceId: defaultWorkspaceId, snapshotDate: "2026-04-30", snapshotType: "MONTHLY", month: "Abr", netWorth: 201500, liquidAssets: 19500, income: 4200, expenses: 2620, savingsRate: 37.6, assets: 304000, liabilities: 102500, investmentValue: 87500, createdAt },
     { id: "snap-mai", workspaceId: defaultWorkspaceId, snapshotDate: "2026-05-31", snapshotType: "MONTHLY", month: "Mai", netWorth: 224000, liquidAssets: 20420, income: 4300, expenses: 2510, savingsRate: 41.6, assets: 325000, liabilities: 101000, investmentValue: 91000, createdAt },
+    { id: "snap-family-jan", workspaceId: familyWorkspaceId, snapshotDate: "2026-01-31", snapshotType: "INITIAL", month: "Jan", netWorth: 122000, liquidAssets: 17800, income: 3900, expenses: 1260, savingsRate: 67.7, assets: 268000, liabilities: 146000, investmentValue: 0, createdAt },
+    { id: "snap-family-fev", workspaceId: familyWorkspaceId, snapshotDate: "2026-02-28", snapshotType: "MONTHLY", month: "Fev", netWorth: 128500, liquidAssets: 19000, income: 3950, expenses: 1350, savingsRate: 65.8, assets: 274000, liabilities: 145500, investmentValue: 0, createdAt },
+    { id: "snap-family-mar", workspaceId: familyWorkspaceId, snapshotDate: "2026-03-31", snapshotType: "MONTHLY", month: "Mar", netWorth: 132900, liquidAssets: 20100, income: 4000, expenses: 1240, savingsRate: 69, assets: 278000, liabilities: 145100, investmentValue: 0, createdAt },
+    { id: "snap-family-abr", workspaceId: familyWorkspaceId, snapshotDate: "2026-04-30", snapshotType: "MONTHLY", month: "Abr", netWorth: 139200, liquidAssets: 21450, income: 4000, expenses: 1305, savingsRate: 67.4, assets: 283500, liabilities: 144300, investmentValue: 0, createdAt },
+    { id: "snap-family-mai", workspaceId: familyWorkspaceId, snapshotDate: "2026-05-31", snapshotType: "MONTHLY", month: "Mai", netWorth: 145600, liquidAssets: 22400, income: 4050, expenses: 1290, savingsRate: 68.1, assets: 289000, liabilities: 143400, investmentValue: 0, createdAt },
   ],
   dataSources: [
     { id: "ds-manual", workspaceId: defaultWorkspaceId, type: "manual", provider: "Manual", status: "updated", lastSyncAt: createdAt, dataUntil: "2026-08-11", createdAt },
     { id: "ds-csv", workspaceId: defaultWorkspaceId, type: "csv", provider: "CSV", status: "disconnected", createdAt },
     { id: "ds-google-drive", workspaceId: defaultWorkspaceId, type: "google_drive", provider: "Google Drive", status: "disconnected", createdAt },
+    { id: "ds-family-manual", workspaceId: familyWorkspaceId, type: "manual", provider: "Manual", status: "updated", lastSyncAt: createdAt, dataUntil: "2026-08-11", createdAt },
+    { id: "ds-family-csv", workspaceId: familyWorkspaceId, type: "csv", provider: "CSV", status: "disconnected", createdAt },
+    { id: "ds-family-google-drive", workspaceId: familyWorkspaceId, type: "google_drive", provider: "Google Drive", status: "disconnected", createdAt },
   ],
 };
 
@@ -229,15 +257,8 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
         return normalized;
       })
     : initialFinanceState.dataSources;
-
-  return {
-    ...initialFinanceState,
-    ...state,
-    users,
-    workspaces,
-    activeWorkspaceId,
-    workspaceMembers,
-    accounts: (state.accounts ?? []).map((account) => ({
+  const accounts = withWorkspaceSeedRecords(
+    (state.accounts ?? []).map((account) => ({
       ...account,
       workspaceId: account.workspaceId ?? defaultWorkspaceId,
       accountType: normalizeAccountType(account.accountType as string),
@@ -250,11 +271,13 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
       createdAt: account.createdAt ?? createdAt,
       updatedAt: account.updatedAt ?? account.createdAt ?? createdAt,
     })),
-    accountOwnerships: state.accountOwnerships?.length ? state.accountOwnerships : initialFinanceState.accountOwnerships,
-    categories,
-    categoryRules: (state.categoryRules ?? []).map((rule) => ({ ...rule, workspaceId: rule.workspaceId ?? defaultWorkspaceId })),
-    transactions,
-    assets: (state.assets ?? []).map((asset) => ({
+    initialFinanceState.accounts,
+    familyWorkspaceId,
+  );
+  const accountOwnerships = withWorkspaceSeedRecords(state.accountOwnerships?.length ? state.accountOwnerships : initialFinanceState.accountOwnerships, initialFinanceState.accountOwnerships, familyWorkspaceId);
+  const categoryRules = withWorkspaceSeedRecords((state.categoryRules ?? []).map((rule) => ({ ...rule, workspaceId: rule.workspaceId ?? defaultWorkspaceId })), initialFinanceState.categoryRules, familyWorkspaceId);
+  const assets = withWorkspaceSeedRecords(
+    (state.assets ?? []).map((asset) => ({
       ...asset,
       workspaceId: asset.workspaceId ?? defaultWorkspaceId,
       type: normalizeAssetType(asset.type as string),
@@ -263,7 +286,27 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
       ownershipPercentage: clampPercentage(asset.ownershipPercentage ?? 100),
       valuationDate: asset.valuationDate ?? "2026-08-01",
     })),
-    liabilities: (state.liabilities ?? []).map((liability) => normalizeLiability(liability)),
+    initialFinanceState.assets,
+    familyWorkspaceId,
+  );
+  const liabilities = withWorkspaceSeedRecords((state.liabilities ?? []).map((liability) => normalizeLiability(liability)), initialFinanceState.liabilities, familyWorkspaceId);
+  const financialScores = withWorkspaceSeedRecords(state.financialScores?.length ? state.financialScores.map((score) => ({ ...score, workspaceId: score.workspaceId ?? defaultWorkspaceId })) : initialFinanceState.financialScores, initialFinanceState.financialScores, familyWorkspaceId);
+  const financialSnapshots = withWorkspaceSeedRecords(state.financialSnapshots?.length ? state.financialSnapshots.map((snapshot) => normalizeSnapshot(snapshot)) : initialFinanceState.financialSnapshots, initialFinanceState.financialSnapshots, familyWorkspaceId);
+
+  return {
+    ...initialFinanceState,
+    ...state,
+    users,
+    workspaces,
+    activeWorkspaceId,
+    workspaceMembers,
+    accounts,
+    accountOwnerships,
+    categories,
+    categoryRules,
+    transactions: withWorkspaceSeedRecords(transactions, initialFinanceState.transactions, familyWorkspaceId),
+    assets,
+    liabilities,
     investments: (state.investments ?? []).map((investment) => ({
       ...investment,
       workspaceId: investment.workspaceId ?? defaultWorkspaceId,
@@ -275,9 +318,9 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
       updatedAt: investment.updatedAt ?? createdAt,
     })),
     financialGoals: state.financialGoals?.length ? state.financialGoals.map((goal) => ({ ...goal, workspaceId: goal.workspaceId ?? defaultWorkspaceId })) : initialFinanceState.financialGoals,
-    financialScores: state.financialScores?.length ? state.financialScores.map((score) => ({ ...score, workspaceId: score.workspaceId ?? defaultWorkspaceId })) : initialFinanceState.financialScores,
-    financialSnapshots: state.financialSnapshots?.length ? state.financialSnapshots.map((snapshot) => normalizeSnapshot(snapshot)) : initialFinanceState.financialSnapshots,
-    dataSources,
+    financialScores,
+    financialSnapshots,
+    dataSources: withWorkspaceSeedRecords(dataSources, initialFinanceState.dataSources, familyWorkspaceId),
   };
 }
 
@@ -469,6 +512,12 @@ function normalizeCategories(categories: CategoryRecord[] | undefined, workspace
   });
 
   return [...existing, ...missing];
+}
+
+function withWorkspaceSeedRecords<T extends { id: string; workspaceId: string }>(records: T[], seedRecords: T[], workspaceId: string) {
+  if (records.some((record) => record.workspaceId === workspaceId)) return records;
+  const existingIds = new Set(records.map((record) => record.id));
+  return [...records, ...seedRecords.filter((record) => record.workspaceId === workspaceId && !existingIds.has(record.id))];
 }
 
 function baseCategoryId(categoryId: string) {

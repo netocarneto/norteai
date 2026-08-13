@@ -18,6 +18,7 @@ type SearchResult = {
 
 export function AppShell({ children, activePath = "/" }: { children: React.ReactNode; activePath?: string }) {
   const { state, activeWorkspace, workspaces, setActiveWorkspace } = useFinanceState();
+  const workspaceLabel = activeWorkspace ? workspaceTypeLabels[activeWorkspace.type] : "Workspace";
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-ink)]">
@@ -42,8 +43,8 @@ export function AppShell({ children, activePath = "/" }: { children: React.React
           </a>
         </div>
         <div className="absolute bottom-7 left-5 right-5 rounded-2xl bg-violet-50 p-4 ring-1 ring-violet-100">
-          <p className="text-sm font-bold text-slate-950">NorteAI Pessoal</p>
-          <p className="mt-1 text-xs leading-5 text-slate-600">Dashboard financeiro pessoal, sem integrações de IA nesta fase.</p>
+          <p className="text-sm font-bold text-slate-950">NorteAI {workspaceLabel}</p>
+          <p className="mt-1 text-xs leading-5 text-slate-600">Workspace financeiro ativo, sem integrações de IA nesta fase.</p>
         </div>
       </aside>
 
@@ -51,13 +52,13 @@ export function AppShell({ children, activePath = "/" }: { children: React.React
         <div className="mx-auto flex max-w-[1220px] items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-2 xl:hidden">
             <BrandMark compact />
-            <span className="truncate text-sm font-black text-slate-900">NorteAI · Pessoal</span>
+            <span className="truncate text-sm font-black text-slate-900">NorteAI · {workspaceLabel}</span>
           </div>
           <GlobalSearch state={state} />
           <div className="flex items-center gap-3">
             <MobileGlobalSearch state={state} />
             <label className="hidden items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-black text-slate-600 ring-1 ring-slate-200 lg:flex">
-              <span>{activeWorkspace ? workspaceTypeLabels[activeWorkspace.type] : "Workspace"}</span>
+              <span>{workspaceLabel}</span>
               <select
                 className="max-w-40 bg-transparent text-sm font-black text-slate-950 outline-none"
                 value={activeWorkspace?.id ?? ""}
