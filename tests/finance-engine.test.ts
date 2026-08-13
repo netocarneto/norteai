@@ -66,16 +66,26 @@ test("calculates freelancer workspace summary independently from personal data",
   const score = calculateNorteScore(summary);
 
   assert.equal(summary.cashPosition, 8600);
-  assert.equal(summary.assets, 8600);
-  assert.equal(summary.liabilities, 0);
-  assert.equal(summary.netWorth, 8600);
+  assert.equal(summary.assets, 26500);
+  assert.equal(summary.liabilities, 3000);
+  assert.equal(summary.netWorth, 23500);
   assert.equal(summary.income, 4150);
   assert.equal(summary.expenses, 389);
   assert.equal(summary.savings, 3761);
   assert.equal(summary.savingsRate, 90.6);
-  assert.equal(score.score, 80);
+  assert.equal(score.score, 75);
   assert.equal(score.classification, "Muito bom");
   assert.deepEqual(summary.spendingCategories.slice(0, 3).map((category) => category.name), ["Outros", "Impostos", "Subscrições"]);
+});
+
+test("calculates freelancer professional patrimony from professional assets and liabilities", () => {
+  const freelancer = scopeFinanceState({ ...initialFinanceState, activeWorkspaceId: freelancerWorkspaceId });
+  const professionalAssets = freelancer.assets.reduce((total, asset) => total + asset.value * ((asset.ownershipPercentage ?? 100) / 100), 0);
+  const professionalLiabilities = freelancer.liabilities.reduce((total, liability) => total + liability.balance, 0);
+
+  assert.equal(professionalAssets, 26500);
+  assert.equal(professionalLiabilities, 3000);
+  assert.equal(professionalAssets - professionalLiabilities, 23500);
 });
 
 test("parses CSV imports with inferred categories and duplicate detection", () => {
@@ -144,6 +154,8 @@ test("adds freelancer seed records to legacy personal-only local states", () => 
   legacy.accounts = legacy.accounts.filter((record) => record.workspaceId !== freelancerWorkspaceId);
   legacy.accountOwnerships = legacy.accountOwnerships.filter((record) => record.workspaceId !== freelancerWorkspaceId);
   legacy.transactions = legacy.transactions.filter((record) => record.workspaceId !== freelancerWorkspaceId);
+  legacy.assets = legacy.assets.filter((record) => record.workspaceId !== freelancerWorkspaceId);
+  legacy.liabilities = legacy.liabilities.filter((record) => record.workspaceId !== freelancerWorkspaceId);
   legacy.dataSources = legacy.dataSources.filter((record) => record.workspaceId !== freelancerWorkspaceId);
 
   const normalized = normalizeFinanceState(legacy);
@@ -151,5 +163,7 @@ test("adds freelancer seed records to legacy personal-only local states", () => 
 
   assert.equal(freelancer.accounts.length, 2);
   assert.equal(freelancer.transactions.length, 5);
+  assert.equal(freelancer.assets.length, 3);
+  assert.equal(freelancer.liabilities.length, 1);
   assert.equal(freelancer.dataSources.some((source) => source.type === "manual" && source.status === "updated"), true);
 });

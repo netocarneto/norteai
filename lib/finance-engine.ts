@@ -191,11 +191,15 @@ export const initialFinanceState: FinanceState = {
     { id: "asset-home", workspaceId: defaultWorkspaceId, name: "Casa", type: "real_estate", value: 250000, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, valuationDate: "2026-08-01", description: "Habitação própria" },
     { id: "asset-tesla", workspaceId: defaultWorkspaceId, name: "Tesla Model 3", type: "vehicle", value: 35000, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, valuationDate: "2026-08-01", description: "Valor estimado de mercado" },
     { id: "asset-family-home", workspaceId: familyWorkspaceId, name: "Casa da família", type: "real_estate", value: 285000, currency: "EUR", ownershipType: "shared", ownershipPercentage: 100, valuationDate: "2026-08-01", description: "Ativo partilhado do agregado" },
+    { id: "asset-freelancer-computer", workspaceId: freelancerWorkspaceId, name: "Computador profissional", type: "valuables", value: 2500, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, valuationDate: "2026-08-11", description: "Equipamento principal da atividade" },
+    { id: "asset-freelancer-camera", workspaceId: freelancerWorkspaceId, name: "Câmara", type: "valuables", value: 4000, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, valuationDate: "2026-08-11", description: "Equipamento técnico" },
+    { id: "asset-freelancer-vehicle", workspaceId: freelancerWorkspaceId, name: "Viatura profissional", type: "vehicle", value: 20000, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, valuationDate: "2026-08-11", description: "Viatura usada na atividade" },
   ],
   liabilities: [
     { id: "lia-mortgage", workspaceId: defaultWorkspaceId, name: "Crédito habitação", type: "mortgage", balance: 126000, monthlyPayment: 620, interestRate: 3.15, maturityDate: "2052-12-31", currency: "EUR" },
     { id: "lia-card", workspaceId: defaultWorkspaceId, name: "Cartão crédito", type: "credit_card", balance: 850, monthlyPayment: 120, interestRate: 12.9, currency: "EUR" },
     { id: "lia-family-mortgage", workspaceId: familyWorkspaceId, name: "Crédito habitação família", type: "mortgage", balance: 148000, monthlyPayment: 650, interestRate: 3.1, maturityDate: "2051-12-31", currency: "EUR" },
+    { id: "lia-freelancer-equipment", workspaceId: freelancerWorkspaceId, name: "Crédito equipamento", type: "personal_loan", balance: 3000, monthlyPayment: 180, interestRate: 6.2, maturityDate: "2027-12-31", currency: "EUR" },
   ],
   investments: [
     { id: "inv-vwce", workspaceId: defaultWorkspaceId, accountId: "acc-broker", assetId: "asset-investments", ticker: "VWCE", name: "Vanguard FTSE All-World", type: "ETF", quantity: 405, averagePrice: 95.2, currentPrice: 105.8, currentValue: 42850, costBasis: 38556, source: "manual", updatedAt: createdAt, institution: "Trade Republic", currency: "EUR" },
@@ -368,6 +372,8 @@ export function scopeFinanceState(state: FinanceState, workspaceId = state.activ
 
 export function calculateSummary(state: FinanceState): FinancialSummary {
   const scoped = scopeFinanceState(state);
+  const activeWorkspace = scoped.workspaces.find((workspace) => workspace.id === scoped.activeWorkspaceId);
+  const isFreelancer = activeWorkspace?.type === "FREELANCER";
   const income = sum(scoped.transactions.filter((item) => item.type === "income").map((item) => item.amount));
   const expenses = Math.abs(sum(scoped.transactions.filter((item) => item.type === "expense").map((item) => item.amount)));
   const investmentContributions = Math.abs(sum(scoped.transactions.filter((item) => item.type === "investment").map((item) => item.amount)));
@@ -376,7 +382,7 @@ export function calculateSummary(state: FinanceState): FinancialSummary {
   const investmentAccounts = sum(scoped.accounts.filter((item) => ["broker", "crypto"].includes(item.accountType)).map((item) => attributableValue(item.balance, item.ownershipPercentage)));
   const investments = scoped.investments.length ? sum(scoped.investments.map((item) => item.currentValue)) : investmentAccounts;
   const nonPortfolioAssets = sum(scoped.assets.map((item) => attributableValue(item.value, item.ownershipPercentage)));
-  const assets = cashPosition + investments + nonPortfolioAssets;
+  const assets = isFreelancer ? nonPortfolioAssets : cashPosition + investments + nonPortfolioAssets;
   const liabilities = sum(scoped.liabilities.map((item) => item.balance));
   const allocation = toPercentSlices(groupValues(scoped.investments, (item) => investmentTypeLabels[item.type], (item) => item.currentValue));
   const spendingCategories = toAmountSlices(groupValues(scoped.transactions.filter((item) => item.type === "expense"), (item) => transactionCategoryName(scoped, item), (item) => Math.abs(item.amount))).sort((a, b) => b.value - a.value);

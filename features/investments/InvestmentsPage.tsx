@@ -31,6 +31,7 @@ export function InvestmentsPage() {
   const { state, setState, summary, activeWorkspace } = useFinanceState();
   const [draft, setDraft] = useState<Omit<InvestmentRecord, "id" | "workspaceId">>(emptyInvestment);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const isFreelancer = activeWorkspace?.type === "FREELANCER";
   const portfolioCost = state.investments.reduce((total, investment) => total + investment.costBasis, 0);
   const portfolioValue = state.investments.reduce((total, investment) => total + investment.currentValue, 0);
   const portfolioGain = portfolioValue - portfolioCost;
@@ -64,18 +65,20 @@ export function InvestmentsPage() {
       <div className="space-y-6">
         <section>
           <h1 className="page-title">Investir</h1>
-          <p className="page-subtitle">Carteira, posições, alocação, rentabilidade e concentração, sem recomendações de IA.</p>
+          <p className="page-subtitle">
+            {isFreelancer ? "Investimentos da atividade, reservas investidas e capital profissional disponível." : "Carteira, posições, alocação, rentabilidade e concentração, sem recomendações de IA."}
+          </p>
         </section>
 
         <section className="grid gap-5 lg:grid-cols-[1fr_1fr] xl:grid-cols-[1fr_1fr_0.9fr]">
           <article className="rounded-3xl bg-financial p-6 text-white shadow-purple">
-            <p className="text-sm font-medium text-violet-100">Carteira total</p>
+            <p className="text-sm font-medium text-violet-100">{isFreelancer ? "Investimentos da atividade" : "Carteira total"}</p>
             <p className="mt-4 text-5xl font-black tracking-normal">{euro.format(summary.investments)}</p>
-            <p className="mt-3 font-black text-emerald-200">Contribuições este mês: {euro.format(summary.investmentContributions)}</p>
+            <p className="mt-3 font-black text-emerald-200">{isFreelancer ? "Reservas investidas este mês" : "Contribuições este mês"}: {euro.format(summary.investmentContributions)}</p>
           </article>
 
           <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
-            <h2 className="section-title">Alocação</h2>
+            <h2 className="section-title">{isFreelancer ? "Alocação da atividade" : "Alocação"}</h2>
             {summary.allocation.length ? (
               <div className="mt-4 grid items-center gap-4 sm:grid-cols-[170px_1fr]">
                 <div className="h-44">
@@ -99,15 +102,17 @@ export function InvestmentsPage() {
               </div>
             ) : (
               <div className="mt-4">
-                <EmptyState title="Sem alocação" description="Cria pelo menos uma posição para calcular a distribuição por classe de ativo." />
+                <EmptyState title="Sem alocação" description={isFreelancer ? "Cria posições da atividade para calcular a distribuição do capital profissional." : "Cria pelo menos uma posição para calcular a distribuição por classe de ativo."} />
               </div>
             )}
           </article>
           <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="section-title">Resumo da carteira</h2>
-                <p className="mt-1 text-sm font-semibold text-slate-500">Valores calculados pelas posições registadas.</p>
+                <h2 className="section-title">{isFreelancer ? "Resumo profissional" : "Resumo da carteira"}</h2>
+                <p className="mt-1 text-sm font-semibold text-slate-500">
+                  {isFreelancer ? "Apenas posições registadas neste workspace profissional." : "Valores calculados pelas posições registadas."}
+                </p>
               </div>
               <div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-teal-50 text-teal-700">
                 <TrendingUp size={20} aria-hidden="true" />
@@ -116,6 +121,7 @@ export function InvestmentsPage() {
             <div className="mt-5 grid gap-3">
               <SummaryRow label="Valor investido" value={euro.format(portfolioCost)} />
               <SummaryRow label="Valor atual" value={euro.format(portfolioValue)} />
+              {isFreelancer ? <SummaryRow label="Mistura com pessoal" value="Não automática" /> : null}
               <SummaryRow
                 label="Diferença estimada"
                 value={`${portfolioGain >= 0 ? "+" : ""}${euro.format(portfolioGain)}${portfolioGainRate === null ? "" : ` · ${portfolioGainRate.toFixed(1)}%`}`}
@@ -128,10 +134,10 @@ export function InvestmentsPage() {
 
         <section className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
           <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
-            <div className="flex items-center gap-2"><Plus size={20} className="text-violet-700" /><h2 className="section-title">{editingId ? "Editar posição" : "Criar posição"}</h2></div>
+            <div className="flex items-center gap-2"><Plus size={20} className="text-violet-700" /><h2 className="section-title">{editingId ? "Editar posição" : (isFreelancer ? "Criar posição da atividade" : "Criar posição")}</h2></div>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <label className="form-field"><span>Ticker</span><input value={draft.ticker} onChange={(event) => setDraft({ ...draft, ticker: event.target.value.toUpperCase() })} placeholder="VWCE" /></label>
-              <label className="form-field"><span>Nome</span><input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} placeholder="Vanguard FTSE All-World" /></label>
+              <label className="form-field"><span>Ticker</span><input value={draft.ticker} onChange={(event) => setDraft({ ...draft, ticker: event.target.value.toUpperCase() })} placeholder={isFreelancer ? "RESERVA" : "VWCE"} /></label>
+              <label className="form-field"><span>Nome</span><input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} placeholder={isFreelancer ? "Reserva investida da atividade" : "Vanguard FTSE All-World"} /></label>
               <label className="form-field"><span>Tipo</span><select value={draft.type} onChange={(event) => setDraft({ ...draft, type: event.target.value as InvestmentType })}>{investmentTypes.map((type) => <option key={type} value={type}>{investmentTypeLabels[type]}</option>)}</select></label>
               <label className="form-field"><span>Instituição</span><input value={draft.institution} onChange={(event) => setDraft({ ...draft, institution: event.target.value })} placeholder="Trade Republic" /></label>
               <label className="form-field"><span>Quantidade</span><input type="number" value={draft.quantity} onChange={(event) => setDraft({ ...draft, quantity: Number(event.target.value) })} /></label>
@@ -139,12 +145,12 @@ export function InvestmentsPage() {
               <label className="form-field"><span>Preço atual</span><input type="number" value={draft.currentPrice ?? 0} onChange={(event) => setDraft({ ...draft, currentPrice: Number(event.target.value) })} /></label>
               <label className="form-field"><span>Valor atual</span><input type="number" value={draft.currentValue} onChange={(event) => setDraft({ ...draft, currentValue: Number(event.target.value) })} /></label>
               <label className="form-field"><span>Custo total</span><input type="number" value={draft.costBasis} onChange={(event) => setDraft({ ...draft, costBasis: Number(event.target.value) })} /></label>
-              <button className="primary-button sm:col-span-2" onClick={saveInvestment}>{editingId ? "Guardar posição" : "Criar posição"}</button>
+              <button className="primary-button sm:col-span-2" onClick={saveInvestment}>{editingId ? "Guardar posição" : (isFreelancer ? "Criar posição da atividade" : "Criar posição")}</button>
             </div>
           </article>
 
           <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
-            <h2 className="section-title">Posições</h2>
+            <h2 className="section-title">{isFreelancer ? "Posições da atividade" : "Posições"}</h2>
             <div className="mt-4 divide-y divide-slate-100">
               {state.investments.length ? (
                 state.investments.map((investment) => (
@@ -180,7 +186,7 @@ export function InvestmentsPage() {
                 ))
               ) : (
                 <div className="py-4">
-                  <EmptyState title="Sem posições" description="Cria ETFs, ações, cripto ou outros ativos para acompanhares a carteira." />
+                  <EmptyState title="Sem posições" description={isFreelancer ? "Cria aplicações financeiras da atividade, reservas investidas ou capital profissional disponível." : "Cria ETFs, ações, cripto ou outros ativos para acompanhares a carteira."} />
                 </div>
               )}
             </div>

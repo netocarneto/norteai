@@ -43,27 +43,7 @@ function PersonalDashboard({ state, summary, score }: { state: FinanceState; sum
       </section>
 
       <section className="grid gap-3 min-[390px]:grid-cols-2 lg:gap-5">
-        <article className="rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5 xl:p-6">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h2 className="text-sm font-black text-slate-950">Norte Score</h2>
-              <div className="mt-3 flex items-center gap-3">
-                <ScoreDial score={score.score} muted={!score.isDataSufficient} />
-                <div className="min-w-0">
-                  <p className="text-sm font-black text-emerald-600">{score.classification}</p>
-                  <p className="mt-1 text-xs font-bold leading-5 text-slate-500">
-                    {score.reason ?? "A tua saúde financeira está muito boa."}
-                  </p>
-                </div>
-              </div>
-              <p className="mt-3 text-[0.72rem] font-semibold leading-5 text-slate-400">
-                Baseado em poupança, fundo de emergência, dívida, diversificação e consistência.
-              </p>
-            </div>
-          </div>
-          <SignalBars value={score.score} muted={!score.isDataSufficient} />
-          {score.isDataSufficient ? <ScoreBreakdown score={score} /> : null}
-        </article>
+        <NorteScoreCard score={score} title="Norte Score" description={score.reason ?? "A tua saúde financeira está muito boa."} />
 
         <article className="rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5 xl:p-6">
           <div className="flex items-start justify-between gap-4">
@@ -163,7 +143,8 @@ function FamilyDashboard({ state, summary, score, onReturnToPersonal }: { state:
         </div>
       </section>
 
-      <section className="grid gap-3 min-[390px]:grid-cols-2 lg:gap-5 xl:grid-cols-4">
+      <section className="grid gap-3 min-[390px]:grid-cols-2 lg:gap-5 xl:grid-cols-5">
+        <NorteScoreCard score={score} title="Norte Score familiar" description="Calculado por regras a partir dos dados familiares registados." />
         <TopStat icon={UsersRound} label="Património familiar" value={euro.format(summary.netWorth)} detail="Ativos menos passivos" tone="violet" />
         <TopStat icon={WalletCards} label="Liquidez partilhada" value={euro.format(summary.cashPosition)} detail="Contas familiares" tone="blue" />
         <TopStat icon={ReceiptText} label="Despesas do mês" value={euro.format(summary.expenses)} detail="Movimentos familiares" tone="slate" />
@@ -214,19 +195,6 @@ function FamilyDashboard({ state, summary, score, onReturnToPersonal }: { state:
         <MonthlyReportCard state={state} summary={summary} />
         <RecentTransactionsCard state={state} recent={recent} />
         <div className="grid gap-5">
-          <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
-            <h2 className="section-title">Norte Score familiar</h2>
-            <div className="mt-4 flex items-center gap-4">
-              <ScoreDial score={score.score} muted={!score.isDataSufficient} />
-              <div>
-                <p className="font-black text-emerald-600">{score.classification}</p>
-                <p className="mt-1 text-sm font-semibold leading-6 text-slate-500">
-                  Calculado por regras a partir dos dados familiares registados.
-                </p>
-              </div>
-            </div>
-            <SignalBars value={score.score} muted={!score.isDataSufficient} />
-          </article>
           <DataFreshnessCard state={state} />
         </div>
       </section>
@@ -241,6 +209,15 @@ function FreelancerDashboard({ state, summary, score, onReturnToPersonal }: { st
   }
 
   const recent = [...state.transactions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+  const professionalAssets = state.assets.reduce((total, asset) => total + ownedAmount(asset.value, asset.ownershipPercentage), 0);
+  const professionalLiabilities = state.liabilities.reduce((total, liability) => total + liability.balance, 0);
+  const professionalNetWorth = professionalAssets - professionalLiabilities;
+  const reserves = state.accounts
+    .filter((account) => account.accountType === "savings" || account.name.toLowerCase().includes("reserva"))
+    .reduce((total, account) => total + ownedAmount(account.balance, account.ownershipPercentage), 0);
+  const activityLiquidity = state.accounts
+    .filter((account) => (account.accountType === "checking" || account.accountType === "cash") && !account.name.toLowerCase().includes("reserva"))
+    .reduce((total, account) => total + ownedAmount(account.balance, account.ownershipPercentage), 0);
   const estimatedTaxReserve = Math.max(0, summary.savings * 0.25);
   const taxReserveAccount = state.accounts.find((account) => account.name.toLowerCase().includes("reserva"));
   const reserveGap = estimatedTaxReserve - (taxReserveAccount?.balance ?? 0);
@@ -250,7 +227,7 @@ function FreelancerDashboard({ state, summary, score, onReturnToPersonal }: { st
       <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="page-title">NorteAI Freelancer</h1>
-          <p className="page-subtitle">Receitas profissionais, despesas, lucro e reserva fiscal estimada.</p>
+          <p className="page-subtitle">Liquidez da atividade, reservas, património profissional e obrigações.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <span className="rounded-full bg-teal-50 px-4 py-2 text-xs font-black uppercase tracking-normal text-teal-700 ring-1 ring-teal-100">
@@ -262,11 +239,13 @@ function FreelancerDashboard({ state, summary, score, onReturnToPersonal }: { st
         </div>
       </section>
 
-      <section className="grid gap-3 min-[390px]:grid-cols-2 lg:gap-5 xl:grid-cols-4">
-        <TopStat icon={BriefcaseBusiness} label="Receitas profissionais" value={euro.format(summary.income)} detail="Entradas do mês" tone="teal" />
-        <TopStat icon={ReceiptText} label="Despesas profissionais" value={euro.format(summary.expenses)} detail="Custos registados" tone="slate" />
-        <TopStat icon={CircleDollarSign} label="Lucro líquido" value={euro.format(summary.savings)} detail={summary.savingsRate === null ? "Sem receitas suficientes" : `${summary.savingsRate}% de margem`} tone="blue" />
-        <TopStat icon={Landmark} label="Reserva fiscal" value={euro.format(estimatedTaxReserve)} detail="Estimativa simples de 25%" tone="violet" />
+      <section className="grid gap-3 min-[390px]:grid-cols-2 lg:gap-5 xl:grid-cols-6">
+        <NorteScoreCard score={score} title="Norte Score profissional" description="Calculado por regras a partir da atividade freelancer registada." />
+        <TopStat icon={BriefcaseBusiness} label="Receita mensal" value={euro.format(summary.income)} detail="Entradas da atividade" tone="teal" />
+        <TopStat icon={WalletCards} label="Dinheiro disponível" value={euro.format(activityLiquidity)} detail="Liquidez operacional" tone="blue" />
+        <TopStat icon={CircleDollarSign} label="Reservas" value={euro.format(reserves)} detail="Impostos e segurança" tone="violet" />
+        <TopStat icon={Landmark} label="Património profissional" value={euro.format(professionalNetWorth)} detail="Ativos menos obrigações" tone="slate" />
+        <TopStat icon={ReceiptText} label="Obrigações" value={euro.format(professionalLiabilities)} detail="Valores a pagar" tone="slate" />
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -299,6 +278,7 @@ function FreelancerDashboard({ state, summary, score, onReturnToPersonal }: { st
             <ReportRow label="Valor sugerido" value={euroCents.format(estimatedTaxReserve)} />
             <ReportRow label="Reserva atual" value={euroCents.format(taxReserveAccount?.balance ?? 0)} />
             <ReportRow label={reserveGap > 0 ? "Falta reservar" : "Folga disponível"} value={euroCents.format(Math.abs(reserveGap))} />
+            <ReportRow label="Património profissional" value={euroCents.format(professionalNetWorth)} />
           </div>
           <p className="mt-4 rounded-2xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-500">
             Estimativa operacional para organização. Não substitui apuramento fiscal oficial.
@@ -310,19 +290,6 @@ function FreelancerDashboard({ state, summary, score, onReturnToPersonal }: { st
         <MonthlyReportCard state={state} summary={summary} />
         <RecentTransactionsCard state={state} recent={recent} />
         <div className="grid gap-5">
-          <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
-            <h2 className="section-title">Norte Score profissional</h2>
-            <div className="mt-4 flex items-center gap-4">
-              <ScoreDial score={score.score} muted={!score.isDataSufficient} />
-              <div>
-                <p className="font-black text-emerald-600">{score.classification}</p>
-                <p className="mt-1 text-sm font-semibold leading-6 text-slate-500">
-                  Calculado por regras a partir da atividade freelancer registada.
-                </p>
-              </div>
-            </div>
-            <SignalBars value={score.score} muted={!score.isDataSufficient} />
-          </article>
           <DataFreshnessCard state={state} />
         </div>
       </section>
@@ -380,10 +347,38 @@ function hasWorkspaceData(state: FinanceState) {
   return Boolean(state.accounts.length || state.transactions.length || state.assets.length || state.liabilities.length || state.investments.length || state.financialGoals.length);
 }
 
+function ownedAmount(value: number, ownershipPercentage = 100) {
+  return value * (ownershipPercentage / 100);
+}
+
 function buildWealthCurve(state: FinanceState, netWorth: number) {
   const snapshots = state.financialSnapshots.map((snapshot) => ({ month: snapshot.month, value: snapshot.netWorth }));
 
   return [...snapshots.slice(-5), { month: "Atual", value: netWorth }];
+}
+
+function NorteScoreCard({ score, title, description }: { score: NorteScore; title: string; description: string }) {
+  return (
+    <article className="rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5 xl:p-6">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-sm font-black text-slate-950">{title}</h2>
+          <div className="mt-3 flex items-center gap-3">
+            <ScoreDial score={score.score} muted={!score.isDataSufficient} />
+            <div className="min-w-0">
+              <p className="text-sm font-black text-emerald-600">{score.classification}</p>
+              <p className="mt-1 text-xs font-bold leading-5 text-slate-500">{description}</p>
+            </div>
+          </div>
+          <p className="mt-3 text-[0.72rem] font-semibold leading-5 text-slate-400">
+            Baseado em poupança, fundo de emergência, dívida, diversificação e consistência.
+          </p>
+        </div>
+      </div>
+      <SignalBars value={score.score} muted={!score.isDataSufficient} />
+      {score.isDataSufficient ? <ScoreBreakdown score={score} /> : null}
+    </article>
+  );
 }
 
 function ScoreBreakdown({ score }: { score: NorteScore }) {
