@@ -14,23 +14,23 @@ export function NorteAIPage() {
               Em desenvolvimento
             </span>
           </div>
-          <p className="page-subtitle">Area do assistente financeiro, sem ligacao real nesta fase.</p>
+          <p className="page-subtitle">Área do assistente financeiro, sem ligação real nesta fase.</p>
         </section>
         <section className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
           <AIInput />
           <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="section-title">Analise completa</h2>
+              <h2 className="section-title">Análise completa</h2>
               <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-normal text-amber-700 ring-1 ring-amber-100">
                 Futuro
               </span>
             </div>
             <div className="mt-5 space-y-4">
               {[
-                "Motor generativo nao implementado nesta fase.",
-                "OpenAI, MCP e chat financeiro estao fora do ambito atual.",
-                "O foco atual e manter dados pessoais, calculos e importacao manual consistentes.",
-                "As recomendacoes futuras deverao usar a mesma base de workspaces e permissoes.",
+                "Motor generativo não implementado nesta fase.",
+                "OpenAI, MCP e chat financeiro estão fora do âmbito atual.",
+                "O foco atual é manter dados pessoais, cálculos e importação manual consistentes.",
+                "As recomendações futuras deverão usar a mesma base de workspaces e permissões.",
               ].map((item) => (
                 <p key={item} className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">{item}</p>
               ))}

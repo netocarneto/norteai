@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, LogOut, Search, Send, Settings } from "lucide-react";
+import { ArrowRight, LogOut, Search } from "lucide-react";
 import { BrandMark } from "@/components/BrandMark";
 import { desktopNav, mobileNav } from "@/lib/demo-data";
 import { useFinanceState } from "@/hooks/use-finance-state";
@@ -36,33 +36,22 @@ export function AppShell({ children, activePath = "/" }: { children: React.React
           })}
         </nav>
         <div className="mt-8 border-t border-slate-100 pt-5">
-          <a href="/definicoes" className={`nav-link ${activePath === "/definicoes" ? "nav-link-active" : ""}`}>
-            <Settings size={20} aria-hidden="true" />
-            <span>Definicoes</span>
-          </a>
           <a href="/login" className="nav-link">
             <LogOut size={20} aria-hidden="true" />
             <span>Sair</span>
           </a>
         </div>
         <div className="absolute bottom-7 left-5 right-5 rounded-2xl bg-violet-50 p-4 ring-1 ring-violet-100">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-bold text-slate-950">NorteAI</p>
-            <span className="rounded-full bg-amber-50 px-2 py-1 text-[0.62rem] font-black uppercase tracking-normal text-amber-700 ring-1 ring-amber-100">
-              Futuro
-            </span>
-          </div>
-          <p className="mt-1 text-xs leading-5 text-slate-600">Assistente financeiro reservado para uma fase futura.</p>
-          <a href="/norteai" className="mt-4 inline-grid size-10 place-items-center rounded-full bg-violet-600 text-white shadow-soft" aria-label="Abrir NorteAI">
-            <Send size={17} aria-hidden="true" />
-          </a>
+          <p className="text-sm font-bold text-slate-950">NorteAI Pessoal</p>
+          <p className="mt-1 text-xs leading-5 text-slate-600">Dashboard financeiro pessoal, sem integrações de IA nesta fase.</p>
         </div>
       </aside>
 
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/82 px-4 py-3 backdrop-blur xl:ml-[250px] xl:px-8">
+      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/86 px-4 py-3 backdrop-blur xl:ml-[250px] xl:px-8">
         <div className="mx-auto flex max-w-[1220px] items-center justify-between gap-4">
-          <div className="xl:hidden">
+          <div className="flex min-w-0 items-center gap-2 xl:hidden">
             <BrandMark compact />
+            <span className="truncate text-sm font-black text-slate-900">NorteAI · Pessoal</span>
           </div>
           <GlobalSearch state={state} />
           <div className="flex items-center gap-3">
@@ -87,18 +76,13 @@ export function AppShell({ children, activePath = "/" }: { children: React.React
             </a>
           </div>
         </div>
-        <MobileWorkspaceSwitcher
-          activeWorkspace={activeWorkspace}
-          workspaces={workspaces}
-          onChange={setActiveWorkspace}
-        />
       </header>
 
-      <main className="pb-24 xl:ml-[250px] xl:pb-8">
+      <main className="pb-[calc(6.5rem+env(safe-area-inset-bottom))] xl:ml-[250px] xl:pb-8">
         <div className="mx-auto max-w-[1220px] px-4 py-5 sm:px-6 xl:px-8">{children}</div>
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-3 py-2 shadow-[0_-18px_35px_rgba(15,23,42,0.08)] backdrop-blur xl:hidden" aria-label="Mobile">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 shadow-[0_-18px_35px_rgba(15,23,42,0.08)] backdrop-blur xl:hidden" aria-label="Mobile">
         <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
           {mobileNav.map((item) => {
             const Icon = item.icon;
@@ -113,37 +97,6 @@ export function AppShell({ children, activePath = "/" }: { children: React.React
         </div>
       </nav>
     </div>
-  );
-}
-
-function MobileWorkspaceSwitcher({
-  activeWorkspace,
-  workspaces,
-  onChange,
-}: {
-  activeWorkspace: ReturnType<typeof useFinanceState>["activeWorkspace"];
-  workspaces: ReturnType<typeof useFinanceState>["workspaces"];
-  onChange: (workspaceId: string) => void;
-}) {
-  return (
-    <label className="mx-auto mt-3 flex max-w-[1220px] items-center gap-3 rounded-2xl bg-white px-3 py-2 text-xs font-black text-slate-500 ring-1 ring-slate-200 lg:hidden">
-      <span className="shrink-0">Workspace</span>
-      <span className="rounded-full bg-violet-50 px-2.5 py-1 text-[0.65rem] uppercase tracking-normal text-violet-700">
-        {activeWorkspace ? workspaceTypeLabels[activeWorkspace.type] : "Ativo"}
-      </span>
-      <select
-        className="min-w-0 flex-1 bg-transparent text-right text-sm font-black text-slate-950 outline-none"
-        value={activeWorkspace?.id ?? ""}
-        onChange={(event) => onChange(event.target.value)}
-        aria-label="Workspace ativo"
-      >
-        {workspaces.map((workspace) => (
-          <option key={workspace.id} value={workspace.id}>
-            {workspace.name}
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }
 
@@ -261,7 +214,7 @@ function buildSearchResults(state: FinanceState, query: string): SearchResult[] 
     ...state.liabilities.map((liability) => ({
       id: `liability-${liability.id}`,
       href: "/patrimonio",
-      eyebrow: "Divida",
+      eyebrow: "Dívida",
       title: liability.name,
       detail: `${euro.format(liability.balance)} em aberto`,
     })),

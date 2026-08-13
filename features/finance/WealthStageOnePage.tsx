@@ -43,13 +43,13 @@ export function WealthStageOnePage() {
     <AppShell activePath="/patrimonio">
       <div className="space-y-6">
         <section>
-          <h1 className="page-title">Patrimonio</h1>
-          <p className="page-subtitle">Ativos, passivos e patrimonio liquido calculado.</p>
+          <h1 className="page-title">Património</h1>
+          <p className="page-subtitle">Ativos, passivos e património líquido calculado.</p>
         </section>
 
         <section className="grid gap-4 md:grid-cols-3">
           <SummaryCard label="Ativos" value={euro.format(summary.assets)} />
-          <SummaryCard label="Divida total" value={euro.format(summary.liabilities)} />
+          <SummaryCard label="Dívida total" value={euro.format(summary.liabilities)} />
           <SummaryCard label="Pagamentos mensais" value={euro.format(state.liabilities.reduce((total, item) => total + item.monthlyPayment, 0))} />
         </section>
 
@@ -58,17 +58,17 @@ export function WealthStageOnePage() {
             <label className="form-field"><span>Nome</span><input value={assetDraft.name} onChange={(event) => setAssetDraft({ ...assetDraft, name: event.target.value })} placeholder="Casa" /></label>
             <label className="form-field"><span>Tipo</span><select value={assetDraft.type} onChange={(event) => setAssetDraft({ ...assetDraft, type: event.target.value as AssetType })}>{assetTypes.map((type) => <option key={type} value={type}>{assetTypeLabels[type]}</option>)}</select></label>
             <label className="form-field"><span>Valor</span><input type="number" value={assetDraft.value} onChange={(event) => setAssetDraft({ ...assetDraft, value: Number(event.target.value) })} /></label>
-            <label className="form-field"><span>Descricao</span><input value={assetDraft.description ?? ""} onChange={(event) => setAssetDraft({ ...assetDraft, description: event.target.value })} /></label>
+            <label className="form-field"><span>Descrição</span><input value={assetDraft.description ?? ""} onChange={(event) => setAssetDraft({ ...assetDraft, description: event.target.value })} /></label>
             <button className="primary-button md:col-span-2" onClick={saveAsset}>{editingAsset ? "Guardar ativo" : "Criar ativo"}</button>
           </CrudPanel>
 
-          <CrudPanel title={editingLiability ? "Editar divida" : "Criar divida"}>
-            <label className="form-field"><span>Nome</span><input value={liabilityDraft.name} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, name: event.target.value })} placeholder="Credito habitacao" /></label>
+          <CrudPanel title={editingLiability ? "Editar dívida" : "Criar dívida"}>
+            <label className="form-field"><span>Nome</span><input value={liabilityDraft.name} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, name: event.target.value })} placeholder="Crédito habitação" /></label>
             <label className="form-field"><span>Tipo</span><select value={liabilityDraft.type} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, type: event.target.value as LiabilityType })}>{liabilityTypes.map((type) => <option key={type} value={type}>{liabilityTypeLabels[type]}</option>)}</select></label>
-            <label className="form-field"><span>Saldo em divida</span><input type="number" value={liabilityDraft.balance} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, balance: Number(event.target.value) })} /></label>
+            <label className="form-field"><span>Saldo em dívida</span><input type="number" value={liabilityDraft.balance} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, balance: Number(event.target.value) })} /></label>
             <label className="form-field"><span>Pagamento mensal</span><input type="number" value={liabilityDraft.monthlyPayment} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, monthlyPayment: Number(event.target.value) })} /></label>
             <label className="form-field"><span>Juro %</span><input type="number" value={liabilityDraft.interestRate} onChange={(event) => setLiabilityDraft({ ...liabilityDraft, interestRate: Number(event.target.value) })} /></label>
-            <button className="primary-button" onClick={saveLiability}>{editingLiability ? "Guardar divida" : "Criar divida"}</button>
+            <button className="primary-button" onClick={saveLiability}>{editingLiability ? "Guardar dívida" : "Criar dívida"}</button>
           </CrudPanel>
         </section>
 

@@ -7,9 +7,9 @@ import { BrandMark } from "@/components/BrandMark";
 
 const steps = [
   { title: "Bem-vindo ao NorteAI", copy: "O teu copiloto financeiro inteligente.", icon: Sparkles },
-  { title: "Informacao pessoal", copy: "Pais, moeda e preferencias para personalizar a experiencia.", icon: UserRound },
-  { title: "Perfil financeiro", copy: "Rendimento, poupanca e experiencia financeira.", icon: BadgeEuro },
-  { title: "Objetivos", copy: "Casa, emergencia, reforma ou investimentos.", icon: Goal },
+  { title: "Informação pessoal", copy: "País, moeda e preferências para personalizar a experiência.", icon: UserRound },
+  { title: "Perfil financeiro", copy: "Rendimento, poupança e experiência financeira.", icon: BadgeEuro },
+  { title: "Objetivos", copy: "Casa, emergência, reforma ou investimentos.", icon: Goal },
   { title: "Perfil de risco", copy: "Conservador, equilibrado, crescimento ou agressivo.", icon: Shield },
 ];
 
@@ -26,10 +26,10 @@ export function OnboardingPage() {
                 Estamos prontos para criar o teu Norte financeiro.
               </h1>
               <p className="mt-4 leading-7 text-slate-600">
-                Uma experiencia premium em cinco passos para preparar o dashboard com dados financeiros iniciais e escolhas realistas.
+                Uma experiência premium em cinco passos para preparar o dashboard com dados financeiros iniciais e escolhas realistas.
               </p>
               <a href="/" className="primary-button mt-8 w-fit">
-                Finalizar configuracao
+                Finalizar configuração
                 <ArrowRight size={18} aria-hidden="true" />
               </a>
             </div>

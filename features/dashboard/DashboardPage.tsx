@@ -10,8 +10,8 @@ import type { FinanceState, FinancialSummary, NorteScore } from "@/types/finance
 
 export function DashboardPage() {
   const { state, summary, score, activeWorkspace } = useFinanceState();
-  if (activeWorkspace?.type === "FAMILY") return <FutureWorkspaceDashboard icon={UsersRound} title="NorteAI Familia" text="Esta area esta preparada para uma fase futura. Nesta fase estamos a finalizar o NorteAI Pessoal." />;
-  if (activeWorkspace?.type === "FREELANCER") return <FutureWorkspaceDashboard icon={BriefcaseBusiness} title="NorteAI Freelancer" text="Esta area esta preparada para atividade independente numa fase futura. Agora o foco e completar o NorteAI Pessoal." />;
+  if (activeWorkspace?.type === "FAMILY") return <FutureWorkspaceDashboard icon={UsersRound} title="NorteAI Família" text="Esta área está preparada para uma fase futura. Nesta fase estamos a finalizar o NorteAI Pessoal." />;
+  if (activeWorkspace?.type === "FREELANCER") return <FutureWorkspaceDashboard icon={BriefcaseBusiness} title="NorteAI Freelancer" text="Esta área está preparada para atividade independente numa fase futura. Agora o foco é completar o NorteAI Pessoal." />;
 
   return <PersonalDashboard state={state} summary={summary} score={score} />;
 }
@@ -19,7 +19,7 @@ export function DashboardPage() {
 function PersonalDashboard({ state, summary, score }: { state: FinanceState; summary: FinancialSummary; score: NorteScore }) {
   const hasData = hasWorkspaceData(state);
   if (!hasData) {
-    return <WorkspaceEmptyState title="Visao Geral" text="Comeca por adicionar a tua primeira conta." action="Adicionar conta" href="/dinheiro" />;
+    return <WorkspaceEmptyState title="Visão Geral" text="Começa por adicionar a tua primeira conta." action="Adicionar conta" href="/dinheiro" />;
   }
 
   const chartCurve = buildWealthCurve(state, summary.netWorth);
@@ -33,50 +33,50 @@ function PersonalDashboard({ state, summary, score }: { state: FinanceState; sum
     <div className="space-y-6">
       <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="page-title">Visao Geral</h1>
-          <p className="page-subtitle">Bom dia, Diogo. A tua visao financeira atual.</p>
+          <h1 className="page-title">Visão Geral</h1>
+          <p className="page-subtitle">Bom dia, Diogo. A tua visão financeira atual.</p>
         </div>
         <a href="/movimentos" className="hidden rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white sm:inline-flex">
           Adicionar movimento
         </a>
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
-        <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100 xl:p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-sm font-black text-slate-950">Norte Score</h2>
-              </div>
-              <div className="mt-4 flex items-center gap-4">
+      <section className="grid gap-3 min-[390px]:grid-cols-2 lg:gap-5">
+        <article className="rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5 xl:p-6">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="text-sm font-black text-slate-950">Norte Score</h2>
+              <div className="mt-3 flex items-center gap-3">
                 <ScoreDial score={score.score} muted={!score.isDataSufficient} />
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm font-black text-emerald-600">{score.classification}</p>
-                  <p className="mt-1 max-w-44 text-xs font-bold leading-5 text-slate-500">
-                    {score.reason ?? "Calculado pelos teus dados financeiros."}
+                  <p className="mt-1 text-xs font-bold leading-5 text-slate-500">
+                    {score.reason ?? "A tua saúde financeira está muito boa."}
                   </p>
                 </div>
               </div>
+              <p className="mt-3 text-[0.72rem] font-semibold leading-5 text-slate-400">
+                Baseado em poupança, fundo de emergência, dívida, diversificação e consistência.
+              </p>
             </div>
-            <ScoreStatusCard score={score} />
           </div>
           <SignalBars value={score.score} muted={!score.isDataSufficient} />
           {score.isDataSufficient ? <ScoreBreakdown score={score} /> : null}
         </article>
 
-        <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100 xl:p-6">
+        <article className="rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5 xl:p-6">
           <div className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="text-sm font-black text-slate-950">Patrimonio liquido</h2>
-              <p className="mt-5 text-4xl font-black leading-none tracking-normal text-[#071733] sm:text-5xl">
+            <div className="min-w-0">
+              <h2 className="text-sm font-black text-slate-950">Património líquido</h2>
+              <p className="mt-4 break-words text-3xl font-black leading-none tracking-normal text-[#071733] sm:text-5xl">
                 {euro.format(summary.netWorth)}
               </p>
-              <p className="mt-4 text-sm font-black text-teal-600">
-                {previousSnapshot ? `${absoluteChange >= 0 ? "+" : ""}${euro.format(absoluteChange)} · ${netWorthDelta !== null ? `${netWorthDelta >= 0 ? "+" : ""}${netWorthDelta.toFixed(1)}%` : "sem %"} desde o ultimo snapshot` : "Historico insuficiente"}
+              <p className="mt-3 text-xs font-black leading-5 text-teal-600 sm:text-sm">
+                {previousSnapshot ? `${absoluteChange >= 0 ? "+" : ""}${euro.format(absoluteChange)} · ${netWorthDelta !== null ? `${netWorthDelta >= 0 ? "+" : ""}${netWorthDelta.toFixed(1)}%` : "sem %"} desde o último snapshot` : "Histórico insuficiente"}
               </p>
             </div>
-            <div className="grid size-16 place-items-center rounded-full bg-teal-50 text-teal-600">
-              <TrendingUp size={30} strokeWidth={2.6} aria-hidden="true" />
+            <div className="grid size-12 shrink-0 place-items-center rounded-full bg-teal-50 text-teal-600 sm:size-16">
+              <TrendingUp size={24} strokeWidth={2.6} aria-hidden="true" />
             </div>
           </div>
         </article>
@@ -84,7 +84,7 @@ function PersonalDashboard({ state, summary, score }: { state: FinanceState; sum
 
       <article className="rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5 xl:p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-black text-slate-950">Evolucao patrimonial</h2>
+          <h2 className="text-sm font-black text-slate-950">Evolução patrimonial</h2>
           <button className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-600" type="button">
             6M
           </button>
@@ -103,8 +103,8 @@ function PersonalDashboard({ state, summary, score }: { state: FinanceState; sum
           ) : (
             <div className="grid h-full place-items-center rounded-2xl bg-slate-50 text-center">
               <div>
-                <p className="font-black text-slate-950">Historico insuficiente</p>
-                <p className="mt-2 text-sm font-semibold text-slate-500">O grafico so usa snapshots guardados. Nenhum valor historico e inventado.</p>
+                <p className="font-black text-slate-950">Histórico insuficiente</p>
+                <p className="mt-2 text-sm font-semibold text-slate-500">O gráfico só usa snapshots guardados. Nenhum valor histórico é inventado.</p>
               </div>
             </div>
           )}
@@ -112,17 +112,17 @@ function PersonalDashboard({ state, summary, score }: { state: FinanceState; sum
       </article>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <InsightTile icon={Target} title="Poupanca mensal." body={summary.savingsRate === null ? "Ainda nao ha receitas suficientes para calcular a taxa." : `A tua taxa de poupanca esta em ${summary.savingsRate}%.`} tone="violet" />
-        <InsightTile icon={PieChartIcon} title="Alocacao calculada." body={summary.allocation.length ? "A carteira e calculada pelas posicoes registadas." : "Adiciona posicoes para calcular a alocacao."} tone="teal" />
+        <InsightTile icon={Target} title="Poupança mensal." body={summary.savingsRate === null ? "Ainda não há receitas suficientes para calcular a taxa." : `A tua taxa de poupança está em ${summary.savingsRate}%.`} tone="violet" />
+        <InsightTile icon={PieChartIcon} title="Alocação calculada." body={summary.allocation.length ? "A carteira é calculada pelas posições registadas." : "Adiciona posições para calcular a alocação."} tone="teal" />
         <InsightTile icon={Lightbulb} title="Dados atualizados." body="A leitura depende das fontes e snapshots guardados." tone="violet" />
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        <TopStat icon={WalletCards} label="Liquidez" value={euro.format(summary.cashPosition)} detail="Contas correntes e poupanca" tone="blue" />
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
+        <TopStat icon={WalletCards} label="Liquidez" value={euro.format(summary.cashPosition)} detail="Contas correntes e poupança" tone="blue" />
         <TopStat icon={Landmark} label="Investimentos" value={euro.format(summary.investments)} detail="Carteira atual" tone="violet" />
-        <TopStat icon={CircleDollarSign} label="Poupanca mensal" value={euro.format(summary.savings)} detail={summary.savingsRate === null ? "Sem receitas suficientes" : `${summary.savingsRate}% das receitas`} tone="teal" />
+        <TopStat icon={CircleDollarSign} label="Poupança mensal" value={euro.format(summary.savings)} detail={summary.savingsRate === null ? "Sem receitas suficientes" : `${summary.savingsRate}% das receitas`} tone="teal" />
         <TopStat icon={TrendingUp} label="Ativos" value={euro.format(summary.assets)} detail="Antes de passivos" tone="slate" />
-        <TopStat icon={Landmark} label="Passivos" value={euro.format(summary.liabilities)} detail="Dividas registadas" tone="slate" />
+        <TopStat icon={Landmark} label="Passivos" value={euro.format(summary.liabilities)} detail="Dívidas registadas" tone="slate" />
       </section>
 
       <section className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.95fr)]">
@@ -151,7 +151,7 @@ function FutureWorkspaceDashboard({ icon: Icon, title, text }: { icon: ElementTy
           </div>
           <div>
             <h2 className="text-xl font-black text-slate-950">Preparado para uma fase futura</h2>
-            <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">Os dados deste workspace continuam isolados. O produto completo desta area nao esta ativo nesta fase.</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">Os dados deste workspace continuam isolados. O produto completo desta área não está ativo nesta fase.</p>
           </div>
           <Link href="/" className="primary-button w-fit">Voltar ao NorteAI Pessoal</Link>
         </div>
@@ -195,33 +195,21 @@ function buildWealthCurve(state: FinanceState, netWorth: number) {
 
 function ScoreBreakdown({ score }: { score: NorteScore }) {
   const rows = [
-    ["Poupanca", score.savingsRatePoints, 30],
-    ["Fundo de emergencia", score.emergencyFundPoints, 20],
-    ["Divida", score.debtRatioPoints, 20],
-    ["Diversificacao", score.diversificationPoints, 20],
-    ["Consistencia", score.consistencyPoints, 10],
+    ["Poupança", score.savingsRatePoints, 30],
+    ["Fundo de emergência", score.emergencyFundPoints, 20],
+    ["Dívida", score.debtRatioPoints, 20],
+    ["Diversificação", score.diversificationPoints, 20],
+    ["Consistência", score.consistencyPoints, 10],
   ] as const;
 
   return (
-    <div className="mt-4 grid gap-2 sm:grid-cols-2">
+    <div className="mt-3 grid gap-1.5 sm:grid-cols-2">
       {rows.map(([label, value, total]) => (
-        <div key={label} className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-xs font-black">
+        <div key={label} className="flex items-center justify-between rounded-xl bg-slate-50 px-2.5 py-1.5 text-[0.68rem] font-black sm:text-xs">
           <span className="text-slate-500">{label}</span>
           <span className="text-slate-950">{value}/{total}</span>
         </div>
       ))}
-    </div>
-  );
-}
-
-function ScoreStatusCard({ score }: { score: NorteScore }) {
-  return (
-    <div className="hidden min-w-40 rounded-2xl bg-slate-50 p-4 sm:block">
-      <p className="text-xs font-black uppercase tracking-normal text-slate-400">Estado</p>
-      <p className="mt-2 text-lg font-black text-slate-950">{score.isDataSufficient ? "Calculado" : "Incompleto"}</p>
-      <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">
-        {score.isDataSufficient ? "Baseado em regras financeiras." : "Adiciona receitas e despesas."}
-      </p>
     </div>
   );
 }
@@ -236,7 +224,7 @@ function DataFreshnessCard({ state }: { state: FinanceState }) {
     <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
       <div className="flex items-center gap-2">
         <Clock3 size={19} className="text-violet-700" aria-hidden="true" />
-        <h2 className="section-title">Atualizacao dos dados</h2>
+        <h2 className="section-title">Atualização dos dados</h2>
       </div>
       <p className="mt-4 text-3xl font-black text-slate-950">{completeness}%</p>
       <p className="mt-1 text-xs font-bold text-slate-500">{needsUpdate} fontes por atualizar</p>
@@ -245,7 +233,7 @@ function DataFreshnessCard({ state }: { state: FinanceState }) {
           <div key={source.id} className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-xs font-black">
             <span className="text-slate-700">{source.provider}</span>
             <span className={source.status === "updated" || source.status === "connected" ? "text-teal-600" : "text-amber-600"}>
-              {source.status === "updated" || source.status === "connected" ? "Atualizado" : `Precisa de atualizacao${source.dataUntil ? ` desde ${source.dataUntil}` : ""}`}
+              {source.status === "updated" || source.status === "connected" ? "Atualizado" : `Precisa de atualização${source.dataUntil ? ` desde ${source.dataUntil}` : ""}`}
             </span>
           </div>
         ))}
@@ -284,12 +272,12 @@ function AnalysisCard({ summary }: { summary: FinancialSummary }) {
     <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
       <div className="flex items-center gap-2">
         <Lightbulb size={19} className="text-violet-700" aria-hidden="true" />
-        <h2 className="section-title">Analise financeira</h2>
+        <h2 className="section-title">Análise financeira</h2>
       </div>
       <div className="mt-4 grid gap-2 text-sm font-bold text-slate-600">
         <ReportRow label="Maior categoria" value={mainCategory ? mainCategory.name : "Sem dados"} />
         <ReportRow label="Despesa principal" value={mainCategory ? euroCents.format(mainCategory.value) : "Sem dados"} />
-        <ReportRow label="Poupanca livre" value={euroCents.format(summary.savings)} />
+        <ReportRow label="Poupança livre" value={euroCents.format(summary.savings)} />
       </div>
     </article>
   );
@@ -308,8 +296,8 @@ function MonthlyReportCard({ state, summary }: { state: FinanceState; summary: F
       <div className="mt-4 grid gap-2 text-sm font-bold text-slate-600">
         <ReportRow label="Receitas" value={euroCents.format(summary.income)} />
         <ReportRow label="Despesas" value={euroCents.format(summary.expenses)} />
-        <ReportRow label="Poupanca" value={euroCents.format(summary.savings)} />
-        <ReportRow label="Taxa de poupanca" value={summary.savingsRate === null ? "Dados insuficientes" : `${summary.savingsRate}%`} />
+        <ReportRow label="Poupança" value={euroCents.format(summary.savings)} />
+        <ReportRow label="Taxa de poupança" value={summary.savingsRate === null ? "Dados insuficientes" : `${summary.savingsRate}%`} />
         <ReportRow label="Investido" value={euroCents.format(invested)} />
       </div>
       <div className="mt-4 space-y-2">
@@ -336,12 +324,12 @@ function ScoreDial({ score, muted = false }: { score: number; muted?: boolean })
 
   return (
     <div
-      className="grid size-24 shrink-0 place-items-center rounded-full"
+      className="grid size-20 shrink-0 place-items-center rounded-full sm:size-24"
       style={{ background: muted ? "#e7ebf1" : `conic-gradient(from -42deg, #6d28d9 0deg, #14b8a6 ${degrees}, #e7ebf1 ${degrees}, #e7ebf1 360deg)` }}
       aria-label={`Norte Score ${score} em 100`}
     >
-      <div className="grid size-[4.7rem] place-items-center rounded-full bg-white">
-        <span className="text-4xl font-black tracking-normal text-[#071733]">{score}</span>
+      <div className="grid size-16 place-items-center rounded-full bg-white sm:size-[4.7rem]">
+        <span className="text-3xl font-black tracking-normal text-[#071733] sm:text-4xl">{score}</span>
       </div>
     </div>
   );
@@ -351,11 +339,11 @@ function SignalBars({ value, muted = false }: { value: number; muted?: boolean }
   const activeBars = Math.round((Math.max(0, Math.min(value, 100)) / 100) * 18);
 
   return (
-    <div className="mt-4 flex items-end gap-1.5" aria-hidden="true">
+    <div className="mt-3 flex items-end gap-1" aria-hidden="true">
       {Array.from({ length: 18 }, (_, index) => (
         <span
           key={index}
-          className={`h-4 w-1.5 rounded-full ${!muted && index < activeBars ? "bg-gradient-to-t from-violet-600 to-teal-400" : "bg-slate-100"}`}
+          className={`h-3.5 w-1.5 rounded-full ${!muted && index < activeBars ? "bg-gradient-to-t from-violet-600 to-teal-400" : "bg-slate-100"}`}
         />
       ))}
     </div>
@@ -375,7 +363,7 @@ function InsightTile({ icon: Icon, title, body, tone }: { icon: ElementType; tit
           <h3 className="text-sm font-black leading-5 text-slate-950">{title}</h3>
           <div className="flex shrink-0 items-center gap-2">
             <span className="rounded-full bg-violet-50 px-2 py-1 text-[0.62rem] font-black uppercase tracking-normal text-violet-700 ring-1 ring-violet-100">
-              Analise financeira
+              Análise financeira
             </span>
             <ChevronRight className="size-4 text-slate-400" aria-hidden="true" />
           </div>
@@ -395,12 +383,12 @@ function TopStat({ icon: Icon, label, value, detail, tone }: { icon: ElementType
   };
 
   return (
-    <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
-      <div className={`grid size-12 place-items-center rounded-2xl ${tones[tone]}`}>
+    <article className="rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5">
+      <div className={`grid size-11 place-items-center rounded-2xl sm:size-12 ${tones[tone]}`}>
         <Icon size={22} aria-hidden="true" />
       </div>
-      <p className="mt-5 text-sm font-bold text-slate-500">{label}</p>
-      <p className="mt-2 text-2xl font-black leading-none tracking-normal text-slate-950 2xl:text-3xl">{value}</p>
+      <p className="mt-4 text-sm font-bold text-slate-500">{label}</p>
+      <p className="mt-2 break-words text-xl font-black leading-none tracking-normal text-slate-950 sm:text-2xl 2xl:text-3xl">{value}</p>
       <p className="mt-3 text-xs font-bold text-slate-400">{detail}</p>
     </article>
   );

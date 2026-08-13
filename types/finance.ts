@@ -32,8 +32,8 @@ export type Goal = {
   targetAmount: number;
   currentAmount: number;
   targetDate: string;
-  priority: "Alta" | "Media" | "Baixa";
-  status: "Ativo" | "Concluido" | "Pausado";
+  priority: "Alta" | "Média" | "Media" | "Baixa";
+  status: "Ativo" | "Concluído" | "Concluido" | "Pausado";
 };
 
 export type Position = {
@@ -204,8 +204,8 @@ export type FinancialGoalRecord = {
   currentValue: number;
   deadline: string;
   type: string;
-  priority: "Alta" | "Media" | "Baixa";
-  status: "Ativo" | "Concluido" | "Pausado";
+  priority: "Alta" | "Média" | "Media" | "Baixa";
+  status: "Ativo" | "Concluído" | "Concluido" | "Pausado";
 };
 
 export type FinancialScoreRecord = {
@@ -279,7 +279,7 @@ export type FinancialSummary = {
 
 export type NorteScore = {
   score: number;
-  classification: "Excelente" | "Muito bom" | "Precisa de atencao" | "Critico" | "Dados insuficientes";
+  classification: "Excelente" | "Muito bom" | "Precisa de atenção" | "Precisa de atencao" | "Crítico" | "Critico" | "Dados insuficientes";
   isDataSufficient: boolean;
   reason?: string;
   savingsRatePoints: number;

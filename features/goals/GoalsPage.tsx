@@ -30,7 +30,7 @@ export function GoalsPage() {
           targetValue: 15000,
           currentValue: 2500,
           deadline: "2027-12-31",
-          priority: "Media",
+          priority: "Média",
           status: "Ativo",
         },
       ],
@@ -43,7 +43,7 @@ export function GoalsPage() {
         <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="page-title">Objetivos</h1>
-            <p className="page-subtitle">CRUD funcional em memoria para validar criacao e gestao de metas.</p>
+            <p className="page-subtitle">Metas financeiras guardadas localmente para validar criação e gestão de objetivos.</p>
           </div>
           <button onClick={addGoal} className="primary-button w-fit">
             <Plus size={18} aria-hidden="true" />

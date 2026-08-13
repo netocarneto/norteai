@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Check, Edit3, Filter, Plus, Search, Trash2, Upload } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { EmptyState } from "@/components/EmptyState";
 import { accountName, categoryName, categoryTypes, euroCents, inferCategoryId, isDuplicateTransaction, parseCsv, transactionTypeLabels, transactionTypes } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { CategoryType, TransactionRecord, TransactionType } from "@/types/finance";
@@ -121,7 +122,7 @@ export function TransactionsPage() {
         <section className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="page-title">Movimentos</h1>
-            <p className="page-subtitle">Transacoes manuais, filtros e importacao CSV sem ligacoes bancarias.</p>
+            <p className="page-subtitle">Transações manuais, filtros e importação CSV sem ligações bancárias.</p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:flex">
             <SummaryPill label="Receitas" value={euroCents.format(summary.income)} tone="text-emerald-600" />
@@ -148,7 +149,7 @@ export function TransactionsPage() {
                 <input type="date" value={draft.date} onChange={(event) => setDraft({ ...draft, date: event.target.value })} />
               </label>
               <label className="form-field">
-                <span>Descricao</span>
+                <span>Descrição</span>
                 <input value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} placeholder="Continente" />
               </label>
               <label className="form-field">
@@ -172,7 +173,9 @@ export function TransactionsPage() {
                   {state.categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
                 </select>
               </label>
-              <button className="primary-button md:col-span-2 xl:col-span-1 2xl:col-span-2" onClick={saveTransaction}>{editingId ? "Guardar movimento" : "Adicionar movimento"}</button>
+              <button className="primary-button md:col-span-2 xl:col-span-1 2xl:col-span-2" onClick={saveTransaction} disabled={!state.accounts.length}>
+                {editingId ? "Guardar movimento" : state.accounts.length ? "Adicionar movimento" : "Cria uma conta primeiro"}
+              </button>
             </div>
           </article>
 
@@ -180,11 +183,11 @@ export function TransactionsPage() {
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(170px,1fr)_130px_150px] 2xl:grid-cols-[minmax(180px,1fr)_130px_150px_150px_130px]">
               <label className="flex items-center gap-2 rounded-2xl bg-slate-50 px-3 py-2 ring-1 ring-slate-100">
                 <Search size={18} className="text-slate-400" aria-hidden="true" />
-                <input className="min-w-0 w-full bg-transparent text-sm outline-none" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Pesquisar..." />
+                <input className="min-w-0 w-full bg-transparent text-sm outline-none" value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="Pesquisar..." />
               </label>
               <label className="form-field">
                 <span className="sr-only">Tipo</span>
-                <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as "all" | TransactionType)}>
+                <select value={typeFilter} onChange={(event) => { setTypeFilter(event.target.value as "all" | TransactionType); setPage(1); }}>
                   <option value="all">Todos</option>
                   {transactionTypes.map((type) => <option key={type} value={type}>{transactionTypeLabels[type]}</option>)}
                 </select>
@@ -205,31 +208,43 @@ export function TransactionsPage() {
               </label>
               <label className="form-field">
                 <span className="sr-only">Data</span>
-                <input type="date" value={dateFilter} onChange={(event) => setDateFilter(event.target.value)} />
+                <input type="date" value={dateFilter} onChange={(event) => { setDateFilter(event.target.value); setPage(1); }} />
               </label>
               <label className="form-field">
                 <span className="sr-only">Ordenacao</span>
-                <select value={sortDirection} onChange={(event) => setSortDirection(event.target.value as "desc" | "asc")}>
+                <select value={sortDirection} onChange={(event) => { setSortDirection(event.target.value as "desc" | "asc"); setPage(1); }}>
                   <option value="desc">Mais recentes</option>
                   <option value="asc">Mais antigos</option>
                 </select>
               </label>
             </div>
             <div className="mt-5 divide-y divide-slate-100">
-              {pageItems.map((transaction) => (
-                <div key={transaction.id} className="flex min-w-0 items-center gap-3 py-4">
-                  <div className="grid size-10 place-items-center rounded-xl bg-slate-100 text-slate-500">
-                    <Filter size={17} aria-hidden="true" />
+              {pageItems.length ? (
+                pageItems.map((transaction) => (
+                  <div key={transaction.id} className="flex min-w-0 flex-wrap items-center gap-3 py-4">
+                    <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-500">
+                      <Filter size={17} aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1 basis-[12rem]">
+                      <p className="truncate font-black text-slate-950">{transaction.merchant}</p>
+                      <p className="truncate text-sm text-slate-500">{transaction.date} · {accountName(state, transaction.accountId)} · {categoryName(state, transaction.categoryId)}</p>
+                    </div>
+                    <p className={`shrink-0 font-black ${transaction.amount > 0 ? "text-emerald-600" : "text-slate-950"}`}>{euroCents.format(transaction.amount)}</p>
+                    <div className="flex shrink-0 gap-2">
+                      <button className="icon-button" onClick={() => editTransaction(transaction)} aria-label="Editar"><Edit3 size={15} /></button>
+                      <button className="icon-button" onClick={() => setState((current) => ({ ...current, transactions: current.transactions.filter((item) => item.id !== transaction.id) }))} aria-label="Eliminar"><Trash2 size={15} /></button>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-black text-slate-950">{transaction.merchant}</p>
-                    <p className="text-sm text-slate-500">{transaction.date} · {accountName(state, transaction.accountId)} · {categoryName(state, transaction.categoryId)}</p>
-                  </div>
-                  <p className={`shrink-0 font-black ${transaction.amount > 0 ? "text-emerald-600" : "text-slate-950"}`}>{euroCents.format(transaction.amount)}</p>
-                  <button className="icon-button" onClick={() => editTransaction(transaction)} aria-label="Editar"><Edit3 size={15} /></button>
-                  <button className="icon-button" onClick={() => setState((current) => ({ ...current, transactions: current.transactions.filter((item) => item.id !== transaction.id) }))} aria-label="Eliminar"><Trash2 size={15} /></button>
+                ))
+              ) : state.transactions.length ? (
+                <div className="py-4">
+                  <EmptyState title="Sem resultados" description="Ajusta a pesquisa, filtros ou data para encontrares outros movimentos." />
                 </div>
-              ))}
+              ) : (
+                <div className="py-4">
+                  <EmptyState title="Ainda não tens movimentos" description="Adiciona manualmente uma receita, despesa ou investimento para veres o histórico aqui." />
+                </div>
+              )}
             </div>
             <div className="mt-4 flex items-center justify-between gap-3 text-sm font-bold text-slate-500">
               <span>{filtered.length} movimentos</span>
@@ -245,22 +260,22 @@ export function TransactionsPage() {
         <section className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
           <div className="flex items-center gap-2">
             <Upload size={20} className="text-violet-700" aria-hidden="true" />
-            <h2 className="section-title">Base de importacao CSV</h2>
+            <h2 className="section-title">Base de importação CSV</h2>
           </div>
           <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-            <textarea className="min-h-36 min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none focus:border-violet-500" value={csvText} onChange={(event) => setCsvText(event.target.value)} />
+            <textarea aria-label="Conteúdo CSV" className="min-h-36 min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none focus:border-violet-500" value={csvText} onChange={(event) => setCsvText(event.target.value)} />
             <div className="min-w-0">
               <div className="flex flex-wrap gap-3">
-                <button className="primary-button" onClick={buildPreview}>Pre-visualizar</button>
+                <button className="primary-button" onClick={buildPreview}>Pré-visualizar</button>
                 <button className="primary-button bg-slate-950" onClick={confirmImport} disabled={!preview.length}>
                   <Check size={17} aria-hidden="true" />
-                  Confirmar importacao
+                  Confirmar importação
                 </button>
               </div>
               <div className="mt-4 space-y-2">
                 {importStats ? (
                   <div className="rounded-2xl bg-teal-50 p-3 text-sm font-black text-teal-700">
-                    {importStats.imported} novos · {importStats.skipped} ignorados por duplicacao
+                    {importStats.imported} novos · {importStats.skipped} ignorados por duplicação
                   </div>
                 ) : null}
                 {preview.map((row) => (
@@ -307,7 +322,7 @@ export function TransactionsPage() {
 
           <article className="min-w-0 rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="section-title">Regras automaticas</h2>
+              <h2 className="section-title">Regras automáticas</h2>
               <button
                 className="primary-button"
                 onClick={() => {

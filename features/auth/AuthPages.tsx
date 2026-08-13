@@ -19,7 +19,7 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
     setStatus(null);
 
     if (!supabase) {
-      setStatus("Supabase ainda nao esta configurado neste ambiente.");
+      setStatus("Supabase ainda não está configurado neste ambiente.");
       return;
     }
 
@@ -62,10 +62,10 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
             O teu copiloto financeiro inteligente.
           </h1>
           <p className="mt-6 max-w-lg text-lg leading-8 text-slate-600">
-            Une patrimonio, dinheiro, objetivos e inteligencia financeira numa experiencia simples e premium.
+            Une património, dinheiro, objetivos e inteligência financeira numa experiência simples e premium.
           </p>
           <div className="mt-10 grid max-w-xl grid-cols-3 gap-4">
-            {["Score 84", "Poupanca 34%", "+8,2% ano"].map((item) => (
+            {["Score 84", "Poupança 34%", "+8,2% ano"].map((item) => (
               <div key={item} className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
                 <p className="font-black text-slate-950">{item}</p>
               </div>
@@ -81,7 +81,7 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
             {isRegister ? "Criar conta" : "Entrar"}
           </h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            {isRegister ? "Comeca por criar a tua visao financeira pessoal." : "Acede ao teu espaco financeiro pessoal."}
+            {isRegister ? "Começa por criar a tua visão financeira pessoal." : "Acede ao teu espaço financeiro pessoal."}
           </p>
           <form className="mt-7 space-y-4" onSubmit={submitAuth}>
             {isRegister && (
@@ -113,12 +113,12 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
           <div className="mt-6 rounded-2xl bg-violet-50 p-4 text-sm leading-6 text-violet-900">
             <div className="flex items-center gap-2 font-black">
               <ShieldCheck size={17} aria-hidden="true" />
-              <span>{isSupabaseConfigured ? "Autenticacao Supabase ativa" : "Autenticacao por configurar"}</span>
+              <span>{isSupabaseConfigured ? "Autenticação Supabase ativa" : "Autenticação por configurar"}</span>
             </div>
-            <p className="mt-1">Sessoes seguras com onboarding automatico de workspace pessoal.</p>
+            <p className="mt-1">Sessões seguras com onboarding automático de workspace pessoal.</p>
           </div>
           <p className="mt-6 text-center text-sm text-slate-600">
-            {isRegister ? "Ja tens conta?" : "Ainda nao tens conta?"}{" "}
+            {isRegister ? "Já tens conta?" : "Ainda não tens conta?"}{" "}
             <a className="font-black text-violet-700" href={isRegister ? "/login" : "/register"}>
               {isRegister ? "Entrar" : "Criar conta"}
             </a>

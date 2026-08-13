@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Edit3, Plus, Trash2, WalletCards } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { EmptyState } from "@/components/EmptyState";
 import { accountTypeLabels, accountTypes, euro, ownershipTypeLabels } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { AccountType, FinancialAccountRecord, OwnershipType } from "@/types/finance";
@@ -81,40 +82,53 @@ export function AccountsPage() {
         <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="page-title">Dinheiro</h1>
-            <p className="page-subtitle">Gere contas correntes, poupanca, dinheiro, corretoras, cripto e outras contas pessoais.</p>
+            <p className="page-subtitle">Contas, saldos, dinheiro disponível, investimentos e dívida numa só leitura.</p>
           </div>
           <div className="rounded-2xl bg-white px-5 py-3 shadow-soft ring-1 ring-slate-100">
-            <p className="text-xs font-bold text-slate-500">Posicao de liquidez</p>
+            <p className="text-xs font-bold text-slate-500">Posição de liquidez</p>
             <p className="text-2xl font-black text-slate-950">{euro.format(summary.cashPosition)}</p>
           </div>
         </section>
 
+        <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <MoneySummaryCard label="Quanto tenho?" value={euro.format(summary.netWorth)} detail="Património líquido" />
+          <MoneySummaryCard label="Disponível" value={euro.format(summary.cashPosition)} detail="Contas correntes e poupança" />
+          <MoneySummaryCard label="Investido" value={euro.format(summary.investments)} detail="Carteira registada" />
+          <MoneySummaryCard label="Quanto devo?" value={euro.format(summary.liabilities)} detail="Passivos registados" />
+        </section>
+
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {state.accounts.map((account) => (
-            <article key={account.id} className="metric-card">
-              <div className="flex items-start justify-between gap-3">
-                <div className="grid size-11 place-items-center rounded-2xl text-white" style={{ background: account.color }}>
-                  <WalletCards size={21} aria-hidden="true" />
+          {state.accounts.length ? (
+            state.accounts.map((account) => (
+              <article key={account.id} className="metric-card">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="grid size-11 place-items-center rounded-2xl text-white" style={{ background: account.color }}>
+                    <WalletCards size={21} aria-hidden="true" />
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="icon-button" onClick={() => editAccount(account)} aria-label={`Editar ${account.name}`}>
+                      <Edit3 size={16} aria-hidden="true" />
+                    </button>
+                    <button className="icon-button" onClick={() => setState((current) => ({ ...current, accounts: current.accounts.filter((item) => item.id !== account.id) }))} aria-label={`Eliminar ${account.name}`}>
+                      <Trash2 size={16} aria-hidden="true" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <button className="icon-button" onClick={() => editAccount(account)} aria-label={`Editar ${account.name}`}>
-                    <Edit3 size={16} aria-hidden="true" />
-                  </button>
-                  <button className="icon-button" onClick={() => setState((current) => ({ ...current, accounts: current.accounts.filter((item) => item.id !== account.id) }))} aria-label={`Eliminar ${account.name}`}>
-                    <Trash2 size={16} aria-hidden="true" />
-                  </button>
-                </div>
-              </div>
-              <p className="mt-4 text-lg font-black text-slate-950">{account.name}</p>
-              <p className="text-sm font-bold text-slate-500">{account.institution} · {accountTypeLabels[account.accountType]} · {ownershipTypeLabels[account.ownershipType]}</p>
-              <p className="mt-4 text-3xl font-black text-slate-950">{euro.format(account.balance)}</p>
-              {account.ownershipType === "shared" ? (
-                <p className="mt-2 text-xs font-black text-violet-700">
-                  Valor atribuivel: {euro.format(account.balance * (account.ownershipPercentage / 100))}
-                </p>
-              ) : null}
-            </article>
-          ))}
+                <p className="mt-4 text-lg font-black text-slate-950">{account.name}</p>
+                <p className="text-sm font-bold text-slate-500">{account.institution} · {accountTypeLabels[account.accountType]} · {ownershipTypeLabels[account.ownershipType]}</p>
+                <p className="mt-4 text-3xl font-black text-slate-950">{euro.format(account.balance)}</p>
+                {account.ownershipType === "shared" ? (
+                  <p className="mt-2 text-xs font-black text-violet-700">
+                    Valor atribuível: {euro.format(account.balance * (account.ownershipPercentage / 100))}
+                  </p>
+                ) : null}
+              </article>
+            ))
+          ) : (
+            <div className="sm:col-span-2 xl:col-span-4">
+              <EmptyState title="Ainda não tens contas" description="Cria uma conta corrente, poupança, corretora ou carteira de dinheiro para começares a acompanhar saldos." />
+            </div>
+          )}
         </section>
 
         <section className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
@@ -128,7 +142,7 @@ export function AccountsPage() {
               <input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} placeholder="Conta corrente" />
             </label>
             <label className="form-field">
-              <span>Instituicao</span>
+              <span>Instituição</span>
               <input value={draft.institution} onChange={(event) => setDraft({ ...draft, institution: event.target.value })} placeholder="Millennium" />
             </label>
             <label className="form-field">
@@ -156,10 +170,20 @@ export function AccountsPage() {
               <span>Cor</span>
               <input value={draft.color} onChange={(event) => setDraft({ ...draft, color: event.target.value })} />
             </label>
-            <button className="primary-button self-end" onClick={saveAccount}>{editingId ? "Guardar alteracoes" : "Criar conta"}</button>
+            <button className="primary-button self-end" onClick={saveAccount}>{editingId ? "Guardar alterações" : "Criar conta"}</button>
           </div>
         </section>
       </div>
     </AppShell>
+  );
+}
+
+function MoneySummaryCard({ label, value, detail }: { label: string; value: string; detail: string }) {
+  return (
+    <article className="rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5">
+      <p className="text-xs font-black uppercase tracking-normal text-slate-400">{label}</p>
+      <p className="mt-3 break-words text-2xl font-black leading-none text-slate-950 sm:text-3xl">{value}</p>
+      <p className="mt-3 text-xs font-bold leading-5 text-slate-500">{detail}</p>
+    </article>
   );
 }

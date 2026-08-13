@@ -1,6 +1,6 @@
 import { TriangleAlert } from "lucide-react";
 
-export function ErrorState({ message = "Nao foi possivel carregar esta area." }: { message?: string }) {
+export function ErrorState({ message = "Não foi possível carregar esta área." }: { message?: string }) {
   return (
     <div className="rounded-2xl border border-rose-200 bg-rose-50 p-5 text-rose-900">
       <div className="flex items-center gap-3 font-bold">
