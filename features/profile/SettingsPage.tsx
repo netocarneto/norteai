@@ -242,13 +242,14 @@ function FinancialSources({ state }: { state: ReturnType<typeof useFinanceState>
     ...state.dataSources.map((source): [string, SourceRow] => [source.provider, { name: source.provider, type: source.type, lastSyncAt: source.lastSyncAt, dataUntil: source.dataUntil, status: source.status }]),
   ].filter(([name]) => Boolean(name));
   const institutions = Array.from(new Map<string, SourceRow>(rows).values());
+  const hasCsvImports = state.transactions.some((transaction) => transaction.source === "csv");
 
   return (
     <div className="mt-4 divide-y divide-slate-100">
       {institutions.map((source) => {
         const status = source.status ?? (source.type === "manual" ? "updated" : "needs_update");
         const isUpdated = status === "updated" || status === "connected";
-        const isOptional = status === "disconnected";
+        const isOptional = status === "disconnected" || (source.type === "csv" && !hasCsvImports && status === "needs_update");
         const action = source.type === "csv" ? "Importar extrato" : source.type === "manual" ? "Atualizar manualmente" : "Futuro";
         return (
           <div key={source.name} className="flex flex-wrap items-center justify-between gap-3 py-3">

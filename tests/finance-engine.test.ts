@@ -6,6 +6,7 @@ import {
   initialFinanceState,
   isDuplicateTransaction,
   markDataSourceUpdated,
+  normalizeFinanceState,
   parseCsv,
 } from "../lib/finance-engine.ts";
 
@@ -66,4 +67,16 @@ test("marks CSV data source as updated after a manual import", () => {
   assert.equal(csv?.status, "updated");
   assert.equal(csv?.dataUntil, "2026-08-10");
   assert.equal(csv?.lastSyncAt, "2026-08-13T18:30:00.000Z");
+});
+
+test("migrates legacy unused CSV source from pending to optional", () => {
+  const legacy = structuredClone(initialFinanceState);
+  legacy.dataSources = legacy.dataSources.map((source) => source.type === "csv" ? { ...source, status: "needs_update", dataUntil: "2026-07-31" } : source);
+  legacy.transactions = legacy.transactions.filter((transaction) => transaction.source !== "csv");
+
+  const normalized = normalizeFinanceState(legacy);
+  const csv = normalized.dataSources.find((source) => source.type === "csv" && source.workspaceId === normalized.activeWorkspaceId);
+
+  assert.equal(csv?.status, "disconnected");
+  assert.equal(csv?.dataUntil, undefined);
 });

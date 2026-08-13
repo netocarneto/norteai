@@ -206,6 +206,29 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
 
   const categories = normalizeCategories(state.categories, workspaces.map((workspace) => workspace.id));
   const categoryMap = Object.fromEntries(categories.map((category) => [category.id, category]));
+  const transactions = (state.transactions ?? []).map((transaction) => {
+    const category = transaction.category ?? categoryMap[transaction.categoryId ?? ""]?.name ?? "Outros";
+    return {
+      ...transaction,
+      workspaceId: transaction.workspaceId ?? defaultWorkspaceId,
+      merchant: transaction.merchant || transaction.description,
+      currency: transaction.currency ?? "EUR",
+      category,
+      source: transaction.source ?? "manual",
+      createdAt: transaction.createdAt ?? createdAt,
+      updatedAt: transaction.updatedAt ?? transaction.createdAt ?? createdAt,
+    };
+  });
+  const hasCsvImports = transactions.some((transaction) => transaction.source === "csv");
+  const dataSources = state.dataSources?.length
+    ? state.dataSources.map((source) => {
+        const normalized = { ...source, workspaceId: source.workspaceId ?? defaultWorkspaceId, status: normalizeDataSourceStatus(source.status as string), createdAt: source.createdAt ?? createdAt };
+        if (normalized.type === "csv" && normalized.status === "needs_update" && !hasCsvImports) {
+          return { ...normalized, status: "disconnected" as const, dataUntil: undefined };
+        }
+        return normalized;
+      })
+    : initialFinanceState.dataSources;
 
   return {
     ...initialFinanceState,
@@ -230,19 +253,7 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
     accountOwnerships: state.accountOwnerships?.length ? state.accountOwnerships : initialFinanceState.accountOwnerships,
     categories,
     categoryRules: (state.categoryRules ?? []).map((rule) => ({ ...rule, workspaceId: rule.workspaceId ?? defaultWorkspaceId })),
-    transactions: (state.transactions ?? []).map((transaction) => {
-      const category = transaction.category ?? categoryMap[transaction.categoryId ?? ""]?.name ?? "Outros";
-      return {
-        ...transaction,
-        workspaceId: transaction.workspaceId ?? defaultWorkspaceId,
-        merchant: transaction.merchant || transaction.description,
-        currency: transaction.currency ?? "EUR",
-        category,
-        source: transaction.source ?? "manual",
-        createdAt: transaction.createdAt ?? createdAt,
-        updatedAt: transaction.updatedAt ?? transaction.createdAt ?? createdAt,
-      };
-    }),
+    transactions,
     assets: (state.assets ?? []).map((asset) => ({
       ...asset,
       workspaceId: asset.workspaceId ?? defaultWorkspaceId,
@@ -266,7 +277,7 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
     financialGoals: state.financialGoals?.length ? state.financialGoals.map((goal) => ({ ...goal, workspaceId: goal.workspaceId ?? defaultWorkspaceId })) : initialFinanceState.financialGoals,
     financialScores: state.financialScores?.length ? state.financialScores.map((score) => ({ ...score, workspaceId: score.workspaceId ?? defaultWorkspaceId })) : initialFinanceState.financialScores,
     financialSnapshots: state.financialSnapshots?.length ? state.financialSnapshots.map((snapshot) => normalizeSnapshot(snapshot)) : initialFinanceState.financialSnapshots,
-    dataSources: state.dataSources?.length ? state.dataSources.map((source) => ({ ...source, workspaceId: source.workspaceId ?? defaultWorkspaceId, status: normalizeDataSourceStatus(source.status as string), createdAt: source.createdAt ?? createdAt })) : initialFinanceState.dataSources,
+    dataSources,
   };
 }
 

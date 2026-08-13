@@ -215,7 +215,8 @@ function ScoreBreakdown({ score }: { score: NorteScore }) {
 }
 
 function DataFreshnessCard({ state }: { state: FinanceState }) {
-  const sources = state.dataSources.filter((source) => source.type === "manual" || (source.type === "csv" && source.status !== "disconnected"));
+  const hasCsvImports = state.transactions.some((transaction) => transaction.source === "csv");
+  const sources = state.dataSources.filter((source) => source.type === "manual" || (source.type === "csv" && hasCsvImports && source.status !== "disconnected"));
   const updated = sources.filter((source) => source.status === "updated" || source.status === "connected").length;
   const completeness = sources.length ? Math.round((updated / sources.length) * 100) : 0;
   const needsUpdate = sources.length - updated;
