@@ -23,6 +23,7 @@ export const defaultWorkspaceId = "workspace-personal";
 export const familyWorkspaceId = "workspace-family";
 export const freelancerWorkspaceId = "workspace-freelancer";
 const createdAt = "2026-08-11T09:00:00.000Z";
+const seededWorkspaceIds = [familyWorkspaceId, freelancerWorkspaceId];
 
 export const workspaceTypeLabels: Record<WorkspaceType, string> = {
   PERSONAL: "Pessoal",
@@ -137,6 +138,8 @@ export const initialFinanceState: FinanceState = {
     { id: "own-family-joint-partner", workspaceId: familyWorkspaceId, accountId: "acc-family-joint", memberId: "member-family-partner", ownershipPercentage: 50 },
     { id: "own-family-savings-diogo", workspaceId: familyWorkspaceId, accountId: "acc-family-savings", memberId: "member-diogo-family", ownershipPercentage: 50 },
     { id: "own-family-savings-partner", workspaceId: familyWorkspaceId, accountId: "acc-family-savings", memberId: "member-family-partner", ownershipPercentage: 50 },
+    { id: "own-freelancer-checking-diogo", workspaceId: freelancerWorkspaceId, accountId: "acc-freelancer-checking", memberId: "member-diogo-freelancer", ownershipPercentage: 100 },
+    { id: "own-freelancer-tax-diogo", workspaceId: freelancerWorkspaceId, accountId: "acc-freelancer-tax", memberId: "member-diogo-freelancer", ownershipPercentage: 100 },
   ],
   accounts: [
     { id: "acc-checking", workspaceId: defaultWorkspaceId, name: "Conta corrente", institution: "Millennium", accountType: "checking", balance: 8420, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, source: "manual", color: "#2563eb", icon: "card", createdAt, updatedAt: createdAt },
@@ -145,6 +148,8 @@ export const initialFinanceState: FinanceState = {
     { id: "acc-cash", workspaceId: defaultWorkspaceId, name: "Carteira", institution: "Manual", accountType: "cash", balance: 0, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, source: "manual", color: "#f59e0b", icon: "cash", createdAt, updatedAt: createdAt },
     { id: "acc-family-joint", workspaceId: familyWorkspaceId, name: "Conta conjunta", institution: "Banco familiar", accountType: "checking", balance: 5240, currency: "EUR", ownershipType: "shared", ownershipPercentage: 100, source: "manual", color: "#0f766e", icon: "card", createdAt, updatedAt: createdAt },
     { id: "acc-family-savings", workspaceId: familyWorkspaceId, name: "Poupança família", institution: "Banco familiar", accountType: "savings", balance: 18000, currency: "EUR", ownershipType: "shared", ownershipPercentage: 100, source: "manual", color: "#6d28d9", icon: "piggy", createdAt, updatedAt: createdAt },
+    { id: "acc-freelancer-checking", workspaceId: freelancerWorkspaceId, name: "Conta profissional", institution: "Banco profissional", accountType: "checking", balance: 6400, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, source: "manual", color: "#0f766e", icon: "card", createdAt, updatedAt: createdAt },
+    { id: "acc-freelancer-tax", workspaceId: freelancerWorkspaceId, name: "Reserva fiscal", institution: "Manual", accountType: "savings", balance: 2200, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, source: "manual", color: "#6d28d9", icon: "piggy", createdAt, updatedAt: createdAt },
   ],
   categories: [defaultWorkspaceId, familyWorkspaceId, freelancerWorkspaceId].flatMap((workspaceId) => baseCategories.map((category) => ({ ...category, id: `${category.id}-${workspaceId}`, workspaceId }))),
   categoryRules: [
@@ -157,6 +162,10 @@ export const initialFinanceState: FinanceState = {
     { id: "rule-family-continente", workspaceId: familyWorkspaceId, merchantKeyword: "Continente", categoryId: `cat-supermarket-${familyWorkspaceId}` },
     { id: "rule-family-edp", workspaceId: familyWorkspaceId, merchantKeyword: "EDP", categoryId: `cat-housing-${familyWorkspaceId}` },
     { id: "rule-family-school", workspaceId: familyWorkspaceId, merchantKeyword: "Escola", categoryId: `cat-education-${familyWorkspaceId}` },
+    { id: "rule-freelancer-client", workspaceId: freelancerWorkspaceId, merchantKeyword: "Cliente", categoryId: `cat-professional-income-${freelancerWorkspaceId}` },
+    { id: "rule-freelancer-figma", workspaceId: freelancerWorkspaceId, merchantKeyword: "Figma", categoryId: `cat-subscriptions-${freelancerWorkspaceId}` },
+    { id: "rule-freelancer-cowork", workspaceId: freelancerWorkspaceId, merchantKeyword: "Cowork", categoryId: `cat-other-${freelancerWorkspaceId}` },
+    { id: "rule-freelancer-accountant", workspaceId: freelancerWorkspaceId, merchantKeyword: "Contabilista", categoryId: `cat-taxes-${freelancerWorkspaceId}` },
   ],
   transactions: [
     { id: "trx-salary", workspaceId: defaultWorkspaceId, accountId: "acc-checking", date: "2026-08-02", description: "Salário Agosto", merchant: "Salário", amount: 4200, currency: "EUR", type: "income", category: "Salário", source: "manual", categoryId: `cat-salary-${defaultWorkspaceId}`, createdAt, updatedAt: createdAt },
@@ -172,6 +181,11 @@ export const initialFinanceState: FinanceState = {
     { id: "trx-family-continente", workspaceId: familyWorkspaceId, accountId: "acc-family-joint", date: "2026-08-05", description: "Supermercado semanal", merchant: "Continente", amount: -168.4, currency: "EUR", type: "expense", category: "Supermercado", source: "manual", categoryId: `cat-supermarket-${familyWorkspaceId}`, createdAt, updatedAt: createdAt },
     { id: "trx-family-edp", workspaceId: familyWorkspaceId, accountId: "acc-family-joint", date: "2026-08-07", description: "Energia", merchant: "EDP", amount: -92.3, currency: "EUR", type: "expense", category: "Habitação", source: "manual", categoryId: `cat-housing-${familyWorkspaceId}`, createdAt, updatedAt: createdAt },
     { id: "trx-family-school", workspaceId: familyWorkspaceId, accountId: "acc-family-joint", date: "2026-08-09", description: "Material escolar", merchant: "Escola", amount: -74.9, currency: "EUR", type: "expense", category: "Educação", source: "manual", categoryId: `cat-education-${familyWorkspaceId}`, createdAt, updatedAt: createdAt },
+    { id: "trx-freelancer-project", workspaceId: freelancerWorkspaceId, accountId: "acc-freelancer-checking", date: "2026-08-02", description: "Projeto UX dashboard", merchant: "Cliente Norte", amount: 3200, currency: "EUR", type: "income", category: "Rendimentos profissionais", source: "manual", categoryId: `cat-professional-income-${freelancerWorkspaceId}`, createdAt, updatedAt: createdAt },
+    { id: "trx-freelancer-retainer", workspaceId: freelancerWorkspaceId, accountId: "acc-freelancer-checking", date: "2026-08-06", description: "Retainer mensal", merchant: "Cliente Atlas", amount: 950, currency: "EUR", type: "income", category: "Rendimentos profissionais", source: "manual", categoryId: `cat-professional-income-${freelancerWorkspaceId}`, createdAt, updatedAt: createdAt },
+    { id: "trx-freelancer-figma", workspaceId: freelancerWorkspaceId, accountId: "acc-freelancer-checking", date: "2026-08-07", description: "Figma Professional", merchant: "Figma", amount: -89, currency: "EUR", type: "expense", category: "Subscrições", source: "manual", categoryId: `cat-subscriptions-${freelancerWorkspaceId}`, createdAt, updatedAt: createdAt },
+    { id: "trx-freelancer-cowork", workspaceId: freelancerWorkspaceId, accountId: "acc-freelancer-checking", date: "2026-08-08", description: "Espaço cowork", merchant: "Cowork Lisboa", amount: -180, currency: "EUR", type: "expense", category: "Outros", source: "manual", categoryId: `cat-other-${freelancerWorkspaceId}`, createdAt, updatedAt: createdAt },
+    { id: "trx-freelancer-accountant", workspaceId: freelancerWorkspaceId, accountId: "acc-freelancer-checking", date: "2026-08-10", description: "Apoio contabilístico", merchant: "Contabilista", amount: -120, currency: "EUR", type: "expense", category: "Impostos", source: "manual", categoryId: `cat-taxes-${freelancerWorkspaceId}`, createdAt, updatedAt: createdAt },
   ],
   assets: [
     { id: "asset-home", workspaceId: defaultWorkspaceId, name: "Casa", type: "real_estate", value: 250000, currency: "EUR", ownershipType: "personal", ownershipPercentage: 100, valuationDate: "2026-08-01", description: "Habitação própria" },
@@ -197,6 +211,7 @@ export const initialFinanceState: FinanceState = {
   financialScores: [
     { id: "score-initial", workspaceId: defaultWorkspaceId, score: 82, createdAt },
     { id: "score-family-initial", workspaceId: familyWorkspaceId, score: 78, createdAt },
+    { id: "score-freelancer-initial", workspaceId: freelancerWorkspaceId, score: 74, createdAt },
   ],
   financialSnapshots: [
     { id: "snap-jan", workspaceId: defaultWorkspaceId, snapshotDate: "2026-01-31", snapshotType: "INITIAL", month: "Jan", netWorth: 112000, liquidAssets: 15000, income: 4000, expenses: 2600, savingsRate: 35, assets: 220000, liabilities: 108000, investmentValue: 72000, createdAt },
@@ -209,6 +224,11 @@ export const initialFinanceState: FinanceState = {
     { id: "snap-family-mar", workspaceId: familyWorkspaceId, snapshotDate: "2026-03-31", snapshotType: "MONTHLY", month: "Mar", netWorth: 132900, liquidAssets: 20100, income: 4000, expenses: 1240, savingsRate: 69, assets: 278000, liabilities: 145100, investmentValue: 0, createdAt },
     { id: "snap-family-abr", workspaceId: familyWorkspaceId, snapshotDate: "2026-04-30", snapshotType: "MONTHLY", month: "Abr", netWorth: 139200, liquidAssets: 21450, income: 4000, expenses: 1305, savingsRate: 67.4, assets: 283500, liabilities: 144300, investmentValue: 0, createdAt },
     { id: "snap-family-mai", workspaceId: familyWorkspaceId, snapshotDate: "2026-05-31", snapshotType: "MONTHLY", month: "Mai", netWorth: 145600, liquidAssets: 22400, income: 4050, expenses: 1290, savingsRate: 68.1, assets: 289000, liabilities: 143400, investmentValue: 0, createdAt },
+    { id: "snap-freelancer-jan", workspaceId: freelancerWorkspaceId, snapshotDate: "2026-01-31", snapshotType: "INITIAL", month: "Jan", netWorth: 4200, liquidAssets: 4200, income: 2800, expenses: 520, savingsRate: 81.4, assets: 4200, liabilities: 0, investmentValue: 0, createdAt },
+    { id: "snap-freelancer-fev", workspaceId: freelancerWorkspaceId, snapshotDate: "2026-02-28", snapshotType: "MONTHLY", month: "Fev", netWorth: 5100, liquidAssets: 5100, income: 3100, expenses: 610, savingsRate: 80.3, assets: 5100, liabilities: 0, investmentValue: 0, createdAt },
+    { id: "snap-freelancer-mar", workspaceId: freelancerWorkspaceId, snapshotDate: "2026-03-31", snapshotType: "MONTHLY", month: "Mar", netWorth: 5900, liquidAssets: 5900, income: 3400, expenses: 680, savingsRate: 80, assets: 5900, liabilities: 0, investmentValue: 0, createdAt },
+    { id: "snap-freelancer-abr", workspaceId: freelancerWorkspaceId, snapshotDate: "2026-04-30", snapshotType: "MONTHLY", month: "Abr", netWorth: 7100, liquidAssets: 7100, income: 3800, expenses: 720, savingsRate: 81.1, assets: 7100, liabilities: 0, investmentValue: 0, createdAt },
+    { id: "snap-freelancer-mai", workspaceId: freelancerWorkspaceId, snapshotDate: "2026-05-31", snapshotType: "MONTHLY", month: "Mai", netWorth: 8200, liquidAssets: 8200, income: 3950, expenses: 760, savingsRate: 80.8, assets: 8200, liabilities: 0, investmentValue: 0, createdAt },
   ],
   dataSources: [
     { id: "ds-manual", workspaceId: defaultWorkspaceId, type: "manual", provider: "Manual", status: "updated", lastSyncAt: createdAt, dataUntil: "2026-08-11", createdAt },
@@ -217,6 +237,9 @@ export const initialFinanceState: FinanceState = {
     { id: "ds-family-manual", workspaceId: familyWorkspaceId, type: "manual", provider: "Manual", status: "updated", lastSyncAt: createdAt, dataUntil: "2026-08-11", createdAt },
     { id: "ds-family-csv", workspaceId: familyWorkspaceId, type: "csv", provider: "CSV", status: "disconnected", createdAt },
     { id: "ds-family-google-drive", workspaceId: familyWorkspaceId, type: "google_drive", provider: "Google Drive", status: "disconnected", createdAt },
+    { id: "ds-freelancer-manual", workspaceId: freelancerWorkspaceId, type: "manual", provider: "Manual", status: "updated", lastSyncAt: createdAt, dataUntil: "2026-08-11", createdAt },
+    { id: "ds-freelancer-csv", workspaceId: freelancerWorkspaceId, type: "csv", provider: "CSV", status: "disconnected", createdAt },
+    { id: "ds-freelancer-google-drive", workspaceId: freelancerWorkspaceId, type: "google_drive", provider: "Google Drive", status: "disconnected", createdAt },
   ],
 };
 
@@ -272,10 +295,10 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
       updatedAt: account.updatedAt ?? account.createdAt ?? createdAt,
     })),
     initialFinanceState.accounts,
-    familyWorkspaceId,
+    seededWorkspaceIds,
   );
-  const accountOwnerships = withWorkspaceSeedRecords(state.accountOwnerships?.length ? state.accountOwnerships : initialFinanceState.accountOwnerships, initialFinanceState.accountOwnerships, familyWorkspaceId);
-  const categoryRules = withWorkspaceSeedRecords((state.categoryRules ?? []).map((rule) => ({ ...rule, workspaceId: rule.workspaceId ?? defaultWorkspaceId })), initialFinanceState.categoryRules, familyWorkspaceId);
+  const accountOwnerships = withWorkspaceSeedRecords(state.accountOwnerships?.length ? state.accountOwnerships : initialFinanceState.accountOwnerships, initialFinanceState.accountOwnerships, seededWorkspaceIds);
+  const categoryRules = withWorkspaceSeedRecords((state.categoryRules ?? []).map((rule) => ({ ...rule, workspaceId: rule.workspaceId ?? defaultWorkspaceId })), initialFinanceState.categoryRules, seededWorkspaceIds);
   const assets = withWorkspaceSeedRecords(
     (state.assets ?? []).map((asset) => ({
       ...asset,
@@ -287,11 +310,11 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
       valuationDate: asset.valuationDate ?? "2026-08-01",
     })),
     initialFinanceState.assets,
-    familyWorkspaceId,
+    seededWorkspaceIds,
   );
-  const liabilities = withWorkspaceSeedRecords((state.liabilities ?? []).map((liability) => normalizeLiability(liability)), initialFinanceState.liabilities, familyWorkspaceId);
-  const financialScores = withWorkspaceSeedRecords(state.financialScores?.length ? state.financialScores.map((score) => ({ ...score, workspaceId: score.workspaceId ?? defaultWorkspaceId })) : initialFinanceState.financialScores, initialFinanceState.financialScores, familyWorkspaceId);
-  const financialSnapshots = withWorkspaceSeedRecords(state.financialSnapshots?.length ? state.financialSnapshots.map((snapshot) => normalizeSnapshot(snapshot)) : initialFinanceState.financialSnapshots, initialFinanceState.financialSnapshots, familyWorkspaceId);
+  const liabilities = withWorkspaceSeedRecords((state.liabilities ?? []).map((liability) => normalizeLiability(liability)), initialFinanceState.liabilities, seededWorkspaceIds);
+  const financialScores = withWorkspaceSeedRecords(state.financialScores?.length ? state.financialScores.map((score) => ({ ...score, workspaceId: score.workspaceId ?? defaultWorkspaceId })) : initialFinanceState.financialScores, initialFinanceState.financialScores, seededWorkspaceIds);
+  const financialSnapshots = withWorkspaceSeedRecords(state.financialSnapshots?.length ? state.financialSnapshots.map((snapshot) => normalizeSnapshot(snapshot)) : initialFinanceState.financialSnapshots, initialFinanceState.financialSnapshots, seededWorkspaceIds);
 
   return {
     ...initialFinanceState,
@@ -304,7 +327,7 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
     accountOwnerships,
     categories,
     categoryRules,
-    transactions: withWorkspaceSeedRecords(transactions, initialFinanceState.transactions, familyWorkspaceId),
+    transactions: withWorkspaceSeedRecords(transactions, initialFinanceState.transactions, seededWorkspaceIds),
     assets,
     liabilities,
     investments: (state.investments ?? []).map((investment) => ({
@@ -320,7 +343,7 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
     financialGoals: state.financialGoals?.length ? state.financialGoals.map((goal) => ({ ...goal, workspaceId: goal.workspaceId ?? defaultWorkspaceId })) : initialFinanceState.financialGoals,
     financialScores,
     financialSnapshots,
-    dataSources: withWorkspaceSeedRecords(dataSources, initialFinanceState.dataSources, familyWorkspaceId),
+    dataSources: withWorkspaceSeedRecords(dataSources, initialFinanceState.dataSources, seededWorkspaceIds),
   };
 }
 
@@ -514,10 +537,12 @@ function normalizeCategories(categories: CategoryRecord[] | undefined, workspace
   return [...existing, ...missing];
 }
 
-function withWorkspaceSeedRecords<T extends { id: string; workspaceId: string }>(records: T[], seedRecords: T[], workspaceId: string) {
-  if (records.some((record) => record.workspaceId === workspaceId)) return records;
-  const existingIds = new Set(records.map((record) => record.id));
-  return [...records, ...seedRecords.filter((record) => record.workspaceId === workspaceId && !existingIds.has(record.id))];
+function withWorkspaceSeedRecords<T extends { id: string; workspaceId: string }>(records: T[], seedRecords: T[], workspaceIds: string | string[]) {
+  return (Array.isArray(workspaceIds) ? workspaceIds : [workspaceIds]).reduce((current, workspaceId) => {
+    if (current.some((record) => record.workspaceId === workspaceId)) return current;
+    const existingIds = new Set(current.map((record) => record.id));
+    return [...current, ...seedRecords.filter((record) => record.workspaceId === workspaceId && !existingIds.has(record.id))];
+  }, records);
 }
 
 function baseCategoryId(categoryId: string) {

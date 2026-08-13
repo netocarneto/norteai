@@ -4,6 +4,7 @@ import {
   calculateNorteScore,
   calculateSummary,
   familyWorkspaceId,
+  freelancerWorkspaceId,
   initialFinanceState,
   isDuplicateTransaction,
   markDataSourceUpdated,
@@ -56,6 +57,23 @@ test("calculates family workspace summary independently from personal data", () 
   assert.equal(summary.savingsRate, 75.4);
   assert.equal(score.score, 61);
   assert.equal(score.classification, "Precisa de atenção");
+});
+
+test("calculates freelancer workspace summary independently from personal data", () => {
+  const freelancerState = { ...initialFinanceState, activeWorkspaceId: freelancerWorkspaceId };
+  const summary = calculateSummary(freelancerState);
+  const score = calculateNorteScore(summary);
+
+  assert.equal(summary.cashPosition, 8600);
+  assert.equal(summary.assets, 8600);
+  assert.equal(summary.liabilities, 0);
+  assert.equal(summary.netWorth, 8600);
+  assert.equal(summary.income, 4150);
+  assert.equal(summary.expenses, 389);
+  assert.equal(summary.savings, 3761);
+  assert.equal(summary.savingsRate, 90.6);
+  assert.equal(score.score, 80);
+  assert.equal(score.classification, "Muito bom");
 });
 
 test("parses CSV imports with inferred categories and duplicate detection", () => {
@@ -117,4 +135,19 @@ test("adds family seed records to legacy personal-only local states", () => {
   assert.equal(family.assets.length, 1);
   assert.equal(family.liabilities.length, 1);
   assert.equal(family.dataSources.some((source) => source.type === "manual" && source.status === "updated"), true);
+});
+
+test("adds freelancer seed records to legacy personal-only local states", () => {
+  const legacy = structuredClone(initialFinanceState);
+  legacy.accounts = legacy.accounts.filter((record) => record.workspaceId !== freelancerWorkspaceId);
+  legacy.accountOwnerships = legacy.accountOwnerships.filter((record) => record.workspaceId !== freelancerWorkspaceId);
+  legacy.transactions = legacy.transactions.filter((record) => record.workspaceId !== freelancerWorkspaceId);
+  legacy.dataSources = legacy.dataSources.filter((record) => record.workspaceId !== freelancerWorkspaceId);
+
+  const normalized = normalizeFinanceState(legacy);
+  const freelancer = scopeFinanceState({ ...normalized, activeWorkspaceId: freelancerWorkspaceId });
+
+  assert.equal(freelancer.accounts.length, 2);
+  assert.equal(freelancer.transactions.length, 5);
+  assert.equal(freelancer.dataSources.some((source) => source.type === "manual" && source.status === "updated"), true);
 });

@@ -11,7 +11,8 @@ import type { FinanceState, FinancialSummary, NorteScore } from "@/types/finance
 export function DashboardPage() {
   const { state, summary, score, activeWorkspace, setActiveWorkspace } = useFinanceState();
   if (activeWorkspace?.type === "FAMILY") return <FamilyDashboard state={state} summary={summary} score={score} onReturnToPersonal={() => setActiveWorkspace(defaultWorkspaceId)} />;
-  if (activeWorkspace?.type === "FREELANCER") return <FutureWorkspaceDashboard icon={BriefcaseBusiness} title="NorteAI Freelancer" text="Esta área está preparada para atividade independente numa fase futura. Agora o foco é completar o NorteAI Pessoal." onReturnToPersonal={() => setActiveWorkspace(defaultWorkspaceId)} />;
+  if (activeWorkspace?.type === "FREELANCER") return <FreelancerDashboard state={state} summary={summary} score={score} onReturnToPersonal={() => setActiveWorkspace(defaultWorkspaceId)} />;
+  if (activeWorkspace?.type === "BUSINESS") return <FutureWorkspaceDashboard icon={BriefcaseBusiness} title="NorteAI Negócios" text="Esta área fica reservada para uma fase futura. Agora o foco está em Pessoal, Família e Freelancer." onReturnToPersonal={() => setActiveWorkspace(defaultWorkspaceId)} />;
 
   return <PersonalDashboard state={state} summary={summary} score={score} />;
 }
@@ -221,6 +222,102 @@ function FamilyDashboard({ state, summary, score, onReturnToPersonal }: { state:
                 <p className="font-black text-emerald-600">{score.classification}</p>
                 <p className="mt-1 text-sm font-semibold leading-6 text-slate-500">
                   Calculado por regras a partir dos dados familiares registados.
+                </p>
+              </div>
+            </div>
+            <SignalBars value={score.score} muted={!score.isDataSufficient} />
+          </article>
+          <DataFreshnessCard state={state} />
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function FreelancerDashboard({ state, summary, score, onReturnToPersonal }: { state: FinanceState; summary: FinancialSummary; score: NorteScore; onReturnToPersonal: () => void }) {
+  const hasData = hasWorkspaceData(state);
+  if (!hasData) {
+    return <WorkspaceEmptyState title="NorteAI Freelancer" subtitle="Workspace profissional ativo." text="Adiciona uma conta profissional para começar a acompanhar a atividade independente." action="Adicionar conta" href="/dinheiro" />;
+  }
+
+  const recent = [...state.transactions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+  const estimatedTaxReserve = Math.max(0, summary.savings * 0.25);
+  const taxReserveAccount = state.accounts.find((account) => account.name.toLowerCase().includes("reserva"));
+  const reserveGap = estimatedTaxReserve - (taxReserveAccount?.balance ?? 0);
+
+  return (
+    <div className="space-y-6">
+      <section className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="page-title">NorteAI Freelancer</h1>
+          <p className="page-subtitle">Receitas profissionais, despesas, lucro e reserva fiscal estimada.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <span className="rounded-full bg-teal-50 px-4 py-2 text-xs font-black uppercase tracking-normal text-teal-700 ring-1 ring-teal-100">
+            Freelancer
+          </span>
+          <Link href="/" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white" onClick={onReturnToPersonal}>
+            Voltar ao Pessoal
+          </Link>
+        </div>
+      </section>
+
+      <section className="grid gap-3 min-[390px]:grid-cols-2 lg:gap-5 xl:grid-cols-4">
+        <TopStat icon={BriefcaseBusiness} label="Receitas profissionais" value={euro.format(summary.income)} detail="Entradas do mês" tone="teal" />
+        <TopStat icon={ReceiptText} label="Despesas profissionais" value={euro.format(summary.expenses)} detail="Custos registados" tone="slate" />
+        <TopStat icon={CircleDollarSign} label="Lucro líquido" value={euro.format(summary.savings)} detail={summary.savingsRate === null ? "Sem receitas suficientes" : `${summary.savingsRate}% de margem`} tone="blue" />
+        <TopStat icon={Landmark} label="Reserva fiscal" value={euro.format(estimatedTaxReserve)} detail="Estimativa simples de 25%" tone="violet" />
+      </section>
+
+      <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+          <div className="flex items-center gap-2">
+            <WalletCards size={20} className="text-violet-700" aria-hidden="true" />
+            <h2 className="section-title">Contas profissionais</h2>
+          </div>
+          <div className="mt-4 space-y-2">
+            {state.accounts.map((account) => (
+              <div key={account.id} className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-3 py-3">
+                <div className="min-w-0">
+                  <p className="truncate font-black text-slate-950">{account.name}</p>
+                  <p className="truncate text-xs font-bold text-slate-500">{account.institution}</p>
+                </div>
+                <p className="shrink-0 font-black text-slate-950">{euro.format(account.balance)}</p>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+          <div className="flex items-center gap-2">
+            <Landmark size={20} className="text-violet-700" aria-hidden="true" />
+            <h2 className="section-title">Reserva fiscal estimada</h2>
+          </div>
+          <div className="mt-4 grid gap-2 text-sm font-bold text-slate-600">
+            <ReportRow label="Lucro líquido" value={euroCents.format(summary.savings)} />
+            <ReportRow label="Percentagem usada" value="25%" />
+            <ReportRow label="Valor sugerido" value={euroCents.format(estimatedTaxReserve)} />
+            <ReportRow label="Reserva atual" value={euroCents.format(taxReserveAccount?.balance ?? 0)} />
+            <ReportRow label={reserveGap > 0 ? "Falta reservar" : "Folga disponível"} value={euroCents.format(Math.abs(reserveGap))} />
+          </div>
+          <p className="mt-4 rounded-2xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-500">
+            Estimativa operacional para organização. Não substitui apuramento fiscal oficial.
+          </p>
+        </article>
+      </section>
+
+      <section className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.95fr)]">
+        <MonthlyReportCard state={state} summary={summary} />
+        <RecentTransactionsCard state={state} recent={recent} />
+        <div className="grid gap-5">
+          <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+            <h2 className="section-title">Norte Score profissional</h2>
+            <div className="mt-4 flex items-center gap-4">
+              <ScoreDial score={score.score} muted={!score.isDataSufficient} />
+              <div>
+                <p className="font-black text-emerald-600">{score.classification}</p>
+                <p className="mt-1 text-sm font-semibold leading-6 text-slate-500">
+                  Calculado por regras a partir da atividade freelancer registada.
                 </p>
               </div>
             </div>

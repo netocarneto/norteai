@@ -129,7 +129,7 @@ export function SettingsPage() {
               <h2 className="section-title">Workspaces</h2>
             </div>
             <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
-              O NorteAI Pessoal está fechado. O workspace Família tem MVP funcional e o Freelancer continua reservado para uma fase futura.
+              O NorteAI Pessoal está fechado. Família e Freelancer estão disponíveis como módulos de protótipo geridos pelo utilizador principal.
             </p>
             <div className="mt-4 divide-y divide-slate-100">
               {workspaces.map((workspace) => (
@@ -142,7 +142,7 @@ export function SettingsPage() {
                     <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-black text-teal-700">Ativo</span>
                   ) : (
                     <div className="flex shrink-0 items-center gap-2">
-                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-500">{workspace.type === "FAMILY" ? "MVP" : "Preparado"}</span>
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-500">{workspace.type === "FAMILY" || workspace.type === "FREELANCER" ? "Disponível" : "Preparado"}</span>
                       <button
                         type="button"
                         className="rounded-full bg-slate-950 px-3 py-1 text-xs font-black text-white"
