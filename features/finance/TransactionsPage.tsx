@@ -38,11 +38,11 @@ export function TransactionsPage() {
   const [dateFilter, setDateFilter] = useState("");
   const [sortDirection, setSortDirection] = useState<"desc" | "asc">("desc");
   const [page, setPage] = useState(1);
-  const [csvText, setCsvText] = useState("date,description,amount\n2026-08-09,Pingo Doce,-42.30\n2026-08-10,Freelance,650");
+  const [csvText, setCsvText] = useState("");
   const [preview, setPreview] = useState<TransactionRecord[]>([]);
   const [importStats, setImportStats] = useState<{ imported: number; skipped: number } | null>(null);
   const [categoryDraft, setCategoryDraft] = useState({ name: "", type: "expense" as CategoryType, icon: "tag", color: "#6d28d9" });
-  const [ruleDraft, setRuleDraft] = useState({ merchantKeyword: "", categoryId: "cat-food" });
+  const [ruleDraft, setRuleDraft] = useState({ merchantKeyword: "", categoryId: "" });
 
   const filtered = useMemo(() => {
     return state.transactions
@@ -105,6 +105,7 @@ export function TransactionsPage() {
   function buildPreview() {
     const accountId = state.accounts[0]?.id;
     if (!accountId) return;
+    setImportStats(null);
     setPreview(parseCsv(csvText, state, accountId));
   }
 
@@ -235,7 +236,7 @@ export function TransactionsPage() {
                 <input type="date" value={dateFilter} onChange={(event) => { setDateFilter(event.target.value); setPage(1); }} />
               </label>
               <label className="form-field">
-                <span className="sr-only">Ordenacao</span>
+                <span className="sr-only">Ordenação</span>
                 <select value={sortDirection} onChange={(event) => { setSortDirection(event.target.value as "desc" | "asc"); setPage(1); }}>
                   <option value="desc">Mais recentes</option>
                   <option value="asc">Mais antigos</option>
@@ -287,7 +288,13 @@ export function TransactionsPage() {
             <h2 className="section-title">Base de importação CSV</h2>
           </div>
           <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-            <textarea aria-label="Conteúdo CSV" className="min-h-36 min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none focus:border-violet-500" value={csvText} onChange={(event) => setCsvText(event.target.value)} />
+            <textarea
+              aria-label="Conteúdo CSV"
+              className="min-h-36 min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none focus:border-violet-500"
+              value={csvText}
+              onChange={(event) => setCsvText(event.target.value)}
+              placeholder={"date,description,amount\n2026-08-09,Pingo Doce,-42.30\n2026-08-10,Freelance,650"}
+            />
             <div className="min-w-0">
               <div className="flex flex-wrap gap-3">
                 <button className="primary-button" onClick={buildPreview}>Pré-visualizar</button>
@@ -353,7 +360,7 @@ export function TransactionsPage() {
                   if (!ruleDraft.merchantKeyword || !ruleDraft.categoryId) return;
                   if (!activeWorkspace) return;
                   setState((current) => ({ ...current, categoryRules: [...current.categoryRules, { ...ruleDraft, workspaceId: activeWorkspace.id, id: `rule-${Date.now()}` }] }));
-                  setRuleDraft({ merchantKeyword: "", categoryId: state.categories[0]?.id ?? "" });
+                  setRuleDraft({ merchantKeyword: "", categoryId: "" });
                 }}
               >
                 <Plus size={17} /> Criar
@@ -361,7 +368,13 @@ export function TransactionsPage() {
             </div>
             <div className="mt-5 grid gap-3 2xl:grid-cols-2">
               <label className="form-field"><span>Palavra-chave do comerciante</span><input value={ruleDraft.merchantKeyword} onChange={(event) => setRuleDraft({ ...ruleDraft, merchantKeyword: event.target.value })} placeholder="Continente" /></label>
-              <label className="form-field"><span>Categoria</span><select value={ruleDraft.categoryId} onChange={(event) => setRuleDraft({ ...ruleDraft, categoryId: event.target.value })}>{state.categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
+              <label className="form-field">
+                <span>Categoria</span>
+                <select value={ruleDraft.categoryId} onChange={(event) => setRuleDraft({ ...ruleDraft, categoryId: event.target.value })}>
+                  <option value="">Selecionar categoria</option>
+                  {state.categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                </select>
+              </label>
             </div>
             <div className="mt-5 space-y-2">
               {state.categoryRules.map((rule) => (

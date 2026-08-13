@@ -137,11 +137,13 @@ function ListPanel({ title, children }: { title: string; children: React.ReactNo
 
 function Row({ title, subtitle, value, onEdit, onDelete }: { title: string; subtitle: string; value: string; onEdit: () => void; onDelete: () => void }) {
   return (
-    <div className="flex items-center gap-3 py-4">
+    <div className="flex flex-wrap items-center gap-3 py-4">
       <div className="min-w-0 flex-1"><p className="truncate font-black text-slate-950">{title}</p><p className="text-sm text-slate-500">{subtitle}</p></div>
-      <p className="font-black text-slate-950">{value}</p>
-      <button className="icon-button" onClick={onEdit} aria-label="Editar"><Edit3 size={15} /></button>
-      <button className="icon-button" onClick={onDelete} aria-label="Eliminar"><Trash2 size={15} /></button>
+      <p className="shrink-0 font-black text-slate-950">{value}</p>
+      <div className="flex shrink-0 gap-2">
+        <button className="icon-button" onClick={onEdit} aria-label="Editar"><Edit3 size={15} /></button>
+        <button className="icon-button" onClick={onDelete} aria-label="Eliminar"><Trash2 size={15} /></button>
+      </div>
     </div>
   );
 }

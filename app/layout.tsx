@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "NorteAI Pessoal",
   description: "O teu copiloto financeiro inteligente.",
   applicationName: "NorteAI Pessoal",
-  metadataBase: new URL("https://norteai-pessoal.app"),
+  metadataBase: new URL("https://norteai.carlosanetopt.workers.dev"),
   manifest: "/manifest.webmanifest",
   openGraph: {
     title: "NorteAI Pessoal",
@@ -55,7 +55,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt" suppressHydrationWarning>
+    <html lang="pt-PT" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
     </html>
   );

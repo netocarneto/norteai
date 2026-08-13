@@ -65,7 +65,7 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
             Une património, dinheiro, objetivos e inteligência financeira numa experiência simples e premium.
           </p>
           <div className="mt-10 grid max-w-xl grid-cols-3 gap-4">
-            {["Score 84", "Poupança 34%", "+8,2% ano"].map((item) => (
+            {["Dados próprios", "Cálculos claros", "Privacidade"].map((item) => (
               <div key={item} className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
                 <p className="font-black text-slate-950">{item}</p>
               </div>

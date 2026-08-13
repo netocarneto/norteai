@@ -1,5 +1,5 @@
-import { NorteAIPage } from "@/features/finance/FinancePages";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <NorteAIPage />;
+  redirect("/");
 }

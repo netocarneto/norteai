@@ -31,11 +31,28 @@ test("server-renders NorteAI dashboard shell", async () => {
   const html = await response.text();
   assert.match(html, /NorteAI Pessoal|NorteAI/);
   assert.match(html, /O teu copiloto financeiro inteligente/);
-  assert.match(html, /Patrimonio liquido|Património líquido/);
-  assert.match(html, /Norte Score|visao financeira atual/);
+  assert.match(html, /Património líquido/);
+  assert.match(html, /Norte Score|visão financeira atual/);
   assert.match(html, /Dinheiro/);
   assert.match(html, /Movimentos/);
   assert.doesNotMatch(html, /Your site is taking shape|codex-preview|react-loading-skeleton/);
+});
+
+test("keeps legacy routes as redirects to Portuguese routes", async () => {
+  const redirects = new Map([
+    ["/money", "/dinheiro"],
+    ["/wealth", "/patrimonio"],
+    ["/investments", "/investimentos"],
+    ["/profile", "/definicoes"],
+    ["/goals", "/objetivos"],
+    ["/norteai", "/"],
+  ]);
+
+  for (const [from, to] of redirects) {
+    const response = await render(from);
+    assert.equal(response.status, 307);
+    assert.equal(new URL(response.headers.get("location"), "http://localhost").pathname, to);
+  }
 });
 
 test("declares installable PWA metadata", async () => {
@@ -45,6 +62,8 @@ test("declares installable PWA metadata", async () => {
   ]);
 
   assert.match(layout, /manifest:\s*"\/manifest\.webmanifest"/);
+  assert.match(layout, /metadataBase:\s*new URL\("https:\/\/norteai\.carlosanetopt\.workers\.dev"\)/);
+  assert.match(layout, /<html lang="pt-PT"/);
   assert.match(layout, /themeColor:\s*"#6d28d9"/);
   assert.equal(JSON.parse(manifest).display, "standalone");
 });
