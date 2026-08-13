@@ -5,6 +5,7 @@ import {
   calculateSummary,
   initialFinanceState,
   isDuplicateTransaction,
+  markDataSourceUpdated,
   parseCsv,
 } from "../lib/finance-engine.ts";
 
@@ -47,4 +48,19 @@ test("parses CSV imports with inferred categories and duplicate detection", () =
   assert.equal(transaction.type, "expense");
   assert.equal(transaction.category, "Supermercado");
   assert.equal(isDuplicateTransaction([transaction], transaction), true);
+});
+
+test("marks CSV data source as updated after a manual import", () => {
+  const next = markDataSourceUpdated(initialFinanceState, {
+    workspaceId: initialFinanceState.activeWorkspaceId,
+    type: "csv",
+    provider: "CSV",
+    dataUntil: "2026-08-10",
+    lastSyncAt: "2026-08-13T18:30:00.000Z",
+  });
+  const csv = next.dataSources.find((source) => source.type === "csv" && source.workspaceId === initialFinanceState.activeWorkspaceId);
+
+  assert.equal(csv?.status, "updated");
+  assert.equal(csv?.dataUntil, "2026-08-10");
+  assert.equal(csv?.lastSyncAt, "2026-08-13T18:30:00.000Z");
 });

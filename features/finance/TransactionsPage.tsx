@@ -5,7 +5,7 @@ import { Check, Edit3, Filter, Plus, Search, Trash2, Upload } from "lucide-react
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { confirmDeletion, explainDeletionBlock } from "@/lib/destructive-actions";
-import { accountName, categoryName, categoryTypes, euroCents, inferCategoryId, isDuplicateTransaction, parseCsv, transactionTypeLabels, transactionTypes } from "@/lib/finance-engine";
+import { accountName, categoryName, categoryTypes, euroCents, inferCategoryId, isDuplicateTransaction, markDataSourceUpdated, parseCsv, transactionTypeLabels, transactionTypes } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { CategoryType, TransactionRecord, TransactionType } from "@/types/finance";
 
@@ -113,7 +113,11 @@ export function TransactionsPage() {
     setState((current) => {
       const fresh = preview.filter((transaction) => !isDuplicateTransaction(current.transactions, transaction));
       setImportStats({ imported: fresh.length, skipped: preview.length - fresh.length });
-      return { ...current, transactions: [...fresh, ...current.transactions] };
+      const dataUntil = preview.map((transaction) => transaction.date).sort((a, b) => b.localeCompare(a))[0];
+      return markDataSourceUpdated(
+        { ...current, transactions: [...fresh, ...current.transactions] },
+        { workspaceId: activeWorkspace?.id ?? current.activeWorkspaceId, type: "csv", provider: "CSV", dataUntil },
+      );
     });
     setPreview([]);
   }

@@ -3,6 +3,7 @@ import type {
   AssetType,
   CategoryRecord,
   CategoryType,
+  DataSourceType,
   FinanceState,
   FinancialSummary,
   InvestmentType,
@@ -415,6 +416,31 @@ export function transactionFingerprint(input: { accountId: string; date: string;
 export function isDuplicateTransaction(existing: TransactionRecord[], transaction: TransactionRecord) {
   const reference = transaction.externalReference ?? transactionFingerprint(transaction);
   return existing.some((item) => (item.externalReference ?? transactionFingerprint(item)) === reference);
+}
+
+export function markDataSourceUpdated(
+  state: FinanceState,
+  input: { workspaceId: string; type: DataSourceType; provider: string; dataUntil?: string; lastSyncAt?: string },
+): FinanceState {
+  const lastSyncAt = input.lastSyncAt ?? new Date().toISOString();
+  const existing = state.dataSources.find((source) => source.workspaceId === input.workspaceId && (source.type === input.type || source.provider === input.provider));
+  const updatedSource = {
+    id: existing?.id ?? `ds-${input.type}-${Date.now()}`,
+    workspaceId: input.workspaceId,
+    type: input.type,
+    provider: input.provider,
+    status: "updated" as const,
+    lastSyncAt,
+    dataUntil: input.dataUntil ?? existing?.dataUntil,
+    createdAt: existing?.createdAt ?? lastSyncAt,
+  };
+
+  return {
+    ...state,
+    dataSources: existing
+      ? state.dataSources.map((source) => (source.id === existing.id ? { ...source, ...updatedSource } : source))
+      : [...state.dataSources, updatedSource],
+  };
 }
 
 function normalizeCategories(categories: CategoryRecord[] | undefined, workspaceIds: string[]) {
