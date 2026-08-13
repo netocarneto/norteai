@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ElementType } from "react";
+import { useEffect, useRef, useState, type ElementType } from "react";
 import { Database, FileSpreadsheet, Globe2, HardDrive, Landmark, LineChart, LogOut, UserRound, UsersRound } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useFinanceState } from "@/hooks/use-finance-state";
@@ -22,10 +22,30 @@ const sourceCatalog: Array<{
   { type: "broker_api", provider: "Broker API", label: "Broker API", description: "Integrações com corretoras ficam para uma fase posterior.", statusLabel: "Futuro", icon: LineChart },
 ];
 
+const settingsStorageKey = "norteai-personal-settings";
+const defaultProfile = { name: "Diogo", email: "diogo@norteai.pt", currency: "EUR", country: "Portugal" };
+const defaultPreferences = { theme: "Sistema", language: "Português de Portugal", dateFormat: "DD/MM/AAAA" };
+type StoredSettings = Partial<{ profile: typeof defaultProfile; preferences: typeof defaultPreferences }>;
+
 export function SettingsPage() {
   const { state, activeWorkspace, workspaces, setActiveWorkspace } = useFinanceState();
-  const [profile, setProfile] = useState({ name: "Diogo", email: "diogo@norteai.pt", currency: "EUR", country: "Portugal" });
-  const [preferences, setPreferences] = useState({ theme: "Sistema", language: "Português de Portugal", dateFormat: "DD/MM/AAAA" });
+  const [profile, setProfile] = useState(defaultProfile);
+  const [preferences, setPreferences] = useState(defaultPreferences);
+  const hasLoadedSettings = useRef(false);
+
+  useEffect(() => {
+    window.queueMicrotask(() => {
+      const stored = readStoredSettings();
+      setProfile({ ...defaultProfile, ...stored.profile });
+      setPreferences({ ...defaultPreferences, ...stored.preferences });
+      hasLoadedSettings.current = true;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedSettings.current) return;
+    window.localStorage.setItem(settingsStorageKey, JSON.stringify({ profile, preferences }));
+  }, [preferences, profile]);
 
   return (
     <AppShell activePath="/definicoes">
@@ -64,7 +84,7 @@ export function SettingsPage() {
               </label>
             </div>
             <p className="mt-4 rounded-2xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-500">
-              Preferências guardadas nesta sessão local do protótipo. A persistência em backend deve ficar para a fase Supabase completa.
+              Guardado automaticamente neste dispositivo. A persistência em backend deve ficar para a fase Supabase completa.
             </p>
           </article>
 
@@ -96,6 +116,9 @@ export function SettingsPage() {
                 </select>
               </label>
             </div>
+            <p className="mt-4 rounded-2xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-500">
+              Guardado automaticamente neste dispositivo.
+            </p>
           </article>
         </section>
 
@@ -190,6 +213,18 @@ export function SettingsPage() {
       </div>
     </AppShell>
   );
+}
+
+function readStoredSettings(): StoredSettings {
+  if (typeof window === "undefined") return {};
+  const raw = window.localStorage.getItem(settingsStorageKey);
+  if (!raw) return {};
+
+  try {
+    return JSON.parse(raw) as StoredSettings;
+  } catch {
+    return {};
+  }
 }
 
 function FinancialSources({ state }: { state: ReturnType<typeof useFinanceState>["state"] }) {
