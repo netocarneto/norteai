@@ -5,6 +5,7 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { Edit3, Plus, Trash2, TrendingUp } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
+import { confirmDeletion } from "@/lib/destructive-actions";
 import { euro, investmentTypeLabels, investmentTypes } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { InvestmentRecord, InvestmentType } from "@/types/finance";
@@ -51,6 +52,11 @@ export function InvestmentsPage() {
     }));
     setDraft(emptyInvestment);
     setEditingId(null);
+  }
+
+  function deleteInvestment(investment: InvestmentRecord) {
+    if (!confirmDeletion(`${investment.ticker} · ${investment.name}`)) return;
+    setState((current) => ({ ...current, investments: current.investments.filter((item) => item.id !== investment.id) }));
   }
 
   return (
@@ -168,7 +174,7 @@ export function InvestmentsPage() {
                         });
                         setEditingId(investment.id);
                       }} aria-label="Editar"><Edit3 size={15} /></button>
-                      <button className="icon-button" onClick={() => setState((current) => ({ ...current, investments: current.investments.filter((item) => item.id !== investment.id) }))} aria-label="Eliminar"><Trash2 size={15} /></button>
+                      <button className="icon-button" onClick={() => deleteInvestment(investment)} aria-label="Eliminar"><Trash2 size={15} /></button>
                     </div>
                   </div>
                 ))

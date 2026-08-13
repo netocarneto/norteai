@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Check, Edit3, Filter, Plus, Search, Trash2, Upload } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
+import { confirmDeletion, explainDeletionBlock } from "@/lib/destructive-actions";
 import { accountName, categoryName, categoryTypes, euroCents, inferCategoryId, isDuplicateTransaction, parseCsv, transactionTypeLabels, transactionTypes } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { CategoryType, TransactionRecord, TransactionType } from "@/types/finance";
@@ -114,6 +115,29 @@ export function TransactionsPage() {
       return { ...current, transactions: [...fresh, ...current.transactions] };
     });
     setPreview([]);
+  }
+
+  function deleteTransaction(transaction: TransactionRecord) {
+    if (!confirmDeletion(transaction.merchant || transaction.description)) return;
+    setState((current) => ({ ...current, transactions: current.transactions.filter((item) => item.id !== transaction.id) }));
+  }
+
+  function deleteCategory(categoryId: string, categoryLabel: string) {
+    const isUsedByTransaction = state.transactions.some((transaction) => transaction.categoryId === categoryId);
+    const isUsedByRule = state.categoryRules.some((rule) => rule.categoryId === categoryId);
+
+    if (isUsedByTransaction || isUsedByRule) {
+      explainDeletionBlock("Esta categoria está associada a movimentos ou regras automáticas. Remove essas associações antes de eliminar a categoria.");
+      return;
+    }
+
+    if (!confirmDeletion(categoryLabel)) return;
+    setState((current) => ({ ...current, categories: current.categories.filter((item) => item.id !== categoryId) }));
+  }
+
+  function deleteRule(ruleId: string, merchantKeyword: string) {
+    if (!confirmDeletion(`regra ${merchantKeyword}`)) return;
+    setState((current) => ({ ...current, categoryRules: current.categoryRules.filter((item) => item.id !== ruleId) }));
   }
 
   return (
@@ -232,7 +256,7 @@ export function TransactionsPage() {
                     <p className={`shrink-0 font-black ${transaction.amount > 0 ? "text-emerald-600" : "text-slate-950"}`}>{euroCents.format(transaction.amount)}</p>
                     <div className="flex shrink-0 gap-2">
                       <button className="icon-button" onClick={() => editTransaction(transaction)} aria-label="Editar"><Edit3 size={15} /></button>
-                      <button className="icon-button" onClick={() => setState((current) => ({ ...current, transactions: current.transactions.filter((item) => item.id !== transaction.id) }))} aria-label="Eliminar"><Trash2 size={15} /></button>
+                      <button className="icon-button" onClick={() => deleteTransaction(transaction)} aria-label="Eliminar"><Trash2 size={15} /></button>
                     </div>
                   </div>
                 ))
@@ -314,7 +338,7 @@ export function TransactionsPage() {
                 <span key={category.id} className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-700">
                   <span className="size-2 rounded-full" style={{ background: category.color }} />
                   {category.name}
-                  <button onClick={() => setState((current) => ({ ...current, categories: current.categories.filter((item) => item.id !== category.id) }))} aria-label={`Eliminar ${category.name}`}>×</button>
+                  <button onClick={() => deleteCategory(category.id, category.name)} aria-label={`Eliminar ${category.name}`}>×</button>
                 </span>
               ))}
             </div>
@@ -343,7 +367,7 @@ export function TransactionsPage() {
               {state.categoryRules.map((rule) => (
                 <div key={rule.id} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm">
                   <span><b>{rule.merchantKeyword}</b> → {categoryName(state, rule.categoryId)}</span>
-                  <button className="font-black text-rose-600" onClick={() => setState((current) => ({ ...current, categoryRules: current.categoryRules.filter((item) => item.id !== rule.id) }))}>Eliminar</button>
+                  <button className="font-black text-rose-600" onClick={() => deleteRule(rule.id, rule.merchantKeyword)}>Eliminar</button>
                 </div>
               ))}
             </div>

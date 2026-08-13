@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Edit3, Plus, Trash2, WalletCards } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
+import { confirmDeletion, explainDeletionBlock } from "@/lib/destructive-actions";
 import { accountTypeLabels, accountTypes, euro, ownershipTypeLabels } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { AccountType, FinancialAccountRecord, OwnershipType } from "@/types/finance";
@@ -76,6 +77,23 @@ export function AccountsPage() {
     setEditingId(account.id);
   }
 
+  function deleteAccount(account: FinancialAccountRecord) {
+    const hasTransactions = state.transactions.some((transaction) => transaction.accountId === account.id);
+    const hasInvestments = state.investments.some((investment) => investment.accountId === account.id);
+
+    if (hasTransactions || hasInvestments) {
+      explainDeletionBlock("Esta conta tem movimentos ou posições associadas. Altera ou remove esses registos antes de eliminar a conta.");
+      return;
+    }
+
+    if (!confirmDeletion(account.name)) return;
+    setState((current) => ({
+      ...current,
+      accounts: current.accounts.filter((item) => item.id !== account.id),
+      accountOwnerships: current.accountOwnerships.filter((item) => item.accountId !== account.id),
+    }));
+  }
+
   return (
     <AppShell activePath="/dinheiro">
       <div className="space-y-6">
@@ -109,7 +127,7 @@ export function AccountsPage() {
                     <button className="icon-button" onClick={() => editAccount(account)} aria-label={`Editar ${account.name}`}>
                       <Edit3 size={16} aria-hidden="true" />
                     </button>
-                    <button className="icon-button" onClick={() => setState((current) => ({ ...current, accounts: current.accounts.filter((item) => item.id !== account.id) }))} aria-label={`Eliminar ${account.name}`}>
+                    <button className="icon-button" onClick={() => deleteAccount(account)} aria-label={`Eliminar ${account.name}`}>
                       <Trash2 size={16} aria-hidden="true" />
                     </button>
                   </div>

@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { GoalCard } from "@/components/GoalCard";
 import { useFinanceState } from "@/hooks/use-finance-state";
+import { confirmDeletion } from "@/lib/destructive-actions";
 
 export function GoalsPage() {
   const { state, setState, activeWorkspace } = useFinanceState();
@@ -65,7 +66,10 @@ export function GoalsPage() {
               <GoalCard
                 key={goal.id}
                 goal={goal}
-                onDelete={() => setState((current) => ({ ...current, financialGoals: current.financialGoals.filter((item) => item.id !== goal.id) }))}
+                onDelete={() => {
+                  if (!confirmDeletion(goal.name)) return;
+                  setState((current) => ({ ...current, financialGoals: current.financialGoals.filter((item) => item.id !== goal.id) }));
+                }}
               />
             ))}
           </section>

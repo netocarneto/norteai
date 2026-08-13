@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Edit3, Landmark, Plus, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { confirmDeletion, explainDeletionBlock } from "@/lib/destructive-actions";
 import { assetTypeLabels, assetTypes, euro, liabilityTypeLabels, liabilityTypes } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { AssetRecord, AssetType, LiabilityRecord, LiabilityType } from "@/types/finance";
@@ -37,6 +38,22 @@ export function WealthStageOnePage() {
     }));
     setLiabilityDraft(emptyLiability);
     setEditingLiability(null);
+  }
+
+  function deleteAsset(asset: AssetRecord) {
+    const hasInvestments = state.investments.some((investment) => investment.assetId === asset.id);
+    if (hasInvestments) {
+      explainDeletionBlock("Este ativo tem posições associadas. Remove ou altera essas posições antes de eliminar o ativo.");
+      return;
+    }
+
+    if (!confirmDeletion(asset.name)) return;
+    setState((current) => ({ ...current, assets: current.assets.filter((item) => item.id !== asset.id) }));
+  }
+
+  function deleteLiability(liability: LiabilityRecord) {
+    if (!confirmDeletion(liability.name)) return;
+    setState((current) => ({ ...current, liabilities: current.liabilities.filter((item) => item.id !== liability.id) }));
   }
 
   return (
@@ -78,7 +95,7 @@ export function WealthStageOnePage() {
               <Row key={asset.id} title={asset.name} subtitle={assetTypeLabels[asset.type]} value={euro.format(asset.value)} onEdit={() => {
                 setAssetDraft({ name: asset.name, type: asset.type, value: asset.value, currency: asset.currency, ownershipType: asset.ownershipType, ownershipPercentage: asset.ownershipPercentage, valuationDate: asset.valuationDate, description: asset.description ?? "", notes: asset.notes ?? "" });
                 setEditingAsset(asset.id);
-              }} onDelete={() => setState((current) => ({ ...current, assets: current.assets.filter((item) => item.id !== asset.id) }))} />
+              }} onDelete={() => deleteAsset(asset)} />
             ))}
           </ListPanel>
           <ListPanel title="Passivos">
@@ -86,7 +103,7 @@ export function WealthStageOnePage() {
               <Row key={liability.id} title={liability.name} subtitle={`${liabilityTypeLabels[liability.type]} · ${liability.interestRate}%`} value={euro.format(liability.balance)} onEdit={() => {
                 setLiabilityDraft({ name: liability.name, type: liability.type, balance: liability.balance, monthlyPayment: liability.monthlyPayment, interestRate: liability.interestRate, currency: liability.currency, maturityDate: liability.maturityDate ?? "" });
                 setEditingLiability(liability.id);
-              }} onDelete={() => setState((current) => ({ ...current, liabilities: current.liabilities.filter((item) => item.id !== liability.id) }))} />
+              }} onDelete={() => deleteLiability(liability)} />
             ))}
           </ListPanel>
         </section>
