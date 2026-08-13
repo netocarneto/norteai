@@ -87,6 +87,11 @@ export function AppShell({ children, activePath = "/" }: { children: React.React
             </a>
           </div>
         </div>
+        <MobileWorkspaceSwitcher
+          activeWorkspace={activeWorkspace}
+          workspaces={workspaces}
+          onChange={setActiveWorkspace}
+        />
       </header>
 
       <main className="pb-24 xl:ml-[250px] xl:pb-8">
@@ -108,6 +113,37 @@ export function AppShell({ children, activePath = "/" }: { children: React.React
         </div>
       </nav>
     </div>
+  );
+}
+
+function MobileWorkspaceSwitcher({
+  activeWorkspace,
+  workspaces,
+  onChange,
+}: {
+  activeWorkspace: ReturnType<typeof useFinanceState>["activeWorkspace"];
+  workspaces: ReturnType<typeof useFinanceState>["workspaces"];
+  onChange: (workspaceId: string) => void;
+}) {
+  return (
+    <label className="mx-auto mt-3 flex max-w-[1220px] items-center gap-3 rounded-2xl bg-white px-3 py-2 text-xs font-black text-slate-500 ring-1 ring-slate-200 lg:hidden">
+      <span className="shrink-0">Workspace</span>
+      <span className="rounded-full bg-violet-50 px-2.5 py-1 text-[0.65rem] uppercase tracking-normal text-violet-700">
+        {activeWorkspace ? workspaceTypeLabels[activeWorkspace.type] : "Ativo"}
+      </span>
+      <select
+        className="min-w-0 flex-1 bg-transparent text-right text-sm font-black text-slate-950 outline-none"
+        value={activeWorkspace?.id ?? ""}
+        onChange={(event) => onChange(event.target.value)}
+        aria-label="Workspace ativo"
+      >
+        {workspaces.map((workspace) => (
+          <option key={workspace.id} value={workspace.id}>
+            {workspace.name}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 
