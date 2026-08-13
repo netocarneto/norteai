@@ -215,7 +215,7 @@ function ScoreBreakdown({ score }: { score: NorteScore }) {
 }
 
 function DataFreshnessCard({ state }: { state: FinanceState }) {
-  const sources = state.dataSources.filter((source) => ["manual", "csv"].includes(source.type));
+  const sources = state.dataSources.filter((source) => source.type === "manual" || (source.type === "csv" && source.status !== "disconnected"));
   const updated = sources.filter((source) => source.status === "updated" || source.status === "connected").length;
   const completeness = sources.length ? Math.round((updated / sources.length) * 100) : 0;
   const needsUpdate = sources.length - updated;
@@ -227,7 +227,7 @@ function DataFreshnessCard({ state }: { state: FinanceState }) {
         <h2 className="section-title">Atualização dos dados</h2>
       </div>
       <p className="mt-4 text-3xl font-black text-slate-950">{completeness}%</p>
-      <p className="mt-1 text-xs font-bold text-slate-500">{needsUpdate} fontes por atualizar</p>
+      <p className="mt-1 text-xs font-bold text-slate-500">{needsUpdate ? `${needsUpdate} fontes por atualizar` : "Fontes ativas atualizadas"}</p>
       <div className="mt-4 space-y-2">
         {sources.map((source) => (
           <div key={source.id} className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-xs font-black">

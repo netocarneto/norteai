@@ -51,6 +51,9 @@ test("parses CSV imports with inferred categories and duplicate detection", () =
 });
 
 test("marks CSV data source as updated after a manual import", () => {
+  const initialCsv = initialFinanceState.dataSources.find((source) => source.type === "csv" && source.workspaceId === initialFinanceState.activeWorkspaceId);
+  assert.equal(initialCsv?.status, "disconnected");
+
   const next = markDataSourceUpdated(initialFinanceState, {
     workspaceId: initialFinanceState.activeWorkspaceId,
     type: "csv",

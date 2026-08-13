@@ -187,7 +187,7 @@ export const initialFinanceState: FinanceState = {
   ],
   dataSources: [
     { id: "ds-manual", workspaceId: defaultWorkspaceId, type: "manual", provider: "Manual", status: "updated", lastSyncAt: createdAt, dataUntil: "2026-08-11", createdAt },
-    { id: "ds-csv", workspaceId: defaultWorkspaceId, type: "csv", provider: "CSV", status: "needs_update", dataUntil: "2026-07-31", createdAt },
+    { id: "ds-csv", workspaceId: defaultWorkspaceId, type: "csv", provider: "CSV", status: "disconnected", createdAt },
     { id: "ds-google-drive", workspaceId: defaultWorkspaceId, type: "google_drive", provider: "Google Drive", status: "disconnected", createdAt },
   ],
 };

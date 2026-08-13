@@ -248,6 +248,7 @@ function FinancialSources({ state }: { state: ReturnType<typeof useFinanceState>
       {institutions.map((source) => {
         const status = source.status ?? (source.type === "manual" ? "updated" : "needs_update");
         const isUpdated = status === "updated" || status === "connected";
+        const isOptional = status === "disconnected";
         const action = source.type === "csv" ? "Importar extrato" : source.type === "manual" ? "Atualizar manualmente" : "Futuro";
         return (
           <div key={source.name} className="flex flex-wrap items-center justify-between gap-3 py-3">
@@ -258,8 +259,8 @@ function FinancialSources({ state }: { state: ReturnType<typeof useFinanceState>
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <span className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-black ${isUpdated ? "bg-teal-50 text-teal-700" : "bg-amber-50 text-amber-700"}`}>
-                {isUpdated ? "Atualizado" : "Requer atualização"}
+              <span className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-black ${isUpdated ? "bg-teal-50 text-teal-700" : isOptional ? "bg-slate-100 text-slate-500" : "bg-amber-50 text-amber-700"}`}>
+                {isUpdated ? "Atualizado" : isOptional ? "Opcional" : "Requer atualização"}
               </span>
               {action === "Futuro" ? (
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-500">Futuro</span>
