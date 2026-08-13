@@ -165,7 +165,7 @@ export function TransactionsPage() {
               <Plus size={20} className="text-violet-700" aria-hidden="true" />
               <h2 className="section-title">{editingId ? "Editar movimento" : "Adicionar movimento"}</h2>
             </div>
-            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+            <div className="mt-5 grid gap-4">
               <label className="form-field">
                 <span>Conta</span>
                 <select value={draft.accountId} onChange={(event) => setDraft({ ...draft, accountId: event.target.value })}>
@@ -195,14 +195,14 @@ export function TransactionsPage() {
                   {transactionTypes.map((type) => <option key={type} value={type}>{transactionTypeLabels[type]}</option>)}
                 </select>
               </label>
-              <label className="form-field sm:col-span-2">
+              <label className="form-field">
                 <span>Categoria</span>
                 <select value={draft.categoryId} onChange={(event) => setDraft({ ...draft, categoryId: event.target.value })}>
                   <option value="">Auto por regra</option>
                   {state.categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
                 </select>
               </label>
-              <button className="primary-button md:col-span-2 xl:col-span-1 2xl:col-span-2" onClick={saveTransaction} disabled={!state.accounts.length}>
+              <button className="primary-button" onClick={saveTransaction} disabled={!state.accounts.length}>
                 {editingId ? "Guardar movimento" : state.accounts.length ? "Adicionar movimento" : "Cria uma conta primeiro"}
               </button>
             </div>
