@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ElementType } from "react";
-import { Database, FileSpreadsheet, Globe2, HardDrive, Landmark, LineChart, LogOut, Moon, ShieldCheck, UserRound, UsersRound } from "lucide-react";
+import { Database, FileSpreadsheet, Globe2, HardDrive, Landmark, LineChart, LogOut, UserRound, UsersRound } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import { workspaceTypeLabels } from "@/lib/finance-engine";
@@ -33,18 +33,6 @@ export function SettingsPage() {
         <section>
           <h1 className="page-title">Definições</h1>
           <p className="page-subtitle">Perfil, preferências, fontes de dados, segurança e informação do produto.</p>
-        </section>
-
-        <section>
-          <h2 className="section-title">Resumo das definições</h2>
-          <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            <SettingsCard icon={UserRound} title="Perfil" text="Nome, email, país, moeda principal e preferências pessoais." />
-            <SettingsCard icon={ShieldCheck} title="Segurança e privacidade" text="Autenticação, sessões e isolamento dos dados por workspace." />
-            <SettingsCard icon={Moon} title="Tema" text="Modo claro, escuro e preferência do sistema." />
-            <SettingsCard icon={Globe2} title="Idioma e região" text="Português de Portugal, formato Euro e calendário local." />
-            <SettingsCard icon={UsersRound} title="Workspaces" text="Pessoal ativo; Família e Freelancer permanecem apenas preparados." />
-            <SettingsCard icon={Database} title="Fontes de dados" text="Entrada manual, CSV e integrações futuras claramente identificadas." />
-          </div>
         </section>
 
         <section className="grid gap-5 xl:grid-cols-[1fr_1fr]">
@@ -259,19 +247,4 @@ function findStoredSource(sources: DataSourceRecord[], type: DataSourceType, pro
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(value));
-}
-
-function SettingsCard({ icon: Icon, title, text }: { icon: ElementType; title: string; text: string }) {
-  return (
-    <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
-      <div className="flex items-start justify-between gap-3">
-        <Icon size={22} className="text-violet-700" aria-hidden="true" />
-        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[0.62rem] font-black uppercase tracking-normal text-slate-500">
-          Informativo
-        </span>
-      </div>
-      <h3 className="mt-4 font-black text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-6 text-slate-600">{text}</p>
-    </article>
-  );
 }
