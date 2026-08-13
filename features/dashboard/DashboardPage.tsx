@@ -154,7 +154,7 @@ function FamilyDashboard({ state, summary, score, onReturnToPersonal }: { state:
         </div>
         <div className="flex flex-wrap gap-2">
           <span className="rounded-full bg-violet-50 px-4 py-2 text-xs font-black uppercase tracking-normal text-violet-700 ring-1 ring-violet-100">
-            MVP Família
+            Família
           </span>
           <Link href="/" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white" onClick={onReturnToPersonal}>
             Voltar ao Pessoal
