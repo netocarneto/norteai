@@ -15,5 +15,6 @@ export const mobileNav: NavItem[] = [
   { label: "Dinheiro", href: "/dinheiro", icon: CreditCard },
   { label: "Movimentos", href: "/movimentos", icon: ListTree },
   { label: "Investir", href: "/investimentos", icon: ChartNoAxesCombined },
+  { label: "Património", href: "/patrimonio", icon: Landmark },
   { label: "Definições", href: "/definicoes", icon: Settings },
 ];
