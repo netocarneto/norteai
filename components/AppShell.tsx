@@ -55,6 +55,7 @@ export function AppShell({ children, activePath = "/" }: { children: React.React
           </div>
           <GlobalSearch state={state} />
           <div className="flex items-center gap-3">
+            <MobileGlobalSearch state={state} />
             <label className="hidden items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-black text-slate-600 ring-1 ring-slate-200 lg:flex">
               <span>{activeWorkspace ? workspaceTypeLabels[activeWorkspace.type] : "Workspace"}</span>
               <select
@@ -165,6 +166,82 @@ function GlobalSearch({ state }: { state: FinanceState }) {
             ) : (
               <p className="px-4 py-6 text-sm font-semibold text-slate-500">Sem resultados para {query}.</p>
             )}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function MobileGlobalSearch({ state }: { state: FinanceState }) {
+  const [query, setQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const cleanQuery = normalizeSearchText(query);
+  const results = useMemo(() => buildSearchResults(state, cleanQuery), [state, cleanQuery]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 80);
+    return () => window.clearTimeout(focusTimer);
+  }, [isOpen]);
+
+  return (
+    <div className="md:hidden">
+      <button
+        type="button"
+        className="grid size-10 place-items-center rounded-full bg-white text-slate-700 ring-1 ring-slate-200"
+        onClick={() => setIsOpen(true)}
+        aria-label="Pesquisar"
+      >
+        <Search size={18} aria-hidden="true" />
+      </button>
+
+      {isOpen ? (
+        <div className="fixed inset-0 z-50 bg-slate-950/35 px-4 pt-[calc(1rem+env(safe-area-inset-top))] backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Pesquisa">
+          <div className="mx-auto max-w-md overflow-hidden rounded-3xl bg-white shadow-soft ring-1 ring-slate-200">
+            <div className="flex items-center gap-3 border-b border-slate-100 p-3">
+              <Search size={18} className="shrink-0 text-slate-400" aria-hidden="true" />
+              <input
+                ref={inputRef}
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                className="min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400"
+                placeholder="Pesquisar..."
+              />
+              <button type="button" className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-600" onClick={() => setIsOpen(false)}>
+                Fechar
+              </button>
+            </div>
+
+            <div className="max-h-[70vh] overflow-y-auto p-2">
+              {query.trim() ? (
+                results.length ? (
+                  results.map((result) => (
+                    <a
+                      key={result.id}
+                      href={result.href}
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 rounded-2xl px-3 py-3 transition active:bg-violet-50"
+                    >
+                      <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-slate-100 text-violet-700">
+                        <Search size={16} aria-hidden="true" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[0.68rem] font-black uppercase tracking-normal text-slate-400">{result.eyebrow}</p>
+                        <p className="truncate text-sm font-black text-slate-950">{result.title}</p>
+                        <p className="truncate text-xs font-semibold text-slate-500">{result.detail}</p>
+                      </div>
+                      <ArrowRight size={16} className="shrink-0 text-slate-300" aria-hidden="true" />
+                    </a>
+                  ))
+                ) : (
+                  <p className="px-4 py-8 text-sm font-semibold text-slate-500">Sem resultados para {query}.</p>
+                )
+              ) : (
+                <p className="px-4 py-8 text-sm font-semibold text-slate-500">Pesquisa contas, movimentos, categorias, investimentos, património e objetivos.</p>
+              )}
+            </div>
           </div>
         </div>
       ) : null}
