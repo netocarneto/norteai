@@ -3,7 +3,7 @@
 import type { ElementType } from "react";
 import Link from "next/link";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { ArrowUpRight, BriefcaseBusiness, ChevronRight, CircleDollarSign, Clock3, Landmark, Lightbulb, PieChart as PieChartIcon, ReceiptText, Target, TrendingUp, UsersRound, WalletCards } from "lucide-react";
+import { ArrowUpRight, BriefcaseBusiness, CircleDollarSign, Clock3, Landmark, Lightbulb, PieChart as PieChartIcon, ReceiptText, Target, TrendingUp, UsersRound, WalletCards } from "lucide-react";
 import { accountName, categoryName, defaultWorkspaceId, euro, euroCents } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { FinanceState, FinancialSummary, NorteScore } from "@/types/finance";
@@ -85,9 +85,9 @@ function PersonalDashboard({ state, summary, score }: { state: FinanceState; sum
       <article className="rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5 xl:p-6">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-black text-slate-950">Evolução patrimonial</h2>
-          <button className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-600" type="button">
+          <span className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-600">
             6M
-          </button>
+          </span>
         </div>
         <div className="mt-4 h-64 sm:h-72 xl:h-[22rem]">
           {hasHistory ? (
@@ -365,7 +365,6 @@ function InsightTile({ icon: Icon, title, body, tone }: { icon: ElementType; tit
             <span className="rounded-full bg-violet-50 px-2 py-1 text-[0.62rem] font-black uppercase tracking-normal text-violet-700 ring-1 ring-violet-100">
               Análise financeira
             </span>
-            <ChevronRight className="size-4 text-slate-400" aria-hidden="true" />
           </div>
         </div>
         <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">{body}</p>
