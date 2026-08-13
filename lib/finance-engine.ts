@@ -258,7 +258,7 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
   const categories = normalizeCategories(state.categories, workspaces.map((workspace) => workspace.id));
   const categoryMap = Object.fromEntries(categories.map((category) => [category.id, category]));
   const transactions = (state.transactions ?? []).map((transaction) => {
-    const category = transaction.category ?? categoryMap[transaction.categoryId ?? ""]?.name ?? "Outros";
+    const category = transaction.category?.trim() || categoryMap[transaction.categoryId ?? ""]?.name || "Outros";
     return {
       ...transaction,
       workspaceId: transaction.workspaceId ?? defaultWorkspaceId,
@@ -379,7 +379,7 @@ export function calculateSummary(state: FinanceState): FinancialSummary {
   const assets = cashPosition + investments + nonPortfolioAssets;
   const liabilities = sum(scoped.liabilities.map((item) => item.balance));
   const allocation = toPercentSlices(groupValues(scoped.investments, (item) => investmentTypeLabels[item.type], (item) => item.currentValue));
-  const spendingCategories = toAmountSlices(groupValues(scoped.transactions.filter((item) => item.type === "expense"), (item) => item.category || categoryName(scoped, item.categoryId), (item) => Math.abs(item.amount))).sort((a, b) => b.value - a.value);
+  const spendingCategories = toAmountSlices(groupValues(scoped.transactions.filter((item) => item.type === "expense"), (item) => transactionCategoryName(scoped, item), (item) => Math.abs(item.amount))).sort((a, b) => b.value - a.value);
 
   return {
     income,
@@ -439,6 +439,13 @@ export function inferCategoryId(state: FinanceState, merchant: string) {
 
 export function categoryName(state: FinanceState, categoryId?: string) {
   return state.categories.find((item) => item.id === categoryId)?.name ?? "Outros";
+}
+
+function transactionCategoryName(state: FinanceState, transaction: TransactionRecord) {
+  const categoryFromId = transaction.categoryId ? categoryName(state, transaction.categoryId) : "";
+  const directCategory = transaction.category?.trim();
+  if (categoryFromId && categoryFromId !== "Outros") return categoryFromId;
+  return directCategory || categoryFromId || "Outros";
 }
 
 export function categoryValue(state: FinanceState, categoryId?: string) {

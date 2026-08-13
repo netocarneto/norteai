@@ -57,6 +57,7 @@ test("calculates family workspace summary independently from personal data", () 
   assert.equal(summary.savingsRate, 75.4);
   assert.equal(score.score, 61);
   assert.equal(score.classification, "Precisa de atenção");
+  assert.deepEqual(summary.spendingCategories.slice(0, 3).map((category) => category.name), ["Habitação", "Supermercado", "Educação"]);
 });
 
 test("calculates freelancer workspace summary independently from personal data", () => {
@@ -74,6 +75,7 @@ test("calculates freelancer workspace summary independently from personal data",
   assert.equal(summary.savingsRate, 90.6);
   assert.equal(score.score, 80);
   assert.equal(score.classification, "Muito bom");
+  assert.deepEqual(summary.spendingCategories.slice(0, 3).map((category) => category.name), ["Outros", "Impostos", "Subscrições"]);
 });
 
 test("parses CSV imports with inferred categories and duplicate detection", () => {
