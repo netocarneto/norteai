@@ -4,14 +4,14 @@ import type { ElementType } from "react";
 import Link from "next/link";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ArrowUpRight, BriefcaseBusiness, ChevronRight, CircleDollarSign, Clock3, Landmark, Lightbulb, PieChart as PieChartIcon, ReceiptText, Target, TrendingUp, UsersRound, WalletCards } from "lucide-react";
-import { accountName, categoryName, euro, euroCents } from "@/lib/finance-engine";
+import { accountName, categoryName, defaultWorkspaceId, euro, euroCents } from "@/lib/finance-engine";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { FinanceState, FinancialSummary, NorteScore } from "@/types/finance";
 
 export function DashboardPage() {
-  const { state, summary, score, activeWorkspace } = useFinanceState();
-  if (activeWorkspace?.type === "FAMILY") return <FutureWorkspaceDashboard icon={UsersRound} title="NorteAI Família" text="Esta área está preparada para uma fase futura. Nesta fase estamos a finalizar o NorteAI Pessoal." />;
-  if (activeWorkspace?.type === "FREELANCER") return <FutureWorkspaceDashboard icon={BriefcaseBusiness} title="NorteAI Freelancer" text="Esta área está preparada para atividade independente numa fase futura. Agora o foco é completar o NorteAI Pessoal." />;
+  const { state, summary, score, activeWorkspace, setActiveWorkspace } = useFinanceState();
+  if (activeWorkspace?.type === "FAMILY") return <FutureWorkspaceDashboard icon={UsersRound} title="NorteAI Família" text="Esta área está preparada para uma fase futura. Nesta fase estamos a finalizar o NorteAI Pessoal." onReturnToPersonal={() => setActiveWorkspace(defaultWorkspaceId)} />;
+  if (activeWorkspace?.type === "FREELANCER") return <FutureWorkspaceDashboard icon={BriefcaseBusiness} title="NorteAI Freelancer" text="Esta área está preparada para atividade independente numa fase futura. Agora o foco é completar o NorteAI Pessoal." onReturnToPersonal={() => setActiveWorkspace(defaultWorkspaceId)} />;
 
   return <PersonalDashboard state={state} summary={summary} score={score} />;
 }
@@ -137,7 +137,7 @@ function PersonalDashboard({ state, summary, score }: { state: FinanceState; sum
   );
 }
 
-function FutureWorkspaceDashboard({ icon: Icon, title, text }: { icon: ElementType; title: string; text: string }) {
+function FutureWorkspaceDashboard({ icon: Icon, title, text, onReturnToPersonal }: { icon: ElementType; title: string; text: string; onReturnToPersonal: () => void }) {
   return (
     <div className="space-y-6">
       <section>
@@ -153,7 +153,7 @@ function FutureWorkspaceDashboard({ icon: Icon, title, text }: { icon: ElementTy
             <h2 className="text-xl font-black text-slate-950">Preparado para uma fase futura</h2>
             <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">Os dados deste workspace continuam isolados. O produto completo desta área não está ativo nesta fase.</p>
           </div>
-          <Link href="/" className="primary-button w-fit">Voltar ao NorteAI Pessoal</Link>
+          <Link href="/" className="primary-button w-fit" onClick={onReturnToPersonal}>Voltar ao NorteAI Pessoal</Link>
         </div>
       </article>
     </div>

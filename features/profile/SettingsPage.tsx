@@ -23,7 +23,7 @@ const sourceCatalog: Array<{
 ];
 
 export function SettingsPage() {
-  const { state, activeWorkspace, workspaces } = useFinanceState();
+  const { state, activeWorkspace, workspaces, setActiveWorkspace } = useFinanceState();
 
   return (
     <AppShell activePath="/definicoes">
@@ -61,7 +61,16 @@ export function SettingsPage() {
                   {workspace.id === activeWorkspace?.id ? (
                     <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-black text-teal-700">Ativo</span>
                   ) : (
-                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-500">Preparado</span>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-500">Preparado</span>
+                      <button
+                        type="button"
+                        className="rounded-full bg-slate-950 px-3 py-1 text-xs font-black text-white"
+                        onClick={() => setActiveWorkspace(workspace.id)}
+                      >
+                        Usar
+                      </button>
+                    </div>
                   )}
                 </div>
               ))}
