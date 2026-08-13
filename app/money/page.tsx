@@ -1,5 +1,5 @@
-import { AccountsPage } from "@/features/finance/AccountsPage";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <AccountsPage />;
+  redirect("/dinheiro");
 }

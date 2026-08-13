@@ -1,5 +1,5 @@
-import { InvestmentsPage } from "@/features/investments/InvestmentsPage";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <InvestmentsPage />;
+  redirect("/investimentos");
 }

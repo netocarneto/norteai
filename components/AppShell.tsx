@@ -71,7 +71,7 @@ export function AppShell({ children, activePath = "/" }: { children: React.React
                 ))}
               </select>
             </label>
-            <a href="/profile" className="flex items-center gap-3 rounded-full bg-white px-1.5 py-1.5 text-sm font-bold text-slate-900 ring-1 ring-slate-200">
+            <a href="/definicoes" className="flex items-center gap-3 rounded-full bg-white px-1.5 py-1.5 text-sm font-bold text-slate-900 ring-1 ring-slate-200">
               <span className="grid size-9 place-items-center rounded-full bg-violet-700 text-white">D</span>
               <span className="hidden sm:inline">Diogo</span>
             </a>
@@ -297,7 +297,7 @@ function buildSearchResults(state: FinanceState, query: string): SearchResult[] 
     })),
     ...state.financialGoals.map((goal) => ({
       id: `goal-${goal.id}`,
-      href: "/goals",
+      href: "/objetivos",
       eyebrow: "Objetivo",
       title: goal.name,
       detail: `${euro.format(goal.currentValue)} de ${euro.format(goal.targetValue)}`,

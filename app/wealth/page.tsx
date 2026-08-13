@@ -1,5 +1,5 @@
-import { WealthStageOnePage } from "@/features/finance/WealthStageOnePage";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <WealthStageOnePage />;
+  redirect("/patrimonio");
 }
