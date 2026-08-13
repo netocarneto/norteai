@@ -397,11 +397,14 @@ function MonthlyReportCard({ state, summary }: { state: FinanceState; summary: F
         <ReportRow label="Taxa de poupança" value={summary.savingsRate === null ? "Dados insuficientes" : `${summary.savingsRate}%`} />
         <ReportRow label="Investido" value={euroCents.format(invested)} />
       </div>
-      <div className="mt-4 space-y-2">
-        {expensesByCategory.map((category) => (
-          <ReportRow key={category.name} label={category.name} value={euroCents.format(category.value)} />
-        ))}
-      </div>
+      {expensesByCategory.length ? (
+        <div className="mt-4 space-y-2">
+          <p className="px-1 text-xs font-black uppercase tracking-normal text-slate-400">Principais categorias</p>
+          {expensesByCategory.map((category, index) => (
+            <ReportRow key={`${category.name || "categoria"}-${index}`} label={category.name?.trim() || "Categoria sem nome"} value={euroCents.format(category.value)} />
+          ))}
+        </div>
+      ) : null}
     </article>
   );
 }
