@@ -143,8 +143,8 @@ function FamilyDashboard({ state, summary, score, onReturnToPersonal }: { state:
         </div>
       </section>
 
-      <section className="grid gap-3 min-[390px]:grid-cols-2 lg:gap-5 xl:grid-cols-5">
-        <NorteScoreCard score={score} title="Norte Score familiar" description="Calculado por regras a partir dos dados familiares registados." />
+      <section className="grid gap-3 min-[390px]:grid-cols-2 lg:gap-5 xl:grid-cols-4">
+        <NorteScoreCard className="xl:col-span-2" score={score} title="Norte Score familiar" description="Calculado por regras a partir dos dados familiares registados." />
         <TopStat icon={UsersRound} label="Património familiar" value={euro.format(summary.netWorth)} detail="Ativos menos passivos" tone="violet" />
         <TopStat icon={WalletCards} label="Liquidez partilhada" value={euro.format(summary.cashPosition)} detail="Contas familiares" tone="blue" />
         <TopStat icon={ReceiptText} label="Despesas do mês" value={euro.format(summary.expenses)} detail="Movimentos familiares" tone="slate" />
@@ -239,8 +239,8 @@ function FreelancerDashboard({ state, summary, score, onReturnToPersonal }: { st
         </div>
       </section>
 
-      <section className="grid gap-3 min-[390px]:grid-cols-2 lg:gap-5 xl:grid-cols-6">
-        <NorteScoreCard score={score} title="Norte Score profissional" description="Calculado por regras a partir da atividade freelancer registada." />
+      <section className="grid gap-3 min-[390px]:grid-cols-2 lg:gap-5 xl:grid-cols-4">
+        <NorteScoreCard className="xl:col-span-2" score={score} title="Norte Score profissional" description="Calculado por regras a partir da atividade freelancer registada." />
         <TopStat icon={BriefcaseBusiness} label="Receita mensal" value={euro.format(summary.income)} detail="Entradas da atividade" tone="teal" />
         <TopStat icon={WalletCards} label="Dinheiro disponível" value={euro.format(activityLiquidity)} detail="Liquidez operacional" tone="blue" />
         <TopStat icon={CircleDollarSign} label="Reservas" value={euro.format(reserves)} detail="Impostos e segurança" tone="violet" />
@@ -357,9 +357,9 @@ function buildWealthCurve(state: FinanceState, netWorth: number) {
   return [...snapshots.slice(-5), { month: "Atual", value: netWorth }];
 }
 
-function NorteScoreCard({ score, title, description }: { score: NorteScore; title: string; description: string }) {
+function NorteScoreCard({ score, title, description, className = "" }: { score: NorteScore; title: string; description: string; className?: string }) {
   return (
-    <article className="rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5 xl:p-6">
+    <article className={`rounded-3xl bg-white p-4 shadow-soft ring-1 ring-slate-100 sm:p-5 xl:p-6 ${className}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-sm font-black text-slate-950">{title}</h2>
