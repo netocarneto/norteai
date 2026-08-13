@@ -1,6 +1,6 @@
 "use client";
 
-import type { ElementType } from "react";
+import { useState, type ElementType } from "react";
 import { Database, FileSpreadsheet, Globe2, HardDrive, Landmark, LineChart, LogOut, Moon, ShieldCheck, UserRound, UsersRound } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useFinanceState } from "@/hooks/use-finance-state";
@@ -24,6 +24,8 @@ const sourceCatalog: Array<{
 
 export function SettingsPage() {
   const { state, activeWorkspace, workspaces, setActiveWorkspace } = useFinanceState();
+  const [profile, setProfile] = useState({ name: "Diogo", email: "diogo@norteai.pt", currency: "EUR", country: "Portugal" });
+  const [preferences, setPreferences] = useState({ theme: "Sistema", language: "Português de Portugal", dateFormat: "DD/MM/AAAA" });
 
   return (
     <AppShell activePath="/definicoes">
@@ -33,13 +35,80 @@ export function SettingsPage() {
           <p className="page-subtitle">Perfil, preferências, fontes de dados, segurança e informação do produto.</p>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <SettingsCard icon={UserRound} title="Perfil" text="Nome, email, país, moeda principal e preferências pessoais." />
-          <SettingsCard icon={ShieldCheck} title="Segurança e privacidade" text="Autenticação, sessões e isolamento dos dados por workspace." />
-          <SettingsCard icon={Moon} title="Tema" text="Modo claro, escuro e preferência do sistema." />
-          <SettingsCard icon={Globe2} title="Idioma e região" text="Português de Portugal, formato Euro e calendário local." />
-          <SettingsCard icon={UsersRound} title="Workspaces" text="Pessoal ativo; Família e Freelancer permanecem apenas preparados." />
-          <SettingsCard icon={Database} title="Fontes de dados" text="Entrada manual, CSV e integrações futuras claramente identificadas." />
+        <section>
+          <h2 className="section-title">Resumo das definições</h2>
+          <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <SettingsCard icon={UserRound} title="Perfil" text="Nome, email, país, moeda principal e preferências pessoais." />
+            <SettingsCard icon={ShieldCheck} title="Segurança e privacidade" text="Autenticação, sessões e isolamento dos dados por workspace." />
+            <SettingsCard icon={Moon} title="Tema" text="Modo claro, escuro e preferência do sistema." />
+            <SettingsCard icon={Globe2} title="Idioma e região" text="Português de Portugal, formato Euro e calendário local." />
+            <SettingsCard icon={UsersRound} title="Workspaces" text="Pessoal ativo; Família e Freelancer permanecem apenas preparados." />
+            <SettingsCard icon={Database} title="Fontes de dados" text="Entrada manual, CSV e integrações futuras claramente identificadas." />
+          </div>
+        </section>
+
+        <section className="grid gap-5 xl:grid-cols-[1fr_1fr]">
+          <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+            <div className="flex items-center gap-2">
+              <UserRound size={20} className="text-violet-700" aria-hidden="true" />
+              <h2 className="section-title">Perfil</h2>
+            </div>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <label className="form-field">
+                <span>Nome</span>
+                <input value={profile.name} onChange={(event) => setProfile({ ...profile, name: event.target.value })} />
+              </label>
+              <label className="form-field">
+                <span>Email</span>
+                <input type="email" value={profile.email} onChange={(event) => setProfile({ ...profile, email: event.target.value })} />
+              </label>
+              <label className="form-field">
+                <span>País</span>
+                <input value={profile.country} onChange={(event) => setProfile({ ...profile, country: event.target.value })} />
+              </label>
+              <label className="form-field">
+                <span>Moeda</span>
+                <select value={profile.currency} onChange={(event) => setProfile({ ...profile, currency: event.target.value })}>
+                  <option value="EUR">Euro (EUR)</option>
+                  <option value="USD">Dólar americano (USD)</option>
+                  <option value="GBP">Libra esterlina (GBP)</option>
+                </select>
+              </label>
+            </div>
+            <p className="mt-4 rounded-2xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-500">
+              Preferências guardadas nesta sessão local do protótipo. A persistência em backend deve ficar para a fase Supabase completa.
+            </p>
+          </article>
+
+          <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
+            <div className="flex items-center gap-2">
+              <Globe2 size={20} className="text-violet-700" aria-hidden="true" />
+              <h2 className="section-title">Preferências</h2>
+            </div>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <label className="form-field">
+                <span>Tema</span>
+                <select value={preferences.theme} onChange={(event) => setPreferences({ ...preferences, theme: event.target.value })}>
+                  <option>Sistema</option>
+                  <option>Claro</option>
+                  <option>Escuro</option>
+                </select>
+              </label>
+              <label className="form-field">
+                <span>Idioma</span>
+                <select value={preferences.language} onChange={(event) => setPreferences({ ...preferences, language: event.target.value })}>
+                  <option>Português de Portugal</option>
+                </select>
+              </label>
+              <label className="form-field">
+                <span>Formato de data</span>
+                <select value={preferences.dateFormat} onChange={(event) => setPreferences({ ...preferences, dateFormat: event.target.value })}>
+                  <option>DD/MM/AAAA</option>
+                  <option>AAAA-MM-DD</option>
+                </select>
+              </label>
+            </div>
+          </article>
         </section>
 
         <section className="grid gap-5 xl:grid-cols-[1fr_1fr]">
@@ -195,8 +264,13 @@ function formatDate(value: string) {
 function SettingsCard({ icon: Icon, title, text }: { icon: ElementType; title: string; text: string }) {
   return (
     <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
-      <Icon size={22} className="text-violet-700" aria-hidden="true" />
-      <h2 className="mt-4 font-black text-slate-950">{title}</h2>
+      <div className="flex items-start justify-between gap-3">
+        <Icon size={22} className="text-violet-700" aria-hidden="true" />
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[0.62rem] font-black uppercase tracking-normal text-slate-500">
+          Informativo
+        </span>
+      </div>
+      <h3 className="mt-4 font-black text-slate-950">{title}</h3>
       <p className="mt-2 text-sm leading-6 text-slate-600">{text}</p>
     </article>
   );
