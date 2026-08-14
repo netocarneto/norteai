@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { confirmDeletion, explainDeletionBlock } from "@/lib/destructive-actions";
 import { accountName, categoryName, categoryTypes, euroCents, inferCategoryId, isDuplicateTransaction, markDataSourceUpdated, parseCsv, transactionTypeLabels, transactionTypes } from "@/lib/finance-engine";
+import { createRecordId } from "@/lib/record-id";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { CategoryType, TransactionRecord, TransactionType } from "@/types/finance";
 
@@ -75,7 +76,7 @@ export function TransactionsPage() {
       ...current,
       transactions: editingId
         ? current.transactions.map((item) => (item.id === editingId ? { ...normalized, id: editingId } : item))
-        : [{ ...normalized, id: `trx-${Date.now()}` }, ...current.transactions],
+        : [{ ...normalized, id: createRecordId() }, ...current.transactions],
     }));
     setDraft(emptyTransaction);
     setEditingId(null);
@@ -332,7 +333,7 @@ export function TransactionsPage() {
                 onClick={() => {
                   if (!categoryDraft.name) return;
                   if (!activeWorkspace) return;
-                  setState((current) => ({ ...current, categories: [...current.categories, { ...categoryDraft, workspaceId: activeWorkspace.id, id: `cat-${Date.now()}` }] }));
+                  setState((current) => ({ ...current, categories: [...current.categories, { ...categoryDraft, workspaceId: activeWorkspace.id, id: createRecordId() }] }));
                   setCategoryDraft({ name: "", type: "expense", icon: "tag", color: "#6d28d9" });
                 }}
               >
@@ -363,7 +364,7 @@ export function TransactionsPage() {
                 onClick={() => {
                   if (!ruleDraft.merchantKeyword || !ruleDraft.categoryId) return;
                   if (!activeWorkspace) return;
-                  setState((current) => ({ ...current, categoryRules: [...current.categoryRules, { ...ruleDraft, workspaceId: activeWorkspace.id, id: `rule-${Date.now()}` }] }));
+                  setState((current) => ({ ...current, categoryRules: [...current.categoryRules, { ...ruleDraft, workspaceId: activeWorkspace.id, id: createRecordId() }] }));
                   setRuleDraft({ merchantKeyword: "", categoryId: "" });
                 }}
               >

@@ -2,8 +2,10 @@
 
 /* eslint-disable @next/next/no-html-link-for-pages */
 
+import { useState } from "react";
 import { ArrowRight, BadgeEuro, Goal, Shield, Sparkles, UserRound } from "lucide-react";
 import { BrandMark } from "@/components/BrandMark";
+import { useFinanceState } from "@/hooks/use-finance-state";
 
 const steps = [
   { title: "Bem-vindo ao NorteAI", copy: "O teu copiloto financeiro inteligente.", icon: Sparkles },
@@ -14,6 +16,19 @@ const steps = [
 ];
 
 export function OnboardingPage() {
+  const { activateWorkspace, isRemoteBacked, isRemoteLoading, remoteError } = useFinanceState();
+  const [isActivatingFreelancer, setIsActivatingFreelancer] = useState(false);
+
+  async function handleActivateFreelancer() {
+    setIsActivatingFreelancer(true);
+    try {
+      await activateWorkspace("FREELANCER");
+      window.location.href = "/";
+    } finally {
+      setIsActivatingFreelancer(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[var(--color-bg)] px-4 py-8">
       <div className="mx-auto max-w-5xl">
@@ -32,6 +47,19 @@ export function OnboardingPage() {
                 Finalizar configuração
                 <ArrowRight size={18} aria-hidden="true" />
               </a>
+              <button
+                type="button"
+                className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white shadow-sm disabled:opacity-60"
+                disabled={isRemoteLoading || isActivatingFreelancer}
+                onClick={() => void handleActivateFreelancer()}
+              >
+                {isActivatingFreelancer ? "A ativar Freelancer..." : "Ativar Freelancer"}
+                <ArrowRight size={18} aria-hidden="true" />
+              </button>
+              <p className="mt-3 rounded-2xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-500">
+                {isRemoteBacked ? "Cria um workspace Freelancer separado no Supabase." : "Sem sessão Supabase, ativa apenas o protótipo local."}
+              </p>
+              {remoteError ? <p className="mt-3 rounded-2xl bg-rose-50 p-3 text-xs font-bold leading-5 text-rose-700">{remoteError}</p> : null}
             </div>
             <div className="grid gap-3">
               {steps.map((step, index) => {

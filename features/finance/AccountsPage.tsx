@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { confirmDeletion, explainDeletionBlock } from "@/lib/destructive-actions";
 import { accountTypeLabels, accountTypes, euro, ownershipTypeLabels } from "@/lib/finance-engine";
+import { createRecordId } from "@/lib/record-id";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { AccountType, FinancialAccountRecord, OwnershipType } from "@/types/finance";
 
@@ -35,7 +36,7 @@ export function AccountsPage() {
     const { ownershipPercentage, ...accountDraft } = draft;
     const now = new Date().toISOString();
     const account = { ...accountDraft, ownershipPercentage, workspaceId: activeWorkspace.id, updatedAt: now, createdAt: editingId ? accountDraft.createdAt : now };
-    const accountId = editingId ?? `acc-${Date.now()}`;
+    const accountId = editingId ?? createRecordId();
     setState((current) => ({
       ...current,
       accounts: editingId
@@ -46,7 +47,7 @@ export function AccountsPage() {
         : [
             ...current.accountOwnerships,
             {
-              id: `own-${Date.now()}`,
+              id: createRecordId(),
               workspaceId: activeWorkspace.id,
               accountId,
               memberId: current.workspaceMembers.find((member) => member.workspaceId === activeWorkspace.id)?.id ?? "member-diogo-personal",

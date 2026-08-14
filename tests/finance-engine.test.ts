@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   calculateNorteScore,
   calculateSummary,
+  defaultWorkspaceId,
   familyWorkspaceId,
   freelancerWorkspaceId,
   initialFinanceState,
@@ -12,6 +13,7 @@ import {
   parseCsv,
   scopeFinanceState,
 } from "../lib/finance-engine.ts";
+import type { FinanceState } from "../types/finance.ts";
 
 test("calculates the initial personal financial summary from registered data", () => {
   const summary = calculateSummary(initialFinanceState);
@@ -166,4 +168,126 @@ test("adds freelancer seed records to legacy personal-only local states", () => 
   assert.equal(freelancer.assets.length, 3);
   assert.equal(freelancer.liabilities.length, 1);
   assert.equal(freelancer.dataSources.some((source) => source.type === "manual" && source.status === "updated"), true);
+});
+
+test("does not inject prototype family or freelancer workspaces when normalizing remote Supabase state", () => {
+  const personalOnly = {
+    ...initialFinanceState,
+    activeWorkspaceId: defaultWorkspaceId,
+    workspaces: initialFinanceState.workspaces.filter((workspace) => workspace.id === defaultWorkspaceId),
+    workspaceMembers: initialFinanceState.workspaceMembers.filter((record) => record.workspaceId === defaultWorkspaceId),
+    accounts: initialFinanceState.accounts.filter((record) => record.workspaceId === defaultWorkspaceId),
+    accountOwnerships: initialFinanceState.accountOwnerships.filter((record) => record.workspaceId === defaultWorkspaceId),
+    categories: initialFinanceState.categories.filter((record) => record.workspaceId === defaultWorkspaceId),
+    categoryRules: initialFinanceState.categoryRules.filter((record) => record.workspaceId === defaultWorkspaceId),
+    transactions: initialFinanceState.transactions.filter((record) => record.workspaceId === defaultWorkspaceId),
+    assets: initialFinanceState.assets.filter((record) => record.workspaceId === defaultWorkspaceId),
+    liabilities: initialFinanceState.liabilities.filter((record) => record.workspaceId === defaultWorkspaceId),
+    investments: initialFinanceState.investments.filter((record) => record.workspaceId === defaultWorkspaceId),
+    financialGoals: initialFinanceState.financialGoals.filter((record) => record.workspaceId === defaultWorkspaceId),
+    financialScores: initialFinanceState.financialScores.filter((record) => record.workspaceId === defaultWorkspaceId),
+    financialSnapshots: initialFinanceState.financialSnapshots.filter((record) => record.workspaceId === defaultWorkspaceId),
+    dataSources: initialFinanceState.dataSources.filter((record) => record.workspaceId === defaultWorkspaceId),
+  };
+
+  const normalized = normalizeFinanceState(personalOnly, { seedPrototypeWorkspaces: false });
+
+  assert.deepEqual(normalized.workspaces.map((workspace) => workspace.type), ["PERSONAL"]);
+  assert.equal(normalized.accounts.some((record) => record.workspaceId === freelancerWorkspaceId), false);
+  assert.equal(normalized.transactions.some((record) => record.workspaceId === freelancerWorkspaceId), false);
+});
+
+test("keeps freelancer CRUD records isolated by freelancer workspace id", () => {
+  const workspaceId = freelancerWorkspaceId;
+  const accountId = "11111111-1111-4111-8111-111111111111";
+  const transactionId = "22222222-2222-4222-8222-222222222222";
+  const assetId = "33333333-3333-4333-8333-333333333333";
+  const liabilityId = "44444444-4444-4444-8444-444444444444";
+  const created: FinanceState = {
+    ...initialFinanceState,
+    activeWorkspaceId: workspaceId,
+    accounts: [
+      ...initialFinanceState.accounts,
+      {
+        id: accountId,
+        workspaceId,
+        name: "Conta teste freelancer",
+        institution: "Banco profissional",
+        accountType: "checking",
+        balance: 1000,
+        currency: "EUR",
+        ownershipType: "personal",
+        ownershipPercentage: 100,
+        source: "manual",
+        color: "#14b8a6",
+        icon: "briefcase",
+        createdAt: "2026-08-13T00:00:00.000Z",
+        updatedAt: "2026-08-13T00:00:00.000Z",
+      },
+    ],
+    transactions: [
+      {
+        id: transactionId,
+        workspaceId,
+        accountId,
+        date: "2026-08-13",
+        description: "Cliente teste",
+        merchant: "Cliente teste",
+        amount: 500,
+        currency: "EUR",
+        type: "income",
+        category: "Rendimentos profissionais",
+        source: "manual",
+        createdAt: "2026-08-13T00:00:00.000Z",
+        updatedAt: "2026-08-13T00:00:00.000Z",
+      },
+      ...initialFinanceState.transactions,
+    ],
+    assets: [
+      ...initialFinanceState.assets,
+      {
+        id: assetId,
+        workspaceId,
+        name: "Ativo profissional teste",
+        type: "valuables",
+        value: 2500,
+        currency: "EUR",
+        ownershipType: "personal",
+        ownershipPercentage: 100,
+        valuationDate: "2026-08-13",
+      },
+    ],
+    liabilities: [
+      ...initialFinanceState.liabilities,
+      {
+        id: liabilityId,
+        workspaceId,
+        name: "Obrigação profissional teste",
+        type: "personal_loan",
+        balance: 300,
+        monthlyPayment: 30,
+        interestRate: 0,
+        currency: "EUR",
+      },
+    ],
+  };
+
+  const freelancer = scopeFinanceState(created);
+  assert.equal(freelancer.accounts.find((record) => record.id === accountId)?.workspaceId, workspaceId);
+  assert.equal(freelancer.transactions.find((record) => record.id === transactionId)?.workspaceId, workspaceId);
+  assert.equal(freelancer.assets.find((record) => record.id === assetId)?.workspaceId, workspaceId);
+  assert.equal(freelancer.liabilities.find((record) => record.id === liabilityId)?.workspaceId, workspaceId);
+
+  const deleted = scopeFinanceState({
+    ...created,
+    accounts: created.accounts.filter((record) => record.id !== accountId),
+    transactions: created.transactions.filter((record) => record.id !== transactionId),
+    assets: created.assets.filter((record) => record.id !== assetId),
+    liabilities: created.liabilities.filter((record) => record.id !== liabilityId),
+  });
+
+  assert.equal(deleted.accounts.some((record) => record.id === accountId), false);
+  assert.equal(deleted.transactions.some((record) => record.id === transactionId), false);
+  assert.equal(deleted.assets.some((record) => record.id === assetId), false);
+  assert.equal(deleted.liabilities.some((record) => record.id === liabilityId), false);
 });

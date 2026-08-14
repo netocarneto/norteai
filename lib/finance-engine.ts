@@ -14,6 +14,7 @@ import type {
   TransactionType,
   WorkspaceType,
 } from "@/types/finance";
+import { createRecordId } from "./record-id.ts";
 
 export const euro = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
 export const euroCents = new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" });
@@ -249,15 +250,16 @@ export const initialFinanceState: FinanceState = {
 
 const categoryNamePtById: Record<string, string> = Object.fromEntries(baseCategories.map((category) => [category.id, category.name]));
 
-export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceState): FinanceState {
+export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceState, options: { seedPrototypeWorkspaces?: boolean } = {}): FinanceState {
   const state = rawState as FinanceState;
+  const seedWorkspaceIds = options.seedPrototypeWorkspaces === false ? [] : seededWorkspaceIds;
   const users = state.users?.length ? state.users : initialFinanceState.users;
-  const workspaces = (state.workspaces?.length ? state.workspaces : initialFinanceState.workspaces).map((workspace) => ({
+  const workspaces = (state.workspaces?.length ? state.workspaces : options.seedPrototypeWorkspaces === false ? [] : initialFinanceState.workspaces).map((workspace) => ({
     ...workspace,
     name: workspace.id === familyWorkspaceId ? "Família" : workspace.name,
   }));
-  const activeWorkspaceId = state.activeWorkspaceId && workspaces.some((workspace) => workspace.id === state.activeWorkspaceId) ? state.activeWorkspaceId : defaultWorkspaceId;
-  const workspaceMembers = state.workspaceMembers?.length ? state.workspaceMembers : initialFinanceState.workspaceMembers;
+  const activeWorkspaceId = state.activeWorkspaceId && workspaces.some((workspace) => workspace.id === state.activeWorkspaceId) ? state.activeWorkspaceId : workspaces[0]?.id ?? defaultWorkspaceId;
+  const workspaceMembers = state.workspaceMembers?.length ? state.workspaceMembers : options.seedPrototypeWorkspaces === false ? [] : initialFinanceState.workspaceMembers;
 
   const categories = normalizeCategories(state.categories, workspaces.map((workspace) => workspace.id));
   const categoryMap = Object.fromEntries(categories.map((category) => [category.id, category]));
@@ -283,7 +285,7 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
         }
         return normalized;
       })
-    : initialFinanceState.dataSources;
+    : options.seedPrototypeWorkspaces === false ? [] : initialFinanceState.dataSources;
   const accounts = withWorkspaceSeedRecords(
     (state.accounts ?? []).map((account) => ({
       ...account,
@@ -299,10 +301,10 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
       updatedAt: account.updatedAt ?? account.createdAt ?? createdAt,
     })),
     initialFinanceState.accounts,
-    seededWorkspaceIds,
+    seedWorkspaceIds,
   );
-  const accountOwnerships = withWorkspaceSeedRecords(state.accountOwnerships?.length ? state.accountOwnerships : initialFinanceState.accountOwnerships, initialFinanceState.accountOwnerships, seededWorkspaceIds);
-  const categoryRules = withWorkspaceSeedRecords((state.categoryRules ?? []).map((rule) => ({ ...rule, workspaceId: rule.workspaceId ?? defaultWorkspaceId })), initialFinanceState.categoryRules, seededWorkspaceIds);
+  const accountOwnerships = withWorkspaceSeedRecords(state.accountOwnerships?.length ? state.accountOwnerships : options.seedPrototypeWorkspaces === false ? [] : initialFinanceState.accountOwnerships, initialFinanceState.accountOwnerships, seedWorkspaceIds);
+  const categoryRules = withWorkspaceSeedRecords((state.categoryRules ?? []).map((rule) => ({ ...rule, workspaceId: rule.workspaceId ?? defaultWorkspaceId })), initialFinanceState.categoryRules, seedWorkspaceIds);
   const assets = withWorkspaceSeedRecords(
     (state.assets ?? []).map((asset) => ({
       ...asset,
@@ -314,11 +316,11 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
       valuationDate: asset.valuationDate ?? "2026-08-01",
     })),
     initialFinanceState.assets,
-    seededWorkspaceIds,
+    seedWorkspaceIds,
   );
-  const liabilities = withWorkspaceSeedRecords((state.liabilities ?? []).map((liability) => normalizeLiability(liability)), initialFinanceState.liabilities, seededWorkspaceIds);
-  const financialScores = withWorkspaceSeedRecords(state.financialScores?.length ? state.financialScores.map((score) => ({ ...score, workspaceId: score.workspaceId ?? defaultWorkspaceId })) : initialFinanceState.financialScores, initialFinanceState.financialScores, seededWorkspaceIds);
-  const financialSnapshots = withWorkspaceSeedRecords(state.financialSnapshots?.length ? state.financialSnapshots.map((snapshot) => normalizeSnapshot(snapshot)) : initialFinanceState.financialSnapshots, initialFinanceState.financialSnapshots, seededWorkspaceIds);
+  const liabilities = withWorkspaceSeedRecords((state.liabilities ?? []).map((liability) => normalizeLiability(liability)), initialFinanceState.liabilities, seedWorkspaceIds);
+  const financialScores = withWorkspaceSeedRecords(state.financialScores?.length ? state.financialScores.map((score) => ({ ...score, workspaceId: score.workspaceId ?? defaultWorkspaceId })) : options.seedPrototypeWorkspaces === false ? [] : initialFinanceState.financialScores, initialFinanceState.financialScores, seedWorkspaceIds);
+  const financialSnapshots = withWorkspaceSeedRecords(state.financialSnapshots?.length ? state.financialSnapshots.map((snapshot) => normalizeSnapshot(snapshot)) : options.seedPrototypeWorkspaces === false ? [] : initialFinanceState.financialSnapshots, initialFinanceState.financialSnapshots, seedWorkspaceIds);
 
   return {
     ...initialFinanceState,
@@ -331,7 +333,7 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
     accountOwnerships,
     categories,
     categoryRules,
-    transactions: withWorkspaceSeedRecords(transactions, initialFinanceState.transactions, seededWorkspaceIds),
+    transactions: withWorkspaceSeedRecords(transactions, initialFinanceState.transactions, seedWorkspaceIds),
     assets,
     liabilities,
     investments: (state.investments ?? []).map((investment) => ({
@@ -344,10 +346,10 @@ export function normalizeFinanceState(rawState: Partial<FinanceState> | FinanceS
       source: investment.source ?? "manual",
       updatedAt: investment.updatedAt ?? createdAt,
     })),
-    financialGoals: state.financialGoals?.length ? state.financialGoals.map((goal) => ({ ...goal, workspaceId: goal.workspaceId ?? defaultWorkspaceId })) : initialFinanceState.financialGoals,
+    financialGoals: state.financialGoals?.length ? state.financialGoals.map((goal) => ({ ...goal, workspaceId: goal.workspaceId ?? defaultWorkspaceId })) : options.seedPrototypeWorkspaces === false ? [] : initialFinanceState.financialGoals,
     financialScores,
     financialSnapshots,
-    dataSources: withWorkspaceSeedRecords(dataSources, initialFinanceState.dataSources, seededWorkspaceIds),
+    dataSources: withWorkspaceSeedRecords(dataSources, initialFinanceState.dataSources, seedWorkspaceIds),
   };
 }
 
@@ -471,15 +473,15 @@ export function parseCsv(csvText: string, state: FinanceState, accountId: string
 
   if (dateIndex < 0 || descriptionIndex < 0 || amountIndex < 0) return [];
 
-  const batchId = `batch-${Date.now()}`;
+  const batchId = createRecordId();
 
-  return lines.filter(Boolean).map((line, index) => {
+  return lines.filter(Boolean).map((line) => {
     const cells = line.split(",").map((item) => item.trim());
     const amount = Number(cells[amountIndex].replace(",", "."));
     const merchant = cells[descriptionIndex];
     const categoryId = inferCategoryId(state, merchant);
     return {
-      id: `csv-${Date.now()}-${index}`,
+      id: createRecordId(),
       workspaceId: state.activeWorkspaceId,
       accountId,
       date: cells[dateIndex],
@@ -515,7 +517,7 @@ export function markDataSourceUpdated(
   const lastSyncAt = input.lastSyncAt ?? new Date().toISOString();
   const existing = state.dataSources.find((source) => source.workspaceId === input.workspaceId && (source.type === input.type || source.provider === input.provider));
   const updatedSource = {
-    id: existing?.id ?? `ds-${input.type}-${Date.now()}`,
+    id: existing?.id ?? createRecordId(),
     workspaceId: input.workspaceId,
     type: input.type,
     provider: input.provider,

@@ -7,6 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { EmptyState } from "@/components/EmptyState";
 import { confirmDeletion } from "@/lib/destructive-actions";
 import { euro, investmentTypeLabels, investmentTypes } from "@/lib/finance-engine";
+import { createRecordId } from "@/lib/record-id";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { InvestmentRecord, InvestmentType } from "@/types/finance";
 
@@ -49,7 +50,7 @@ export function InvestmentsPage() {
       ...current,
       investments: editingId
         ? current.investments.map((item) => (item.id === editingId ? { ...investment, id: editingId } : item))
-        : [...current.investments, { ...investment, id: `inv-${Date.now()}` }],
+        : [...current.investments, { ...investment, id: createRecordId() }],
     }));
     setDraft(emptyInvestment);
     setEditingId(null);

@@ -5,6 +5,7 @@ import { Edit3, Landmark, Plus, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { confirmDeletion, explainDeletionBlock } from "@/lib/destructive-actions";
 import { assetTypeLabels, assetTypes, euro, liabilityTypeLabels, liabilityTypes } from "@/lib/finance-engine";
+import { createRecordId } from "@/lib/record-id";
 import { useFinanceState } from "@/hooks/use-finance-state";
 import type { AssetRecord, AssetType, LiabilityRecord, LiabilityType } from "@/types/finance";
 
@@ -46,7 +47,7 @@ export function WealthStageOnePage() {
     const asset = { ...assetDraft, workspaceId: activeWorkspace.id };
     setState((current) => ({
       ...current,
-      assets: editingAsset ? current.assets.map((item) => (item.id === editingAsset ? { ...asset, id: editingAsset } : item)) : [...current.assets, { ...asset, id: `asset-${Date.now()}` }],
+      assets: editingAsset ? current.assets.map((item) => (item.id === editingAsset ? { ...asset, id: editingAsset } : item)) : [...current.assets, { ...asset, id: createRecordId() }],
     }));
     setAssetDraft(isFreelancer ? { ...emptyAsset, type: "valuables" } : emptyAsset);
     setEditingAsset(null);
@@ -57,7 +58,7 @@ export function WealthStageOnePage() {
     const liability = { ...liabilityDraft, type: liabilityDraftType, workspaceId: activeWorkspace.id };
     setState((current) => ({
       ...current,
-      liabilities: editingLiability ? current.liabilities.map((item) => (item.id === editingLiability ? { ...liability, id: editingLiability } : item)) : [...current.liabilities, { ...liability, id: `lia-${Date.now()}` }],
+      liabilities: editingLiability ? current.liabilities.map((item) => (item.id === editingLiability ? { ...liability, id: editingLiability } : item)) : [...current.liabilities, { ...liability, id: createRecordId() }],
     }));
     setLiabilityDraft(isFreelancer ? { ...emptyLiability, type: "personal_loan" } : emptyLiability);
     setEditingLiability(null);

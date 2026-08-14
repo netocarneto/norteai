@@ -28,10 +28,12 @@ const defaultPreferences = { theme: "Sistema", language: "Português de Portugal
 type StoredSettings = Partial<{ profile: typeof defaultProfile; preferences: typeof defaultPreferences }>;
 
 export function SettingsPage() {
-  const { state, activeWorkspace, workspaces, setActiveWorkspace } = useFinanceState();
+  const { state, activeWorkspace, workspaces, setActiveWorkspace, activateWorkspace, isRemoteBacked, isRemoteLoading, remoteError } = useFinanceState();
   const [profile, setProfile] = useState(defaultProfile);
   const [preferences, setPreferences] = useState(defaultPreferences);
+  const [activatingWorkspace, setActivatingWorkspace] = useState<"FAMILY" | "FREELANCER" | null>(null);
   const hasLoadedSettings = useRef(false);
+  const hasFreelancerWorkspace = workspaces.some((workspace) => workspace.type === "FREELANCER");
 
   useEffect(() => {
     window.queueMicrotask(() => {
@@ -131,6 +133,9 @@ export function SettingsPage() {
             <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
               O NorteAI Pessoal está fechado. Família e Freelancer estão disponíveis como módulos de protótipo geridos pelo utilizador principal.
             </p>
+            <p className="mt-3 rounded-2xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-500">
+              {isRemoteBacked ? "Ligado ao Supabase: workspaces e dados financeiros usam isolamento por workspace." : "Modo local: os módulos usam dados deste dispositivo até existir sessão Supabase."}
+            </p>
             <div className="mt-4 divide-y divide-slate-100">
               {workspaces.map((workspace) => (
                 <div key={workspace.id} className="flex items-center justify-between gap-4 py-3">
@@ -155,6 +160,26 @@ export function SettingsPage() {
                 </div>
               ))}
             </div>
+            {!hasFreelancerWorkspace ? (
+              <div className="mt-4 rounded-3xl bg-slate-50 p-4 ring-1 ring-slate-100">
+                <p className="font-black text-slate-950">Freelancer</p>
+                <p className="mt-1 text-sm font-semibold leading-6 text-slate-500">
+                  Cria um workspace profissional separado para contas, movimentos, património, obrigações e fontes de dados da atividade.
+                </p>
+                <button
+                  type="button"
+                  className="primary-button mt-4 w-fit"
+                  disabled={isRemoteLoading || activatingWorkspace === "FREELANCER"}
+                  onClick={() => {
+                    setActivatingWorkspace("FREELANCER");
+                    void activateWorkspace("FREELANCER").finally(() => setActivatingWorkspace(null));
+                  }}
+                >
+                  {activatingWorkspace === "FREELANCER" ? "A ativar..." : "Ativar Freelancer"}
+                </button>
+              </div>
+            ) : null}
+            {remoteError ? <p className="mt-3 rounded-2xl bg-rose-50 p-3 text-xs font-bold leading-5 text-rose-700">{remoteError}</p> : null}
           </article>
 
           <article className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-slate-100">
