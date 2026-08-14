@@ -86,7 +86,7 @@ export function SettingsPage() {
               </label>
             </div>
             <p className="mt-4 rounded-2xl bg-slate-50 p-3 text-xs font-bold leading-5 text-slate-500">
-              Guardado automaticamente neste dispositivo. A persistência em backend deve ficar para a fase Supabase completa.
+              Guardado automaticamente neste dispositivo. Os dados financeiros usam Supabase quando existe sessão autenticada.
             </p>
           </article>
 
